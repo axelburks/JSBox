@@ -94,5 +94,6 @@ function download() {
     })
   } else {
     $ui.toast("请输入正确的下载地址格式！")
+    $("button").hidden = false
   }
 }
