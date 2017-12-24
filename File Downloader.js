@@ -4,8 +4,6 @@
 3.通过 url scheme 运行，可指定 auto 自动开始下载
 jsbox://run?name=File%20Downloader&url=https://dldir1.qq.com/qqfile/qq/TIM2.1.0/22747/TIM2.1.0.exe&auto=true
 
- 脚本特点：
-
 */
 
 $ui.render({
@@ -16,7 +14,7 @@ $ui.render({
     {
       type: "label",
       props: {
-        text: "输入地址：",
+        text: "下载地址：",
         align: $align.lefts
       },
       layout: function(make, view) {
@@ -84,16 +82,15 @@ function download() {
     $ui.toast("开始下载: " + url)
     $ui.loading(true)
     $http.download({
-        url: url,
-        progress: function (bytesWritten, totalBytes) {
-          var percentage = bytesWritten * 1.0 / totalBytes
-        },
-        handler: function(resp) {
-          $ui.loading(false)
-          $share.sheet(resp.data)
-        }
-      })
-
+      url: url,
+      progress: function (bytesWritten, totalBytes) {
+        var percentage = bytesWritten * 1.0 / totalBytes
+      },
+      handler: function(resp) {
+        $ui.loading(false)
+        $share.sheet(resp.data)
+      }
+    })
   } else {
     $ui.toast("请输入正确的下载地址格式！")
   }
