@@ -4,6 +4,7 @@
 3.通过 url scheme 运行，可指定 auto 自动开始下载
 jsbox://run?name=File%20Downloader&url=https://dldir1.qq.com/qqfile/qq/TIM2.1.0/22747/TIM2.1.0.exe&auto=true
 
+作者联系：https://t.me/axel_burks
 */
 
 $ui.render({

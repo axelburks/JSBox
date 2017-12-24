@@ -4,12 +4,12 @@
 2.主程序内直接运行，自动填充剪贴板链接
 3.通过 url scheme 运行
 
+作者联系：https://t.me/axel_burks
 */
 
-var auto = $context.query.auto || ($context.text ? true : false)
 var content = $context.query.url || $context.text || ($clipboard.text ? $clipboard.text : null)
 if(content != null){
-	var url = content.match(/^(https?|magnet):\/\/[^\s]+/i)
+	var url = content.match(/^(https?:\/\/|magnet:)[^\s]+/i)[0]
 	var thunder_url = content.match(/^thunder:\/\/[^\s]+/i)
 	if (url) {
 		var scheme = "thunder://" + $text.base64Encode(url)
