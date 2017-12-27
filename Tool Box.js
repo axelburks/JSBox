@@ -6,6 +6,7 @@
 
 作者联系：https://t.me/axel_burks
 */
+Version = 1.0
 
 const
   DeviceSIZE = $device.info.screen,
@@ -295,6 +296,33 @@ function searchItem(query) {
   var result = extensions.filter(isContain)
   updateItem(result)
 }
+
+function checkVersion() {
+  $http.get({
+    url: "https://raw.githubusercontent.com/axelburks/JSBox/master/updateInfo",
+    handler: function(resp) {
+      var afterVersion = resp.data["Tool Box"].version;
+      var msg = resp.data["Tool Box"].msg;
+      if (afterVersion > version) {
+        $ui.alert({
+          title: "检测到新的版本！V" + afterVersion,
+          message: "是否更新?\n" + msg,
+          actions: [{
+            title: "更新",
+            handler: function() {
+              var url = "jsbox://install?url=https://raw.githubusercontent.com/axelburks/JSBox/master/Tool%20Box.js&name=Tool Box&icon=icon_102.png";
+              $app.openURL(encodeURI(url));
+              $app.close()
+            }
+          }, {
+            title: "取消"
+          }]
+        })
+      }
+    }
+  })
+}
+
 
 Array.prototype.move = function(from, to) {
   var object = this[from]

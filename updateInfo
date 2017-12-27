@@ -1,0 +1,14 @@
+{
+  "Tool Box":{
+    "version": 1.0,
+    "msg": "更新说明：\n1.支持字母检索中文\n2.支持非连续关键字检索"
+  },
+  "XQRcode":{
+    "version": 0.8,
+    "msg": "更新说明：\n1.增加支持迅雷\n2.修复微信、QQ链接"
+  },
+  "File Downloader":{
+    "version": 1.0,
+    "msg": "更新说明：\n1.通过 url scheme 运行，可指定 auto 自动开始下载：\n jsbox://run?name=File%20Downloader&downloadUrl=https://domain.com/A.exe&auto=true"
+  }
+}
