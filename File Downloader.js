@@ -1,15 +1,16 @@
 /*
+文件下载工具
 1.通过 share extension 运行，直接下载链接内容
 2.主程序内直接运行，自动填充剪贴板链接
 3.通过 url scheme 运行，可指定 auto 自动开始下载
-jsbox://run?name=File%20Downloader&url=https://dldir1.qq.com/qqfile/qq/TIM2.1.0/22747/TIM2.1.0.exe&auto=true
+jsbox://run?name=File%20Downloader&downloadUrl=https://dldir1.qq.com/qqfile/qq/TIM2.1.0/22747/TIM2.1.0.exe&auto=true
 
 作者联系：https://t.me/axel_burks
 */
 
 $ui.render({
   props: {
-    title: "Downloader"
+    title: "File Downloader"
   },
   views: [
     {
@@ -25,9 +26,9 @@ $ui.render({
       }
     },
     {
-      id: "downloadButton",
       type: "button",
       props: {
+        id: "downloadButton",
         title: "下载"
       },
       layout: function(make) {
@@ -42,9 +43,9 @@ $ui.render({
       }
     },
     {
-      id: "inputUrl",
       type: "text",
       props: {
+        id: "inputUrl",
         type: $kbType.url,
         bgcolor: $rgba(100, 100, 100, 0.2),
         radius: 12
@@ -57,28 +58,24 @@ $ui.render({
       events: {
         ready: function(sender) {
           var auto = $context.query.auto || ($context.text ? true : false)
-          var content = $context.query.url || $context.text || ($clipboard.text ? $clipboard.text : null)
+          var content = $context.query.downloadUrl || $context.text || ($clipboard.text ? $clipboard.text : null)
           if(content != null){
             sender.text = content
           }
           if(auto){
-            $("button").hidden = true
+            // $("downloadButton").hidden = true
             download()
           } else {
             sender.focus()
           }
         }
-        // returned: function(sender) {
-        //   download()
-        // }
       }
     }
   ]
 })
 
 function download() {
-  // var url = $("text").text
-  var url = $("text").text.match(/^https?:\/\/[^\s]+/i)
+  var url = $("inputUrl").text.match(/^https?:\/\/[^\s]+/i)
   if (url) {
     $ui.toast("开始下载: " + url)
     $ui.loading(true)
@@ -90,10 +87,15 @@ function download() {
       handler: function(resp) {
         $ui.loading(false)
         $share.sheet(resp.data)
+        $delay(20, function() {
+          $context.close()
+          $app.close()
+        })
       }
     })
   } else {
     $ui.toast("请输入正确的下载地址格式！")
-    $("button").hidden = false
+    $("downloadButton").hidden = false
+    $("inputUrl").focus()
   }
 }

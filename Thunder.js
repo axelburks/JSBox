@@ -7,7 +7,7 @@
 作者联系：https://t.me/axel_burks
 */
 
-var content = $context.query.url || $context.text || ($clipboard.text ? $clipboard.text : null)
+var content = $context.query.downloadUrl || $context.text || ($clipboard.text ? $clipboard.text : null)
 if(content != null){
 	var url = content.match(/^(https?:\/\/|magnet:)[^\s]+/i)[0]
 	var thunder_url = content.match(/^thunder:\/\/[^\s]+/i)
