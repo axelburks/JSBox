@@ -11,7 +11,18 @@
 */
 var version = 0.8
 
-var autoUpdate = $context.query.length || ($context.text ? false : true)
+var autoUpdate = $context.image ? false : true
+Object.size = function(obj) {
+  var size = 0, key;
+  for (key in obj) {
+      if (obj.hasOwnProperty(key)) size++;
+  }
+  return size;
+};
+if (autoUpdate == true && Object.size($context.query) > 0) {
+  autoUpdate = false
+}
+
 var qr = $context.image || ($clipboard.image ? $clipboard.image.image : null)
 if (qr == null) {
   $qrcode.scan({
@@ -31,7 +42,7 @@ if (qr == null) {
   }
 }
 
-if(autoUpdate == true){
+if (autoUpdate == true) {
   checkVersion()
 }
 
@@ -79,7 +90,7 @@ function showResult(text, runningExt) {
     $app.openURL(scheme)
     if (runningExt)
       $context.close()
-  } else if(text.match(/^magnet:[^\s]+/i)){
+  } else if (text.match(/^magnet:[^\s]+/i)) {
     var magnet_link = text.match(/^magnet:[^\s]+/i)[0]
     $app.openURL("thunder://" + $text.base64Encode(magnet_link))
     if (runningExt)

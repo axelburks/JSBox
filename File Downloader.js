@@ -9,7 +9,18 @@ jsbox://run?name=File%20Downloader&downloadUrl=https://domain.com/A.exe&auto=tru
 */
 var version = 1.1
 
-var autoUpdate = $context.query.length || ($context.text ? false : true)
+var autoUpdate = $context.text ? false : true
+Object.size = function(obj) {
+  var size = 0, key;
+  for (key in obj) {
+      if (obj.hasOwnProperty(key)) size++;
+  }
+  return size;
+};
+if (autoUpdate == true && Object.size($context.query) > 0) {
+  autoUpdate = false
+}
+
 $ui.render({
   props: {
     title: "File Downloader"
@@ -61,10 +72,10 @@ $ui.render({
         ready: function(sender) {
           var auto = $context.query.auto || ($context.text ? true : false)
           var content = $context.query.downloadUrl || $context.text || ($clipboard.text ? $clipboard.text : null)
-          if(content != null){
+          if (content != null) {
             sender.text = content
           }
-          if(auto){
+          if (auto) {
             // $("downloadButton").hidden = true
             download(true)
           } else {
@@ -76,7 +87,7 @@ $ui.render({
   ]
 })
 
-if(autoUpdate == true){
+if (autoUpdate == true) {
   checkVersion()
 }
 
@@ -93,7 +104,7 @@ function download(ext) {
       handler: function(resp) {
         $ui.loading(false)
         $share.sheet(resp.data)
-        if(ext){
+        if (ext) {
           $delay(25, function() {
             $context.close()
             $app.close()

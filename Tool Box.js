@@ -44,7 +44,7 @@ $ui.render({
       },
       events: {
         didBeginEditing: function(sender) {
-          if(listView.data.length != extensions.length){
+          if (listView.data.length != extensions.length) {
             updateItem(extensions)
           }
         },
@@ -161,7 +161,7 @@ for (var i = 0; i < addins.length; i++) {
 }
 var listView = $("list")
 for (var i = 0; i < extensions.length; i++) {
-  if($file.extensions.indexOf(extensions[i]) === -1){
+  if ($file.extensions.indexOf(extensions[i]) === -1) {
     extensions.splice(i, 1)
   }
 }
