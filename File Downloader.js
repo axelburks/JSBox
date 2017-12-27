@@ -64,7 +64,7 @@ $ui.render({
           }
           if(auto){
             // $("downloadButton").hidden = true
-            download()
+            download(true)
           } else {
             sender.focus()
           }
@@ -74,7 +74,7 @@ $ui.render({
   ]
 })
 
-function download() {
+function download(ext) {
   var url = $("inputUrl").text.match(/^https?:\/\/[^\s]+/i)
   if (url) {
     $ui.toast("开始下载: " + url)
@@ -87,10 +87,12 @@ function download() {
       handler: function(resp) {
         $ui.loading(false)
         $share.sheet(resp.data)
-        $delay(20, function() {
-          $context.close()
-          $app.close()
-        })
+        if(ext){
+          $delay(25, function() {
+            $context.close()
+            $app.close()
+          })
+        }
       }
     })
   } else {
