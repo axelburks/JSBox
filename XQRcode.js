@@ -9,7 +9,9 @@
 
 作者联系：https://t.me/axel_burks
 */
+var version = 0.8
 
+var autoUpdate = $context.query.length || ($context.text ? false : true)
 var qr = $context.image || ($clipboard.image ? $clipboard.image.image : null)
 if (qr == null) {
   $qrcode.scan({
@@ -27,6 +29,10 @@ if (qr == null) {
   } else {
     showWarning("run through Share Extension", true)
   }
+}
+
+if(autoUpdate == true){
+  checkVersion()
 }
 
 function isContains(str, regxstr) {
@@ -108,4 +114,30 @@ $ui.alert({
     }
   }]
 })
+}
+
+function checkVersion() {
+  $http.get({
+    url: "https://raw.githubusercontent.com/axelburks/JSBox/master/updateInfo",
+    handler: function(resp) {
+      var afterVersion = resp.data["XQRcode"]["version"];
+      var msg = resp.data["XQRcode"]["msg"];
+      if (afterVersion > version) {
+        $ui.alert({
+          title: "检测到新的版本！V" + afterVersion,
+          message: "是否更新?\n" + msg,
+          actions: [{
+            title: "更新",
+            handler: function() {
+              var url = "jsbox://install?url=https://raw.githubusercontent.com/axelburks/JSBox/master/Tool%20Box.js&name=XQRcode&icon=icon_102.png";
+              $app.openURL(encodeURI(url));
+              $app.close()
+            }
+          }, {
+            title: "取消"
+          }]
+        })
+      }
+    }
+  })
 }

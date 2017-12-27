@@ -7,7 +7,9 @@ jsbox://run?name=File%20Downloader&downloadUrl=https://domain.com/A.exe&auto=tru
 
 作者联系：https://t.me/axel_burks
 */
+var version = 1.1
 
+var autoUpdate = $context.query.length || ($context.text ? false : true)
 $ui.render({
   props: {
     title: "File Downloader"
@@ -74,6 +76,10 @@ $ui.render({
   ]
 })
 
+if(autoUpdate == true){
+  checkVersion()
+}
+
 function download(ext) {
   var url = $("inputUrl").text.match(/^https?:\/\/[^\s]+/i)
   if (url) {
@@ -100,4 +106,30 @@ function download(ext) {
     $("downloadButton").hidden = false
     $("inputUrl").focus()
   }
+}
+
+function checkVersion() {
+  $http.get({
+    url: "https://raw.githubusercontent.com/axelburks/JSBox/master/updateInfo",
+    handler: function(resp) {
+      var afterVersion = resp.data["File Downloader"]["version"];
+      var msg = resp.data["File Downloader"]["msg"];
+      if (afterVersion > version) {
+        $ui.alert({
+          title: "检测到新的版本！V" + afterVersion,
+          message: "是否更新?\n" + msg,
+          actions: [{
+            title: "更新",
+            handler: function() {
+              var url = "jsbox://install?url=https://raw.githubusercontent.com/axelburks/JSBox/master/Tool%20Box.js&name=File Downloader&icon=icon_102.png";
+              $app.openURL(encodeURI(url));
+              $app.close()
+            }
+          }, {
+            title: "取消"
+          }]
+        })
+      }
+    }
+  })
 }

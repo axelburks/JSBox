@@ -6,14 +6,9 @@
 
 作者联系：https://t.me/axel_burks
 */
-Version = 1.0
+var version = 1.1
 
-const
-  DeviceSIZE = $device.info.screen,
-  LocalDataPath = "drive://ToolBox.json";
-
-var 
-  extensions = $cache.get("extensions") || []
+var extensions = $cache.get("extensions") || []
 
 if ($app.env != $env.app) {
   $ui.menu({
@@ -97,8 +92,8 @@ $ui.render({
             props: {
               id: "ext",
               titleColor: $color("black"),
-              //titleEdgeInsets: $insets(0, 0, 0, 0),
-              imageEdgeInsets: $insets(0, 0, 0, 50),
+              titleEdgeInsets: $insets(0, 15, 0, 0),
+              imageEdgeInsets: $insets(0, 0, 0, 15),
               //contentEdgeInsets: $insets(0, 100, 0, 0),
               bgcolor: $rgba(100, 100, 100, 0.1),
               align: $align.center
@@ -106,7 +101,7 @@ $ui.render({
             layout: function (make, view) {
               make.left.right.inset(10)
               make.top.inset(5)
-              make.width.equalTo(DeviceSIZE.width - 40)
+              make.width.equalTo($device.info.screen.width - 40)
               make.height.equalTo(40)
             },
             events: {
@@ -165,6 +160,12 @@ for (var i = 0; i < addins.length; i++) {
   ext_icon[addins[i].name.replace('.js', '')] = addins[i].icon.replace('.png', '').replace('icon_', '')
 }
 var listView = $("list")
+for (var i = 0; i < extensions.length; i++) {
+  if($file.extensions.indexOf(extensions[i]) === -1){
+    extensions.splice(i, 1)
+  }
+}
+saveItems()
 updateItem(extensions)
 
 function updateItem(data) {
@@ -301,8 +302,8 @@ function checkVersion() {
   $http.get({
     url: "https://raw.githubusercontent.com/axelburks/JSBox/master/updateInfo",
     handler: function(resp) {
-      var afterVersion = resp.data["Tool Box"].version;
-      var msg = resp.data["Tool Box"].msg;
+      var afterVersion = resp.data["Tool Box"]["version"];
+      var msg = resp.data["Tool Box"]["msg"];
       if (afterVersion > version) {
         $ui.alert({
           title: "检测到新的版本！V" + afterVersion,
@@ -329,6 +330,8 @@ Array.prototype.move = function(from, to) {
   this.splice(from, 1)
   this.splice(to, 0, object)
 }
+
+checkVersion()
 
 var PinYin = {  
   "a": "\u554a\u963f\u9515",  
