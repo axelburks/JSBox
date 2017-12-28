@@ -9,6 +9,7 @@
 var version = 1.1
 
 var extensions = $cache.get("extensions") || []
+const DeviceSIZE = $device.info.screen
 
 if ($app.env != $env.app) {
   $ui.menu({
@@ -19,6 +20,8 @@ if ($app.env != $env.app) {
   })
   return
 }
+
+const runIcon = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAvUlEQVQ4T6WT0Q3CMAxEzxvBBlwn6QiM0G7QbgAbsIHLBrABbAATGFlKUEuVpin+iSLlXnT2WfBnyVivqjWAgeRjLfcLUNUDAA3CBkBP8pUDpQCuc/GR5HkJsgSIugFAS9LPWa0BRNEpgCb9KQFEWx3JNlJLAVF3I7n3yyaAmd2rqtoVA8zsLSINyW6LhR6AiyfZyFows6uI1Kl0JgFm9hQRD9KlKEjBp4/K45yt32XyffARZXdg1sTsV4kHH8DdXxEwdimcAAAAAElFTkSuQmCC"
 
 $ui.render({
   props: {
@@ -88,21 +91,80 @@ $ui.render({
         separatorHidden: true,
         template: [
           {
-            type: "button",
+            type: "view",
             props: {
-              id: "ext",
-              titleColor: $color("black"),
-              titleEdgeInsets: $insets(0, 15, 0, 0),
-              imageEdgeInsets: $insets(0, 0, 0, 15),
-              //contentEdgeInsets: $insets(0, 100, 0, 0),
+              id: "itemView",
               bgcolor: $rgba(100, 100, 100, 0.1),
-              align: $align.center
+              radius: 5
             },
             layout: function (make, view) {
               make.left.right.inset(10)
               make.top.inset(5)
-              make.width.equalTo($device.info.screen.width - 40)
+              make.width.equalTo(DeviceSIZE.width - 40)
               make.height.equalTo(40)
+            }
+          },
+          {
+            type: "button",
+            props: {
+              id: "icon",
+              //imageEdgeInsets: $insets(0, (DeviceSIZE.width - 40)/4, 0, 0),
+              //contentEdgeInsets: $insets(0, 100, 0, 0),
+              bgcolor: $color("clear")
+            },
+            layout: function (make, view) {
+              var preView = $("itemView")
+              make.top.equalTo(preView.top).offset(0)
+              make.left.equalTo(preView.left).offset(0)
+              make.height.equalTo(preView.height)
+              make.width.equalTo((DeviceSIZE.width - 40)/5)
+            }
+          },
+          {
+            type: "button",
+            props: {
+              id: "run",
+              src: runIcon,
+              bgcolor: $color("clear")
+            },
+            layout: function (make, view) {
+              var preView = $("itemView")
+              make.top.equalTo(preView.top).offset(0)
+              make.right.equalTo(preView.right).offset(0)
+              make.height.equalTo(preView.height)
+              make.width.equalTo((DeviceSIZE.width - 40)/7)
+            }
+          },
+          {
+            type: "label",
+            props: {
+              id: "name",
+              textColor: $color("black"),
+              autoFontSize: true,
+              bgcolor: $color("clear"),
+              align: $align.center
+            },
+            layout: function (make) {
+              var preView = $("icon")
+              make.top.equalTo($("itemView").top).offset(0)
+              make.left.equalTo(preView.right).offset(0)
+              make.height.equalTo(preView.height)
+              make.right.equalTo($("run").left).offset(0)
+            }
+          },
+          {
+            type: "button",
+            props: {
+              id: "tapArea",
+              bgcolor: $color("clear"),
+              titleColor: $color("clear")
+            },
+            layout: function (make, view) {
+              var preView = $("itemView")
+              make.top.equalTo(preView.top).offset(0)
+              make.left.equalTo(preView.left).offset(0)
+              make.height.equalTo(preView.height)
+              make.right.equalTo(preView.right).offset(0)
             },
             events: {
               tapped: function(sender) {
@@ -110,8 +172,7 @@ $ui.render({
                 //$addin.run(sender.title)
               }
             }
-            
-          }
+          },
         ],
         actions: [
           {
@@ -158,8 +219,13 @@ function updateItem(data) {
   for (var id = 0; id < count; id++) {
     ext_name = data[id]
     temp.push({
-      ext: {
+      icon: {
         icon: $icon(ext_icon[ext_name], $color("darkGray"), $size(20, 20)),
+      },
+      name: {
+        text: ext_name
+      },
+      tapArea: {
         title: ext_name
       }
     })
@@ -171,10 +237,17 @@ function insertItem(text) {
   extensions.unshift(text)
   listView.insert({
     index: 0,
-    value: {ext:{
-      icon: $icon(ext_icon[text], $color("darkGray"), $size(20, 20)),
-      title: text
-    }}
+    value: {
+      icon: {
+        icon: $icon(ext_icon[ext_name], $color("darkGray"), $size(20, 20)),
+      },
+      name: {
+        text: ext_name
+      },
+      tapArea: {
+        title: ext_name
+      }
+    }
   })
   saveItems()
 }
