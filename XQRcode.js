@@ -43,7 +43,11 @@ if (qr == null) {
 }
 
 if (autoUpdate == true) {
-  checkVersion()
+  $thread.background({
+    handler: function() {
+      checkVersion()
+    }
+  })
 }
 
 function isContains(str, regxstr) {
@@ -140,7 +144,7 @@ function checkVersion() {
           actions: [{
             title: "更新",
             handler: function() {
-              var url = "jsbox://install?url=https://raw.githubusercontent.com/axelburks/JSBox/master/Tool%20Box.js&name=XQRcode&icon=icon_102.png";
+              var url = "jsbox://install?url=https://raw.githubusercontent.com/axelburks/JSBox/master/XQRcode.js&name=XQRcode&icon=icon_102.png";
               $app.openURL(encodeURI(url));
               $app.close()
             }

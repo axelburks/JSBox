@@ -3,7 +3,7 @@
 1.通过 share extension 运行，直接下载链接内容
 2.主程序内直接运行，自动填充剪贴板链接
 3.通过 url scheme 运行，可指定 auto 自动开始下载
-jsbox://run?name=File%20Downloader&downloadUrl=https://domain.com/A.exe&auto=true
+jsbox://run?name=Downloader&downloadUrl=https://domain.com/A.exe&auto=true
 
 作者联系：https://t.me/axel_burks
 */
@@ -23,7 +23,7 @@ if (autoUpdate == true && Object.size($context.query) > 0) {
 
 $ui.render({
   props: {
-    title: "File Downloader"
+    title: "Downloader"
   },
   views: [
     {
@@ -88,7 +88,11 @@ $ui.render({
 })
 
 if (autoUpdate == true) {
-  checkVersion()
+  $thread.background({
+    handler: function() {
+      checkVersion()
+    }
+  })
 }
 
 function download(ext) {
@@ -123,8 +127,8 @@ function checkVersion() {
   $http.get({
     url: "https://raw.githubusercontent.com/axelburks/JSBox/master/updateInfo",
     handler: function(resp) {
-      var afterVersion = resp.data["File Downloader"]["version"];
-      var msg = resp.data["File Downloader"]["msg"];
+      var afterVersion = resp.data["Downloader"]["version"];
+      var msg = resp.data["Downloader"]["msg"];
       if (afterVersion > version) {
         $ui.alert({
           title: "检测到新的版本！V" + afterVersion,
@@ -132,7 +136,7 @@ function checkVersion() {
           actions: [{
             title: "更新",
             handler: function() {
-              var url = "jsbox://install?url=https://raw.githubusercontent.com/axelburks/JSBox/master/Tool%20Box.js&name=File Downloader&icon=icon_102.png";
+              var url = "jsbox://install?url=https://raw.githubusercontent.com/axelburks/JSBox/master/Downloader.js&name=Downloader&icon=icon_102.png";
               $app.openURL(encodeURI(url));
               $app.close()
             }

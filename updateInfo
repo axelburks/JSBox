@@ -7,8 +7,8 @@
     "version": 0.8,
     "msg": "更新说明：\n1.增加支持迅雷\n2.修复微信、QQ链接"
   },
-  "File Downloader":{
+  "Downloader":{
     "version": 1.1,
-    "msg": "更新说明：\n1.通过 url scheme 运行，可指定 auto 自动开始下载：\n jsbox://run?name=File%20Downloader&downloadUrl=https://domain.com/A.exe&auto=true"
+    "msg": "更新说明：\n1.通过 url scheme 运行，可指定 auto 自动开始下载：\n jsbox://run?name=Downloader&downloadUrl=https://domain.com/A.exe&auto=true"
   }
 }

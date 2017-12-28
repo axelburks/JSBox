@@ -2,7 +2,7 @@
 脚本工具箱合集
 1.点击 ⚙️ 进入设置项
 2.可在设置内关闭开关或者直接在首页左滑删除
-3.支持拖动排序，检索（支持字母检索中文、支持非连续关键字检索）
+3.支持拖动排序，检索（支持字母检索中文、支持非连续关键字检索: xscj->xteko文本收藏夹）
 
 作者联系：https://t.me/axel_burks
 */
@@ -106,28 +106,12 @@ $ui.render({
             },
             events: {
               tapped: function(sender) {
-                $addin.run(sender.title)
+                $app.openURL("jsbox://run?name=" + encodeURI(sender.title))
+                //$addin.run(sender.title)
               }
             }
             
           }
-          // {
-          //   type: "label",
-          //   props: {
-          //     id: "title",
-          //     font: $font("bold", 18),
-          //     autoFontSize: true,
-          //     bgcolor: $rgba(100, 100, 100, 0.2),
-          //     radius: 2
-          //   },
-          //   layout: function (make) {
-          //     var preView = $("icon")
-          //     make.left.equalTo(preView.right).offset(0)
-          //     make.height.equalTo(20)
-          //     make.top.inset(8)
-          //     make.right.inset(5)
-          //   }
-          // }
         ],
         actions: [
           {
@@ -178,9 +162,6 @@ function updateItem(data) {
         icon: $icon(ext_icon[ext_name], $color("darkGray"), $size(20, 20)),
         title: ext_name
       }
-      // title: {
-      //   text: ext_name
-      // }
     })
   }
   listView.data = temp  
@@ -331,7 +312,11 @@ Array.prototype.move = function(from, to) {
   this.splice(to, 0, object)
 }
 
-checkVersion()
+$thread.background({
+  handler: function() {
+    checkVersion()
+  }
+})
 
 var PinYin = {  
   "a": "\u554a\u963f\u9515",  
