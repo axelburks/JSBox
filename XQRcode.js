@@ -2,10 +2,12 @@
 解析二维码，自动打开到相应的 App 或保存到剪贴板
 1.通过 share extension 运行
 2.主程序内直接运行，自动解析剪贴板图片
-3.无法识别时取消打开微信扫描
+3.无法识别时点击取消打开微信扫描
 支持的 App：
 支付宝、淘宝、口碑、京东、OFO、Safari、迅雷
 微博、微信；需要跳转到 App 内再次扫描
+
+可添加至 Launch Center Pro 等应用快速启动：jsbox://run?name=XQRcode
 
 作者联系：https://t.me/axel_burks
 */
@@ -63,11 +65,11 @@ function showResult(text, runningExt) {
   })
   var scheme = text.match(/^\w+:\/\/[^\s]*/i)
   if (scheme) {
-    var url = text.match(/^(https?|weixin):\/\/[^\s]+/i)[0]
+    var url = text.match(/^(https?|weixin|wxp):\/\/[^\s]+/i)[0]
     if (url) {
       if (isContains(url,/weibo\.cn/i)) {
         scheme = "weibo://qrcode"
-      } else if (isContains(url,/weixin:\/\/|weixin\.qq|tenpay\.com/i)) {
+      } else if (isContains(url,/(weixin|wxp):\/\/|weixin\.qq|tenpay\.com/i)) {
         scheme = "weixin://scanqrcode"
       } else if (isContains(url,/(wsk|txz)\.qq\.com/i)) {
         scheme = "mqq://"

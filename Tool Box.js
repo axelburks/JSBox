@@ -217,7 +217,7 @@ function updateItem(data) {
   var temp = []
   count = data.length
   for (var id = 0; id < count; id++) {
-    ext_name = data[id]
+    var ext_name = data[id]
     temp.push({
       icon: {
         icon: $icon(ext_icon[ext_name], $color("darkGray"), $size(20, 20)),
@@ -239,13 +239,13 @@ function insertItem(text) {
     index: 0,
     value: {
       icon: {
-        icon: $icon(ext_icon[ext_name], $color("darkGray"), $size(20, 20)),
+        icon: $icon(ext_icon[text], $color("darkGray"), $size(20, 20))
       },
       name: {
-        text: ext_name
+        text: text
       },
       tapArea: {
-        title: ext_name
+        title: text
       }
     }
   })
