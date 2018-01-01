@@ -270,6 +270,7 @@ function selectItem() {
       {
         type: "label",
         props: {
+          id: "conTitle",
           text: "请选择添加扩展",
           align: $align.center,
           font: $font("bold", 18),
@@ -282,27 +283,67 @@ function selectItem() {
         }
       },
       {
+        type: "label",
+        props: {
+          id: "allItems",
+          text: "一键开关"
+        },
+        layout: function(make) {
+          make.top.equalTo($("conTitle").bottom).offset(2)
+          make.left.right.inset(15)
+          make.height.equalTo(45)
+        }
+      },
+      {
+        type: "switch",
+        props: {
+          id: "switchAll",
+          onColor: $color("#00EEEE"),
+          thumbColor: $color("#EE00EE"),
+          on: switchAll()
+        },
+        layout: function(make, view) {
+          //make.centerY.equalTo($("allItems").centerY)
+          make.top.equalTo($("allItems").top).offset(6)
+          make.bottom.equalTo($("allItems").bottom)
+          make.right.inset(15)
+        },
+        events: {
+          changed: function(sender) {
+            var name = $file.extensions[sender.info]
+            var index = extensions.indexOf(name)
+            if (index === -1) {
+              insertItem(name)
+            } else {
+              extensions.splice(index, 1)
+              saveItems()
+            }
+            updateItem(extensions)
+          }
+        }
+      },
+      {
         type: "list",
         props: {
           template: [
             {
               type: "label",
               props: {
-                id: "label"
+                id: "itemName"
               },
               layout: function(make) {
-                make.left.right.inset(10)
+                make.left.right.inset(15)
                 make.top.bottom.equalTo(0)
               }
             },
             {
               type: "switch",
               props: {
-                id: "switch"
+                id: "itemSwitch"
               },
               layout: function(make, view) {
                 make.centerY.equalTo(view.super)
-                make.right.inset(10)
+                make.right.inset(15)
               },
               events: {
                 changed: function(sender) {
@@ -315,20 +356,23 @@ function selectItem() {
                     saveItems()
                   }
                   updateItem(extensions)
+                  
+                  $("switchAll").data = { on: switchAll()}
+                  $console.info($("switchAll").data)
                 }
               }
             }
           ],
           data: $file.extensions.map(function(item, index) { 
             return {
-              label: { text: item },
-              switch: { on: extensions.indexOf(item) != -1, info: index }
+              itemName: { text: item },
+              itemSwitch: { on: extensions.indexOf(item) != -1, info: index }
             }
           })
         },
         layout: function(make) {
           make.left.bottom.right.equalTo(0)
-          make.top.equalTo($("label").bottom).offset(1)
+          make.top.equalTo($("allItems").bottom).offset(1)
         },
         events: {
           didSelect(sender, indexPath) {
@@ -378,6 +422,16 @@ function checkVersion() {
   })
 }
 
+function switchAll() {
+  var status = true
+  var itemAll = $file.extensions
+  for (var i = 0; i < itemAll.length; i++) {
+    if (extensions.indexOf(itemAll[i]) == -1) {
+      status = false
+    }
+  }
+  return status
+}
 
 Array.prototype.move = function(from, to) {
   var object = this[from]

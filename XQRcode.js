@@ -63,7 +63,7 @@ function showResult(text, runningExt) {
     "type": "public.plain-text",
     "value": text
   })
-  var scheme = text.match(/^\w+:\/\/[^\s]*/i)
+  var scheme = text.match(/^(?!ssr?:\/\/)\w+:\/\/[^\s]*/i)
   if (scheme) {
     var url = text.match(/^(https?|weixin|wxp):\/\/[^\s]+/i)[0]
     if (url) {
@@ -85,8 +85,8 @@ function showResult(text, runningExt) {
         scheme = "koubei://platformapi/startapp?saId=10000007&qrcode=" + url
       } else if (isContains(url,/(qr|d)\.alipay\.com|spay3\.swiftpass\.cn|tlt\.allinpay\.com|v\.ubox\.cn\/qr|i\.55tuan\.com\/rq/i)) {
         scheme = "alipays://platformapi/startapp?saId=10000007&qrcode=" + url
-      } else if (isContains(url,/item\.jd\.com/i)) {
-        var skuId = url.toString().match(/item\.jd\.com\/(\d+)(?=\.html)/i)[1]
+      } else if (isContains(url,/item\.(m\.)?jd\.com/i)) {
+        var skuId = url.toString().match(/item.*?jd\.com\/.*?(\d+)(?=\.html)/i)[1]
         scheme = "openapp.jdmobile://virtual?params=" + encodeURIComponent("{\"sourceValue\":\"0_productDetail_97\",\"des\":\"productDetail\",\"skuId\":\"" + skuId + "\",\"category\":\"jump\",\"sourceType\":\"PCUBE_CHANNEL\"}")
       } else if (isContains(url,/qr\.m\.jd\.com/i)) {
         var key = url.toString().match(/qr\.m\.jd\.com\/p\?k=([^\s]+)/i)[1]
