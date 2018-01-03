@@ -178,8 +178,7 @@ $ui.render({
                 if (sender.title == null) {
                   return
                 }
-                $app.openURL("jsbox://run?name=" + encodeURI(sender.title))
-                //$addin.run(sender.title)
+                $addin.run(sender.title)
               }
             }
           },
