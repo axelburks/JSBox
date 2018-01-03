@@ -1,18 +1,18 @@
 {
   "Tool Box":{
     "version": 1.2,
-    "msg": "更新说明：\n1.增加实时检索\n2.增加一键开关\n3.提高检索精度"
+    "msg": "1.增加实时检索\n2.增加一键开关\n3.提高检索精度"
   },
   "XQRcode":{
     "version": 0.8,
-    "msg": "更新说明：\n1.增加支持迅雷\n2.修复微信、QQ链接"
+    "msg": "1.增加支持迅雷\n2.修复微信、QQ链接"
   },
   "Downloader":{
     "version": 1.1,
-    "msg": "更新说明：\n1.通过 url scheme 运行，可指定 auto 自动开始下载：\n jsbox://run?name=Downloader&downloadUrl=https://domain.com/A.exe&auto=true"
+    "msg": "1.通过 url scheme 运行，可指定 auto 自动开始下载：\n jsbox://run?name=Downloader&downloadUrl=https://domain.com/A.exe&auto=true"
   },
   "Emoji":{
     "version": 0.1,
-    "msg": "更新说明：\n增加实时检索"
+    "msg": "增加实时检索"
   },
 }

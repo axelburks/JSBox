@@ -172,7 +172,7 @@ function checkVersion() {
       if (afterVersion > version) {
         $ui.alert({
           title: "检测到新的版本！V" + afterVersion,
-          message: "是否更新?\n" + msg,
+          message: "更新说明：\n" + msg,
           actions: [{
             title: "更新",
             handler: function() {
