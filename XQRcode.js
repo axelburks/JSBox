@@ -1,13 +1,14 @@
 /*
-解析二维码，自动打开到相应的 App 或保存到剪贴板
-1.通过 share extension 运行
-2.主程序内直接运行，自动解析剪贴板图片
+解析二维码，自动打开到相应的 App 并保存到剪贴板
+1.通过 share extension 运行，避免保存图片 或 直接相册运行
+2.主程序内直接运行，自动解析剪贴板图片 或 开启扫描
 3.无法识别时点击取消打开微信扫描
 支持的 App：
 支付宝、淘宝、口碑、京东、OFO、Safari、迅雷
 微博、微信；需要跳转到 App 内再次扫描
 
 可添加至 Launch Center Pro 等应用快速启动：jsbox://run?name=XQRcode
+欢迎提供更多相关 url scheme
 
 作者联系：https://t.me/axel_burks
 */

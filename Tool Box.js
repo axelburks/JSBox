@@ -6,7 +6,7 @@
 
 作者联系：https://t.me/axel_burks
 */
-var version = 1.1
+var version = 1.2
 
 var extensions = $cache.get("extensions") || []
 const DeviceSIZE = $device.info.screen
@@ -48,6 +48,13 @@ $ui.render({
       events: {
         didBeginEditing: function(sender) {
           if (listView.data.length != extensions.length) {
+            updateItem(extensions)
+          }
+        },
+        changed: function(sender) {
+          if (sender.text) {
+            searchItem(sender.text)
+          } else {
             updateItem(extensions)
           }
         },
@@ -168,6 +175,9 @@ $ui.render({
             },
             events: {
               tapped: function(sender) {
+                if (sender.title == null) {
+                  return
+                }
                 $app.openURL("jsbox://run?name=" + encodeURI(sender.title))
                 //$addin.run(sender.title)
               }
@@ -213,54 +223,6 @@ for (var i = 0; i < extensions.length; i++) {
 saveItems()
 updateItem(extensions)
 
-function updateItem(data) {
-  var temp = []
-  count = data.length
-  for (var id = 0; id < count; id++) {
-    var ext_name = data[id]
-    temp.push({
-      icon: {
-        icon: $icon(ext_icon[ext_name], $color("darkGray"), $size(20, 20)),
-      },
-      name: {
-        text: ext_name
-      },
-      tapArea: {
-        title: ext_name
-      }
-    })
-  }
-  listView.data = temp  
-}
-
-function insertItem(text) {
-  extensions.unshift(text)
-  listView.insert({
-    index: 0,
-    value: {
-      icon: {
-        icon: $icon(ext_icon[text], $color("darkGray"), $size(20, 20))
-      },
-      name: {
-        text: text
-      },
-      tapArea: {
-        title: text
-      }
-    }
-  })
-  saveItems()
-}
-
-function deleteItem(indexPath) {
-  var text = extensions[indexPath.row]
-  var index = extensions.indexOf(text)
-  if (index >= 0) {
-    extensions.splice(index, 1)
-    saveItems()
-  }
-}
-
 function selectItem() {
   $ui.push({
     props: {
@@ -286,7 +248,8 @@ function selectItem() {
         type: "label",
         props: {
           id: "allItems",
-          text: "一键开关"
+          text: "一键开关",
+          font: $font("bold", 18)
         },
         layout: function(make) {
           make.top.equalTo($("conTitle").bottom).offset(2)
@@ -298,33 +261,25 @@ function selectItem() {
         type: "switch",
         props: {
           id: "switchAll",
-          onColor: $color("#00EEEE"),
-          thumbColor: $color("#EE00EE"),
-          on: switchAll()
+          onColor: $color("gray"),
+          thumbColor: $color("lightGray"),
+          on: statusAll()
         },
         layout: function(make, view) {
-          //make.centerY.equalTo($("allItems").centerY)
           make.top.equalTo($("allItems").top).offset(6)
           make.bottom.equalTo($("allItems").bottom)
           make.right.inset(15)
         },
         events: {
           changed: function(sender) {
-            var name = $file.extensions[sender.info]
-            var index = extensions.indexOf(name)
-            if (index === -1) {
-              insertItem(name)
-            } else {
-              extensions.splice(index, 1)
-              saveItems()
-            }
-            updateItem(extensions)
+            switchAll(sender.on)
           }
         }
       },
       {
         type: "list",
         props: {
+          id: "addList",
           template: [
             {
               type: "label",
@@ -348,17 +303,7 @@ function selectItem() {
               events: {
                 changed: function(sender) {
                   var name = $file.extensions[sender.info]
-                  var index = extensions.indexOf(name)
-                  if (index === -1) {
-                    insertItem(name)
-                  } else {
-                    extensions.splice(index, 1)
-                    saveItems()
-                  }
-                  updateItem(extensions)
-                  
-                  $("switchAll").data = { on: switchAll()}
-                  $console.info($("switchAll").data)
+                  updateSwitch(name, 0.5)
                 }
               }
             }
@@ -376,11 +321,83 @@ function selectItem() {
         },
         events: {
           didSelect(sender, indexPath) {
+            var name = $file.extensions[indexPath.row]
+            updateSwitch(name, 0.1)
           }
         }
       }
     ]
   })
+}
+
+function updateItem(data) {
+  var temp = []
+  count = data.length
+  if (count > 0) {
+    for (var id = 0; id < count; id++) {
+      var ext_name = data[id]
+      temp.push({
+        icon: {
+          icon: $icon(ext_icon[ext_name], $color("darkGray"), $size(20, 20)),
+        },
+        name: {
+          text: ext_name
+        },
+        run: {
+          src: runIcon
+        },
+        tapArea: {
+          title: ext_name
+        }
+      })
+    }
+  } else {
+    temp = [{
+      icon: {
+        icon: $icon("100", $color("clear"), $size(20, 20)),
+      },
+      name: {
+        text: "未添加扩展，请点击 ⚙️ 按钮"
+      },
+      run: {
+        src: ""
+      },
+      tapArea: {}
+    }]
+  }
+  
+  listView.data = temp
+}
+
+function insertItem(text) {
+  extensions.unshift(text)
+  listView.insert({
+    index: 0,
+    value: {
+      icon: {
+        icon: $icon(ext_icon[text], $color("darkGray"), $size(20, 20))
+      },
+      name: {
+        text: text
+      },
+      run: {
+        src: runIcon
+      },
+      tapArea: {
+        title: text
+      }
+    }
+  })
+  saveItems()
+}
+
+function deleteItem(indexPath) {
+  var text = extensions[indexPath.row]
+  var index = extensions.indexOf(text)
+  if (index >= 0) {
+    extensions.splice(index, 1)
+    saveItems()
+  }
 }
 
 function saveItems() {
@@ -390,11 +407,76 @@ function saveItems() {
 function searchItem(query) {
   function isContain(element) {
     var rex = query.split("").join(".*")
-    return new RegExp(rex,"i").test(ConvertPinyin(element))
+    var patt = new RegExp("[\u4e00-\u9fa5]")
+    var temp = ""
+    if (patt.test(query)) {
+      temp = element
+    } else {
+      temp = ConvertPinyin(element)
+    }
+    return new RegExp(rex,"i").test(temp)
   }
   var result = extensions.filter(isContain)
   updateItem(result)
 }
+
+function updateSwitch(name, delay) {
+  var index = extensions.indexOf(name)
+  if (index === -1) {
+    insertItem(name)
+  } else {
+    extensions.splice(index, 1)
+    saveItems()
+  }
+  $("switchAll").on = statusAll()
+  $delay(delay, function() {
+    updateSwitchlist()
+  })
+  updateItem(extensions)
+}
+
+function updateSwitchlist() {
+  $("addList").data = $file.extensions.map(function(item, index) { 
+    return {
+      itemName: { text: item },
+      itemSwitch: { on: extensions.indexOf(item) != -1, info: index }
+    }
+  })
+}
+
+function statusAll() {
+  var status = true
+  var itemAll = $file.extensions
+  for (var i = 0; i < itemAll.length; i++) {
+    if (extensions.indexOf(itemAll[i]) == -1) {
+      status = false
+    }
+  }
+  return status
+}
+
+function switchAll(status) {
+  if (status == true) {
+    extensions = $file.extensions
+  } else {
+    extensions = []
+  }
+  updateSwitchlist()
+  updateItem(extensions)
+  saveItems()
+}
+
+Array.prototype.move = function(from, to) {
+  var object = this[from]
+  this.splice(from, 1)
+  this.splice(to, 0, object)
+}
+
+$thread.background({
+  handler: function() {
+    checkVersion()
+  }
+})
 
 function checkVersion() {
   $http.get({
@@ -421,29 +503,6 @@ function checkVersion() {
     }
   })
 }
-
-function switchAll() {
-  var status = true
-  var itemAll = $file.extensions
-  for (var i = 0; i < itemAll.length; i++) {
-    if (extensions.indexOf(itemAll[i]) == -1) {
-      status = false
-    }
-  }
-  return status
-}
-
-Array.prototype.move = function(from, to) {
-  var object = this[from]
-  this.splice(from, 1)
-  this.splice(to, 0, object)
-}
-
-$thread.background({
-  handler: function() {
-    checkVersion()
-  }
-})
 
 var PinYin = {  
   "a": "\u554a\u963f\u9515",  

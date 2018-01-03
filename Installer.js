@@ -7,6 +7,7 @@ $app.strings = {
     "ERROR": "Running Error",
     "OK": "OK",
     "Existed": "Already Existed",
+    "ANOTHER": "Please input another name",
     "CANCEL": "Cancel",
     "REPLACE": "Replace",
     "RENAME": "Rename",
@@ -21,6 +22,7 @@ $app.strings = {
     "ERROR": "运行错误",
     "OK": "好的",
     "Existed": "文件已存在",
+    "ANOTHER": "请输入其他名称",
     "CANCEL": "取消",
     "REPLACE": "覆盖",
     "RENAME": "重命名",
@@ -42,7 +44,7 @@ if (file && file.fileName) {
       addins_list = addins_list + addins[i].name + "|"
     }
     if (addins_list.indexOf(fileName) > -1) {
-      warning(fileName, file)
+      warning(addins_list, fileName, file)
     } else {
       install(fileName, file)
     }
@@ -120,9 +122,10 @@ function error(name, data) {
   })  
 }
 
-function warning(name, data) {
+function warning(list, name, data) {
   $ui.alert({
     title: $l10n("Existed"),
+    message: name,
     actions: [{
         title: $l10n("CANCEL"),
         style: "Cancel",
@@ -140,7 +143,34 @@ function warning(name, data) {
       {
         title: $l10n("RENAME"),
         handler: function() {
-          install(name.replace('.js', '') + "_1", data)
+          var new_name = "0"
+          $input.text({
+            type: $kbType.default,
+            placeholder: name.replace('.js',''),
+            handler: function(text) {
+              new_name = text
+              // if (list.indexOf(new_name) > -1) {
+              //   $ui.alert({
+              //     title: $l10n("Existed"),
+              //     message: $l10n("ANOTHER"),
+              //     actions: [{
+              //       title: $l10n("OK"),
+              //       style: "Cancel",
+              //       handler: function() {
+              //         $input.text({
+              //           type: $kbType.default,
+              //           placeholder: name.replace('.js',''),
+              //           handler: function(new_text) {
+              //             new_name = new_text
+              //           }
+              //         })
+              //       }
+              //     }]
+              //   })
+              // }
+              install(new_name, data)
+            }
+          })          
         }
       }
     ]
