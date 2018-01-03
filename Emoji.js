@@ -67,7 +67,7 @@ $ui.render({
             props: {
               id: "item",
               textColor: $color("black"),
-              autoFontSize: true,
+              // autoFontSize: true,
               align: $align.center
             },
             layout: function (make) {
@@ -119,17 +119,19 @@ function searchItem(item) {
 
     keys = allKey.match(reg) || [];
     if(!keys.length) {
+      $("list").separatorHidden = true
       $("list").data = [{
         item: {
-          text: "No Result...",
+          text: "No Result ...",
           textColor: $color("black"),
+          font: $font(18)
         },
       }]
     } else {
       var result = new Object()
       for (var i = 0; i < keys.length; i++) {
         key = trim(keys[i], ',');
-        result[key] = allEmoji[key].join(', ')
+        result[key] = allEmoji[key].join('  ')
       }
       showResult(result)
     }
@@ -138,24 +140,30 @@ function searchItem(item) {
 function showResult(data) {
   var temp = []
   if (typeof(data) == "undefined") {
+    $("list").separatorHidden = true,
     $("list").data = [{
       item: {
-        text: "copyright © 2007-2017",
+        text: "😎",
         textColor: $color("lightGray"),
+        font: $font(30)
       }
     },
     {
       item: {
-        text: "dofy.net & PHPz.org & PHPz.mobi",
+        text: "copyright © 2007-2017\ndofy.net & PHPz.org & PHPz.mobi",
         textColor: $color("lightGray"),
+        font: $font(12),
+        lines:0
       }
     }]
   } else {
+    $("list").separatorHidden = false
     for (key in data) {
       temp.push({
         item: {
           text: key + ":   " + data[key],
           textColor: $color("black"),
+          font: $font(18)
         },
       })
     }
