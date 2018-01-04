@@ -14,7 +14,7 @@
 
 作者联系：https://t.me/axel_burks
 */
-var version = 0.82
+var version = 0.83
 
 $app.strings = {
   "en": {
@@ -122,6 +122,9 @@ function showResult(text, runningExt) {
       } else if (isContains(url,/(qr|d)\.alipay\.com\/(kox|sux)/i)) {
         scheme = "koubei://platformapi/startapp?saId=10000007&qrcode=" + url
       } else if (isContains(url,/(qr|d)\.alipay\.com|spay3\.swiftpass\.cn|tlt\.allinpay\.com|v\.ubox\.cn\/qr|i\.55tuan\.com\/rq/i)) {
+        if (!isContains(url,/^[0-9A-Z\:\/\/]+$/)) {
+          url = $text.URLEncode(url)
+        }
         scheme = "alipays://platformapi/startapp?saId=10000007&qrcode=" + url
       } else if (isContains(url,/item\.(m\.)?jd\.com/i)) {
         var skuId = url.toString().match(/item.*?jd\.com\/.*?(\d+)(?=\.html)/i)[1]

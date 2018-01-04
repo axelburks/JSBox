@@ -4,8 +4,8 @@
     "msg": "1.区分运行环境\n2.检索提示bug修复"
   },
   "XQRcode":{
-    "version": 0.82,
-    "msg": "1.取消扫描时改为询问是否打开微信继续扫描"
+    "version": 0.83,
+    "msg": "1.修复旧版本支付宝二维码的兼容性\n2.若未安装口碑 App 则将代码中 koubei:// 修改为 alipays:// 即可"
   },
   "Downloader":{
     "version": 1.1,
