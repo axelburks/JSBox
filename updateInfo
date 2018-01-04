@@ -1,7 +1,7 @@
 {
   "Tool Box":{
-    "version": 1.21,
-    "msg": "1.区分运行环境"
+    "version": 1.23,
+    "msg": "1.区分运行环境\n2.检索提示bug修复"
   },
   "XQRcode":{
     "version": 0.8,

@@ -6,7 +6,7 @@
 
 作者联系：https://t.me/axel_burks
 */
-var version = 1.21
+var version = 1.23
 
 var extensions = $cache.get("extensions") || []
 const DeviceSIZE = $device.info.screen
@@ -224,7 +224,7 @@ for (var i = 0; i < extensions.length; i++) {
   }
 }
 saveItems()
-updateItem(extensions)
+updateItem(extensions, "init")
 
 function selectItem() {
   $ui.push({
@@ -333,7 +333,8 @@ function selectItem() {
   })
 }
 
-function updateItem(data) {
+function updateItem(data, status) {
+  $console.info(status)
   var temp = []
   count = data.length
   if (count > 0) {
@@ -355,20 +356,37 @@ function updateItem(data) {
       })
     }
   } else {
-    temp = [{
-      icon: {
-        icon: $icon("100", $color("clear"), $size(20, 20)),
-      },
-      name: {
-        text: "未添加扩展，请点击 ⚙️ 按钮"
-      },
-      run: {
-        src: ""
-      },
-      tapArea: {
-        title: ""
-      }
-    }]
+    if (status == "init") {
+      temp = [{
+        icon: {
+          icon: $icon("100", $color("clear"), $size(20, 20)),
+        },
+        name: {
+          text: "未添加扩展，请点击 ⚙️ 按钮"
+        },
+        run: {
+          src: ""
+        },
+        tapArea: {
+          title: ""
+        }
+      }]
+    } else {
+      temp = [{
+        icon: {
+          icon: $icon("100", $color("clear"), $size(20, 20)),
+        },
+        name: {
+          text: "Inputing...Try to tap Return button..."
+        },
+        run: {
+          src: ""
+        },
+        tapArea: {
+          title: ""
+        }
+      }]
+    }
   }
   
   listView.data = temp
@@ -437,7 +455,7 @@ function updateSwitch(name, delay) {
   $delay(delay, function() {
     updateSwitchlist()
   })
-  updateItem(extensions)
+  updateItem(extensions, "init")
 }
 
 function updateSwitchlist() {
@@ -467,7 +485,7 @@ function switchAll(status) {
     extensions = []
   }
   updateSwitchlist()
-  updateItem(extensions)
+  updateItem(extensions, "init")
   saveItems()
 }
 
