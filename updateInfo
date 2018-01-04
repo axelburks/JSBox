@@ -4,8 +4,8 @@
     "msg": "1.区分运行环境\n2.检索提示bug修复"
   },
   "XQRcode":{
-    "version": 0.8,
-    "msg": "1.增加支持迅雷\n2.修复微信、QQ链接"
+    "version": 0.82,
+    "msg": "1.取消扫描时改为询问是否打开微信继续扫描"
   },
   "Downloader":{
     "version": 1.1,

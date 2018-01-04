@@ -10,11 +10,26 @@
 可添加至 Launch Center Pro 等应用快速启动：jsbox://run?name=XQRcode
 欢迎提供更多相关 url scheme
 
-问题：QQ 扫一扫 url scheme 未知，因此只能打开 QQ 而无法自动打开扫一扫
+问题：QQ 扫一扫 url scheme 未知，因此 QQ 登录或支付只能打开 QQ 而无法自动打开扫一扫
 
 作者联系：https://t.me/axel_burks
 */
-var version = 0.8
+var version = 0.82
+
+$app.strings = {
+  "en": {
+    "ALERT": "Open Wechat?",
+    "SCANMORE": "Which has more accurate recognition effect",
+    "OK": "OK",
+    "CANCEL": "Cancel",
+  },
+  "zh-Hans": {
+    "ALERT": "是否打开微信？",
+    "SCANMORE": "具有更佳的识别率",
+    "OK": "好的",
+    "CANCEL": "取消",
+  }
+}
 
 var autoUpdate = $context.image ? false : true
 Object.size = function(obj) {
@@ -35,7 +50,7 @@ if (qr == null) {
       showResult(string, false)
     },
     cancelled() {
-      $app.openURL("weixin://scanqrcode")
+      cancelAction()
     }
   })
 } else {
@@ -57,6 +72,26 @@ if (autoUpdate == true) {
 
 function isContains(str, regxstr) {
   return new RegExp(regxstr).test(str)
+}
+
+function cancelAction() {
+  $ui.alert({
+    title: $l10n("ALERT"),
+    message: $l10n("SCANMORE"),
+    actions: [{
+      title: $l10n("CANCEL"),
+      style: "Cancel",
+      handler: function() {
+        $app.close()
+      }
+    },
+    {
+      title: $l10n("OK"),
+      handler: function() {
+        $app.openURL("weixin://scanqrcode")
+      }
+    }]
+  })
 }
 
 function showResult(text, runningExt) {
