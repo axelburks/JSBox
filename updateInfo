@@ -1,7 +1,7 @@
 {
   "Tool Box":{
-    "version": 1.2,
-    "msg": "1.增加实时检索\n2.增加一键开关\n3.提高检索精度"
+    "version": 1.21,
+    "msg": "1.区分运行环境"
   },
   "XQRcode":{
     "version": 0.8,

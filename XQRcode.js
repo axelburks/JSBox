@@ -4,11 +4,13 @@
 2.主程序内直接运行，自动解析剪贴板图片 或 开启扫描
 3.无法识别时点击取消打开微信扫描
 支持的 App：
-支付宝、淘宝、口碑、京东、OFO、Safari、迅雷
+支付宝、淘宝、口碑、京东、Safari、迅雷、磁力、OFO扫车码
 微博、微信；需要跳转到 App 内再次扫描
 
 可添加至 Launch Center Pro 等应用快速启动：jsbox://run?name=XQRcode
 欢迎提供更多相关 url scheme
+
+问题：QQ 扫一扫 url scheme 未知，因此只能打开 QQ 而无法自动打开扫一扫
 
 作者联系：https://t.me/axel_burks
 */

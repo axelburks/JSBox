@@ -6,12 +6,12 @@
 
 作者联系：https://t.me/axel_burks
 */
-var version = 1.2
+var version = 1.21
 
 var extensions = $cache.get("extensions") || []
 const DeviceSIZE = $device.info.screen
 
-if ($app.env != $env.app) {
+if ($app.env == $env.today) {
   $ui.menu({
     items: extensions,
     handler: function(title, idx) {
@@ -175,10 +175,14 @@ $ui.render({
             },
             events: {
               tapped: function(sender) {
-                if (sender.title == null) {
+                if (sender.title == "") {
                   return
                 }
-                $addin.run(sender.title)
+                if ($app.env == $env.app) {
+                  $app.openURL("jsbox://run?name=" + encodeURI(sender.title))
+                } else {
+                  $addin.run(sender.title)
+                }
               }
             }
           },
@@ -361,7 +365,9 @@ function updateItem(data) {
       run: {
         src: ""
       },
-      tapArea: {}
+      tapArea: {
+        title: ""
+      }
     }]
   }
   
