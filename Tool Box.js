@@ -334,7 +334,6 @@ function selectItem() {
 }
 
 function updateItem(data, status) {
-  $console.info(status)
   var temp = []
   count = data.length
   if (count > 0) {
@@ -514,7 +513,7 @@ function checkVersion() {
           actions: [{
             title: "更新",
             handler: function() {
-              var url = "jsbox://install?url=https://raw.githubusercontent.com/axelburks/JSBox/master/Tool%20Box.js&name=Tool Box&icon=icon_102.png";
+              var url = "jsbox://install?url=https://raw.githubusercontent.com/axelburks/JSBox/master/Tool%20Box.js&name=" + $addin.current.name.split(".js")[0] + "&icon=icon_102.png";
               $app.openURL(encodeURI(url));
               $app.close()
             }

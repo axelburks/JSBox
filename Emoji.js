@@ -184,7 +184,7 @@ function checkVersion() {
           actions: [{
             title: "更新",
             handler: function() {
-              var url = "jsbox://install?url=https://raw.githubusercontent.com/axelburks/JSBox/master/Emoji.js&name=Emoji&icon=icon_168.png";
+              var url = "jsbox://install?url=https://raw.githubusercontent.com/axelburks/JSBox/master/Emoji.js&name=" + $addin.current.name.split(".js")[0] + "&icon=icon_168.png";
               $app.openURL(encodeURI(url));
               $app.close()
             }

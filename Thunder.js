@@ -12,6 +12,7 @@ if(content != null){
 	var url = content.match(/^(https?:\/\/|magnet:)[^\s]+/i)[0]
 	var thunder_url = content.match(/^thunder:\/\/[^\s]+/i)
 	if (url) {
+		$clipboard.clear()
 		var scheme = "thunder://" + $text.base64Encode(url)
 		$app.openURL(scheme)
 		if ($context.text)
