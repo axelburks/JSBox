@@ -206,17 +206,16 @@ function pushbullet(accesstoken, device) {
                       $ui.menu({
                         items: push.map(function(item) {
                           if (item.type == "note") {
-                            if (item.body.indexOf("\n") >= 0) {
-                              return item.body.trim().split("\n")[0] + "...(👀 Multi-Lines)"
-                            } else {
-                              return item.body
-                            }
+                            return item.body.replace(/\n/g," ")
+                            
                           } else if (item.type == "link") {
-                            mkd = "[" + item.body + "]" + "(" + item.url + ")"
-                            if (item.title) {
-                              return "🔗:" + item.title
+                            
+                            if (item.body) {
+                              return "🔗:[" + item.body.replace(/\n/g,"") + "]" + "(" + item.title.replace(/\n/g,"") + ")"
+                            } else if (item.title) {
+                              return "🔗:[" + item.title.replace(/\n/g,"") + "]" + "(" + item.url + ")"
                             } else {
-                              return "🔗:" + mkd
+                              return "🔗:" + item.url
                             }
 
                           } else {
@@ -313,7 +312,7 @@ function pushbulletClip(accesstoken, device) {
     })
   } else {
     if ($clipboard.link) {
-      sendLink($clipboard.text.replace($clipboard.link, ''), $clipboard.link, null, accesstoken, device)
+      sendLink($clipboard.text.replace($clipboard.link, '') || $clipboard.link, $clipboard.link, null, accesstoken, device)
     } else {
       sendNote($clipboard.text, accesstoken, device)
     }
@@ -328,12 +327,13 @@ function pushbulletSafari(accesstoken, device) {
 }
 
 function pushbulletAction(accesstoken, device) {
-  if ($context.link) {
-    sendLink(null, $context.link, null, accesstoken, device)
+  var re = /^file:\/\//i;
+  if ($context.link && !re.test($context.link)) {
+    sendLink($context.text || $context.link, $context.link, null, accesstoken, device)
   } else if ($context.text) {
     var link = $context.text.match(/^https?:\/\/[^\s]+/i)[0]
     if (link) {
-      sendLink($context.text.replace(link, ''), link, null, accesstoken, device)
+      sendLink($context.text.replace(link, '') || link, link, null, accesstoken, device)
     } else {
       sendNote($context.text, accesstoken, device)
     }
