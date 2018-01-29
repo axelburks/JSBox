@@ -7,28 +7,30 @@
 作者联系：https://t.me/axel_burks
 */
 
-var content = $context.query.downloadUrl || $context.text || ($clipboard.text ? $clipboard.text : null)
+var content = $context.query.downloadUrl || $context.link || $context.text || ($clipboard.text ? $clipboard.text : null)
 if(content != null){
-	var url = content.match(/^(https?:\/\/|magnet:)[^\s]+/i)[0]
+	var url = content.match(/^(https?:\/\/|magnet:)[^\s]+/i)
 	var thunder_url = content.match(/^thunder:\/\/[^\s]+/i)
 	if (url) {
 		$clipboard.clear()
 		var scheme = "thunder://" + $text.base64Encode(url)
 		$app.openURL(scheme)
-		if ($context.text)
+		if ($context.link || $context.text) {
 			$context.close()
+		}
 	} else if(thunder_url){
 		$app.openURL(thunder_url)
 	}else {
 		$ui.alert({
-			title: "Warning",
-			message: "请使用正确的地址！",
+			title: "No URLs",
+			message: content,
 			actions: [{
 				title: "OK",
 				style: "Cancel",
 				handler: function() {
-					if ($context.text)
+					if ($context.link || $context.text) {
 						$context.close()
+					}
 					$system.home()
 				}
 			}]

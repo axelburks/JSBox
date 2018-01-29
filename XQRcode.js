@@ -141,7 +141,7 @@ function showResult(text, runningExt) {
       $context.close()
     $app.close()
   } else if (text.match(/^magnet:[^\s]+/i)) {
-    var magnet_link = text.match(/^magnet:[^\s]+/i)[0]
+    var magnet_link = text.match(/^magnet:[^\s]+/i)
     $app.openURL("thunder://" + $text.base64Encode(magnet_link))
     if (runningExt)
       $context.close()
