@@ -331,8 +331,9 @@ function pushbulletAction(accesstoken, device) {
   if ($context.link && !re.test($context.link)) {
     sendLink($context.text || $context.link, $context.link, null, accesstoken, device)
   } else if ($context.text) {
-    var link = $context.text.match(/^https?:\/\/[^\s]+/i)[0]
+    var link = $context.text.match(/https?:\/\/[^\s]+/i)
     if (link) {
+      link = link[0]
       sendLink($context.text.replace(link, '') || link, link, null, accesstoken, device)
     } else {
       sendNote($context.text, accesstoken, device)

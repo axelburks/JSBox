@@ -9,9 +9,10 @@
 
 var content = $context.query.downloadUrl || $context.link || $context.text || ($clipboard.text ? $clipboard.text : null)
 if(content != null){
-	var url = content.match(/^(https?:\/\/|magnet:)[^\s]+/i)
-	var thunder_url = content.match(/^thunder:\/\/[^\s]+/i)
+	var url = content.match(/(https?:\/\/|magnet:)[^\s]+/i)
+	var thunder_url = content.match(/thunder:\/\/[^\s]+/i)
 	if (url) {
+		url = url[0]
 		$clipboard.clear()
 		var scheme = "thunder://" + $text.base64Encode(url)
 		$app.openURL(scheme)
@@ -19,11 +20,12 @@ if(content != null){
 			$context.close()
 		}
 	} else if(thunder_url){
+		thunder_url = thunder_url[0]
 		$app.openURL(thunder_url)
 	}else {
 		$ui.alert({
 			title: "No URLs",
-			message: content,
+			message: content.substring(0,80),
 			actions: [{
 				title: "OK",
 				style: "Cancel",

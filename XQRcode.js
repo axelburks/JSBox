@@ -105,8 +105,10 @@ function showResult(text, runningExt) {
   })
   var scheme = text.match(/^(?!ssr?:\/\/)\w+:\/\/[^\s]*/i)
   if (scheme) {
-    var url = text.match(/^(https?|weixin|wxp):\/\/[^\s]+/i)[0]
+    scheme = scheme[0]
+    var url = text.match(/^(https?|weixin|wxp):\/\/[^\s]+/i)
     if (url) {
+      url = url[0]
       if (isContains(url,/weibo\.cn/i)) {
         scheme = "weibo://qrcode"
       } else if (isContains(url,/(weixin|wxp):\/\/|weixin\.qq|tenpay\.com/i)) {
@@ -141,7 +143,7 @@ function showResult(text, runningExt) {
       $context.close()
     $app.close()
   } else if (text.match(/^magnet:[^\s]+/i)) {
-    var magnet_link = text.match(/^magnet:[^\s]+/i)
+    var magnet_link = text.match(/^magnet:[^\s]+/i)[0]
     $app.openURL("thunder://" + $text.base64Encode(magnet_link))
     if (runningExt)
       $context.close()
