@@ -58,7 +58,7 @@ if (qr == null) {
   if (text) {
     showResult(text, true)
   } else {
-    showWarning("run through Share Extension", true)
+    showWarning(true)
   }
 }
 
@@ -166,14 +166,15 @@ function showResult(text, runningExt) {
   }
 }
 
-function showWarning(text, runningExt) {
+function showWarning(runningExt) {
 $ui.alert({
   title: "QR Code Error",
-  message: "The image you " + text + " should be a QR Code.\n\nPlease try again.",
+  message: "Shared Image OR Clip Content is NOT a QR Code.\n\nPlease try again.",
   actions: [{
     title: "OK",
     style: "Cancel",
     handler: function() {
+      $clipboard.clear()
       if (runningExt)
         $context.close()
     }
