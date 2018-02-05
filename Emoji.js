@@ -8,7 +8,7 @@ Apple Emoji 本地版
 
 作者联系：https://t.me/axel_burks
 */
-var version = 0.1
+var version = 0.15
 
 $ui.render({
   props: {
@@ -48,7 +48,7 @@ $ui.render({
         returned: function (sender) {
           if (sender.text) {
             sender.blur()
-            searchItem(sender.text)
+            searchItem(sender.text, "returned")
           } else {
             showResult()
             sender.blur()
@@ -100,9 +100,9 @@ function trim(str, search) {
   return str.replace(reg, '');
 }
 
-function searchItem(item) {
+function searchItem(item, status) {
   var patt = new RegExp("[a-zA-Z]")
-  if (patt.test(item)) {
+  if (patt.test(item) && status != "returned") {
     //showResult()
     return
   }
@@ -184,7 +184,7 @@ function checkVersion() {
           actions: [{
             title: "更新",
             handler: function() {
-              var url = "jsbox://install?url=https://raw.githubusercontent.com/axelburks/JSBox/master/Emoji.js&name=" + $addin.current.name.split(".js")[0] + "&icon=icon_168.png";
+              var url = "jsbox://install?url=https://raw.githubusercontent.com/axelburks/JSBox/master/Emoji.js&name=" + $addin.current.name.split(".js")[0] + "&icon=" + $addin.current.icon;
               $app.openURL(encodeURI(url));
               $app.close()
             }

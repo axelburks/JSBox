@@ -6,7 +6,7 @@
 
 作者联系：https://t.me/axel_burks
 */
-var version = 1.23
+var version = 1.3
 
 var extensions = $cache.get("extensions") || []
 const DeviceSIZE = $device.info.screen

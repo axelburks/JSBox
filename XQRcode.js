@@ -14,7 +14,7 @@
 
 作者联系：https://t.me/axel_burks
 */
-var version = 0.83
+var version = 0.9
 
 $app.strings = {
   "en": {
@@ -194,7 +194,7 @@ function checkVersion() {
           actions: [{
             title: "更新",
             handler: function() {
-              var url = "jsbox://install?url=https://raw.githubusercontent.com/axelburks/JSBox/master/XQRcode.js&name=" + $addin.current.name.split(".js")[0] + "&icon=icon_018.png";
+              var url = "jsbox://install?url=https://raw.githubusercontent.com/axelburks/JSBox/master/XQRcode.js&name=" + $addin.current.name.split(".js")[0] + "&icon=" + $addin.current.icon;
               $app.openURL(encodeURI(url));
               $app.close()
             }

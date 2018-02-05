@@ -1,18 +1,22 @@
 {
   "Tool Box":{
-    "version": 1.23,
-    "msg": "1.区分运行环境\n2.检索提示bug修复"
+    "version": 1.3,
+    "msg": "1.修复 一键开关 导致的排序重置\n2.更新时维持用户更改的名称图标"
   },
   "XQRcode":{
-    "version": 0.83,
-    "msg": "1.修复旧版本支付宝二维码的兼容性\n2.若未安装口碑 App 则将代码中 koubei:// 修改为 alipays:// 即可"
+    "version": 0.9,
+    "msg": "1.取消扫描时退回桌面\n2.增加部分支付宝链接\n3.修复部分无响应情况"
   },
   "Downloader":{
     "version": 1.1,
     "msg": "1.通过 url scheme 运行，可指定 auto 自动开始下载：\n jsbox://run?name=Downloader&downloadUrl=https://domain.com/A.exe&auto=true"
   },
   "Emoji":{
-    "version": 0.1,
-    "msg": "增加实时检索"
+    "version": 0.15,
+    "msg": "优化结果显示"
+  },
+  "Pushbullet":{
+    "version": 1.0,
+    "msg": "1.Pin -> JSBox\n2.支持循环删除条目\n3.增加支持 Link 类型\n4.修复某些情况下的处理错误\n5.增加指定接收设备，避免发送端安装 App 的情况下也收到通知\n6.修改通知中心动作仅为发送动作(Line 27 处可自行修改回原方式)\n7.Note 类型检测到链接时自动转换为 Link 类型，接收自动打开链接\n8.Safari Extension 运行增加获取当前页面标题、链接、选中内容\n9.Action Extension 运行增加支持发送 Note, Link 类型\n10.AppStore 链接自动转换为 ASO100 页面（支持查看美区等商店内容且数据更全面，Line 356 处可自行删除取消转换）"
   },
 }

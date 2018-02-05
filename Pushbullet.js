@@ -24,7 +24,7 @@ if ($app.env == $env.today) {
   var accesstoken = getToken()
   var device = getDevice()
   if (accesstoken) {
-    // 执行 pushbullet
+    // pushbullet：全部功能 / pushbulletClip：发送剪贴板
     //pushbullet(accesstoken, device)
     pushbulletClip(accesstoken, device)
   } else {
@@ -353,6 +353,7 @@ function sendNote(note, accesstoken, device) {
 
 function sendLink(title, link, selection, accesstoken, device) {
   $ui.loading("Loading...")
+  //Change AppStore urls to ASO100 ⬇️
   var patt = /itunes\.apple\.com\/(\w+)\/app\//;
   var result;
   if ((result = patt.exec(link)) != null) {
@@ -360,6 +361,7 @@ function sendLink(title, link, selection, accesstoken, device) {
     var appid = regex.exec(link)[1];
     link = "https://www.qimai.cn/app/baseinfo/appid/" + appid + "/country/" + result[1];
   }
+  //End ⬆️
   $http.request({
     method: "POST",
     url: "https://api.pushbullet.com/v2/pushes",
