@@ -30,11 +30,11 @@ if ($app.env == $env.today) {
   } else {
     var message = {
       title: "Access Token Missing 😅",
-      message: "Execute This xTeko In Pin App For More Information.",
+      message: "Execute This Script In JSBox App For More Information.",
       actions: [{
-          title: "Open JSBox",
+          title: "Run in JSBox",
           handler: function() {
-            $app.openURL("jsbox://")
+            $app.openURL("jsbox://run?name=" + $addin.current.name.split(".js")[0])
           }
         },
         {
@@ -46,7 +46,6 @@ if ($app.env == $env.today) {
       ]
     }
     $ui.alert(message)
-
   }
 }
 // 从应用内启动
@@ -188,74 +187,7 @@ function pushbullet(accesstoken, device) {
           actions: [{
               title: "One",
               handler: function() {
-                $ui.loading("Loading...")
-                $http.request({
-                  method: "GET",
-                  url: "https://api.pushbullet.com/v2/pushes?active=true",
-                  header: {
-                    "Access-Token": accesstoken
-                  },
-                  timeout: timeout,
-                  handler: function(resp) {
-                    $ui.loading(false)
-                    var push = resp.data.pushes
-                    if (push.length == 0) {
-                      $ui.alert("NO PUSHES❌")
-                      $app.close()
-                    } else {
-                      $ui.menu({
-                        items: push.map(function(item) {
-                          if (item.type == "note") {
-                            return item.body.replace(/\n/g," ")
-                            
-                          } else if (item.type == "link") {
-                            
-                            if (item.body) {
-                              return "🔗:[" + item.body.replace(/\n/g,"") + "]" + "(" + item.title.replace(/\n/g,"") + ")"
-                            } else if (item.title) {
-                              return "🔗:[" + item.title.replace(/\n/g,"") + "]" + "(" + item.url + ")"
-                            } else {
-                              return "🔗:" + item.url
-                            }
-
-                          } else {
-                            var filename = item.file_url
-                            return "📝:" + filename.substr(filename.lastIndexOf('/') + 1)
-
-                          }
-                        }),
-                        handler: function(title, idx) {
-                          var iden = push[idx].iden
-
-                          $http.request({
-                            method: "DELETE",
-                            url: "https://api.pushbullet.com/v2/pushes/" + iden,
-                            header: {
-                              "Access-Token": accesstoken
-                            },
-                            timeout: timeout,
-                            handler: function(resp) {
-                              toast(resp)
-                              delayClose()
-                            }
-
-                          })
-                        },
-                        finished: function(cancelled) {
-                          if (cancelled) {
-
-                            $app.close()
-
-                          }
-                        }
-
-                      })
-
-                    }
-
-                  }
-
-                })
+                deleteItem(accesstoken)
               }
             }, {
               title: "All",
@@ -271,19 +203,15 @@ function pushbullet(accesstoken, device) {
                   handler: function(resp) {
                     toast(resp)
                     delayClose()
-
                   }
                 })
-
               }
             },
             {
-
               title: "Cancel",
               handler: function() {
                 $app.close()
               }
-
             }
           ]
         })
@@ -295,7 +223,6 @@ function pushbullet(accesstoken, device) {
       }
     }
   })
-
 }
 
 function pushbulletClip(accesstoken, device) {
@@ -426,6 +353,13 @@ function sendNote(note, accesstoken, device) {
 
 function sendLink(title, link, selection, accesstoken, device) {
   $ui.loading("Loading...")
+  var patt = /itunes\.apple\.com\/(\w+)\/app\//;
+  var result;
+  if ((result = patt.exec(link)) != null) {
+    var regex = /.+id(\d+).*/;
+    var appid = regex.exec(link)[1];
+    link = "https://www.qimai.cn/app/baseinfo/appid/" + appid + "/country/" + result[1];
+  }
   $http.request({
     method: "POST",
     url: "https://api.pushbullet.com/v2/pushes",
@@ -444,6 +378,65 @@ function sendLink(title, link, selection, accesstoken, device) {
     handler: function(resp) {
       toast(resp)
       delayClose()
+    }
+  })
+}
+
+function deleteItem(accesstoken) {
+  $ui.loading("Loading...")
+  $http.request({
+    method: "GET",
+    url: "https://api.pushbullet.com/v2/pushes?active=true",
+    header: {
+      "Access-Token": accesstoken
+    },
+    timeout: timeout,
+    handler: function(resp) {
+      $ui.loading(false)
+      var push = resp.data.pushes
+      if (push.length == 0) {
+        $ui.alert("NO PUSHES❌")
+        $app.close()
+      } else {
+        $ui.menu({
+          items: push.map(function(item) {
+            if (item.type == "note") {
+              return item.body.replace(/\n/g," ")
+            } else if (item.type == "link") {
+              if (item.body) {
+                return "🔗:[" + item.body.replace(/\n/g,"") + "]" + "(" + item.title.replace(/\n/g,"") + ")"
+              } else if (item.title) {
+                return "🔗:[" + item.title.replace(/\n/g,"") + "]" + "(" + item.url + ")"
+              } else {
+                return "🔗:" + item.url
+              }
+            } else {
+              var filename = item.file_url
+              return "📝:" + filename.substr(filename.lastIndexOf('/') + 1)
+            }
+          }),
+          handler: function(title, idx) {
+            var iden = push[idx].iden
+            $http.request({
+              method: "DELETE",
+              url: "https://api.pushbullet.com/v2/pushes/" + iden,
+              header: {
+                "Access-Token": accesstoken
+              },
+              timeout: timeout,
+              handler: function(resp) {
+                toast(resp)
+                deleteItem(accesstoken)
+              }
+            })
+          },
+          finished: function(cancelled) {
+            if (cancelled) {
+              $app.close()
+            }
+          }
+        })
+      }
     }
   })
 }
