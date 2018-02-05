@@ -180,7 +180,8 @@ function warning(list, name, data) {
 function install(name, data) {
   $addin.save({
     name: name,
-    data: data
+    data: data,
+    types: 1
   })
   $ui.toast($l10n("SUCCESS"), 1)
   $delay(1.5, function() {
