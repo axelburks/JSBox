@@ -479,7 +479,11 @@ function statusAll() {
 
 function switchAll(status) {
   if (status == true) {
-    extensions = $file.extensions
+    var allexts = $file.extensions
+    for (var i = 0; i < extensions.length; i++) {
+      allexts.removeByValue(extensions[i]);
+    }
+    extensions = extensions.concat(allexts)
   } else {
     extensions = []
   }
@@ -492,6 +496,15 @@ Array.prototype.move = function(from, to) {
   var object = this[from]
   this.splice(from, 1)
   this.splice(to, 0, object)
+}
+
+Array.prototype.removeByValue = function(val) {
+  for(var i=0; i<this.length; i++) {
+    if(this[i] == val) {
+      this.splice(i, 1);
+      break;
+    }
+  }
 }
 
 $thread.background({
@@ -513,7 +526,7 @@ function checkVersion() {
           actions: [{
             title: "更新",
             handler: function() {
-              var url = "jsbox://install?url=https://raw.githubusercontent.com/axelburks/JSBox/master/Tool%20Box.js&name=" + $addin.current.name.split(".js")[0] + "&icon=icon_102.png";
+              var url = "jsbox://install?url=https://raw.githubusercontent.com/axelburks/JSBox/master/Tool%20Box.js&name=" + $addin.current.name.split(".js")[0] + "&icon=" + $addin.current.icon;
               $app.openURL(encodeURI(url));
               $app.close()
             }
