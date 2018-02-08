@@ -22,12 +22,14 @@ $app.strings = {
     "SCANMORE": "Which has more accurate recognition effect",
     "OK": "OK",
     "CANCEL": "Cancel",
+    "CANNOTOPEN": "No available app can open the URL Scheme on the device.",
   },
   "zh-Hans": {
     "ALERT": "是否打开微信？",
     "SCANMORE": "具有更佳的识别率",
     "OK": "好的",
     "CANCEL": "取消",
+    "CANNOTOPEN": "缺少对应 App，无法打开 URL Scheme",
   }
 }
 
@@ -105,6 +107,7 @@ function showResult(text, runningExt) {
   })
   var scheme = text.match(/^(?!ssr?:\/\/)\w+:\/\/[^\s]*/i)
   if (scheme) {
+    var result = ""
     scheme = scheme[0]
     var url = text.match(/^(https?|weixin|wxp):\/\/[^\s]+/i)
     if (url) {
@@ -122,7 +125,7 @@ function showResult(text, runningExt) {
       } else if (isContains(url,/taobao\.com|tb\.cn|tmall\.com|qazdsa\.com/i)) {
         scheme = url.toString().replace(/https?/i,"taobao")
       } else if (isContains(url,/qr\.shouqianba\.com|qr\.alipay\.com.*PAI_LOGIN/i)) {
-          scheme = "alipays://platformapi/startapp?saId=10000007"
+        scheme = "alipays://platformapi/startapp?saId=10000007"
       } else if (isContains(url,/(qr|d)\.alipay\.com\/(kox|sux)/i)) {
         scheme = "koubei://platformapi/startapp?saId=10000007&qrcode=" + url
       } else if (isContains(url,/(qr|d|m)\.alipay\.com|spay3\.swiftpass\.cn|tlt\.allinpay\.com|v\.ubox\.cn\/qr|i\.55tuan\.com\/rq/i)) {
@@ -137,11 +140,45 @@ function showResult(text, runningExt) {
         var key = url.toString().match(/qr\.m\.jd\.com\/p\?k=([^\s]+)/i)[1]
         scheme = "openApp.jdMobile://virtual?params=" + encodeURIComponent("{\"category\":\"jump\",\"des\":\"ScanLogin\",\"key\":\"" + key + "\"}")
       }
+      var preResult = $app.openURL(scheme);
+      if (preResult) {
+        result = preResult
+      } else {
+        if (isContains(scheme,/koubei:\/\/platformapi/i)) {
+          scheme = scheme.replace("koubei://","alipays://");
+          result = $app.openURL(scheme);
+          if (!result) {
+            result = $app.openURL(url);
+          }
+        } else {
+          result = $app.openURL(url);
+        }
+      }
+    } else {
+      result = $app.openURL(scheme);
     }
-    $app.openURL(scheme)
-    if (runningExt)
-      $context.close()
-    $app.close()
+
+    if (result) {
+      if (runningExt)
+        $context.close()
+      $app.close()
+    } else {
+      $ui.alert({
+        title: $l10n("CANNOTOPEN"),
+        message: scheme,
+        actions: [{
+          title: "OK",
+          style: "Cancel",
+          handler: function() {
+            if (runningExt)
+              $context.close()
+            $system.home()
+            $app.close()
+          }
+        }]
+      })
+    }
+
   } else if (text.match(/^magnet:[^\s]+/i)) {
     var magnet_link = text.match(/^magnet:[^\s]+/i)[0]
     $app.openURL("thunder://" + $text.base64Encode(magnet_link))
