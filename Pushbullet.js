@@ -476,7 +476,8 @@ function toast(resp) {
   } else {
     $ui.toast("Request Timeout, Try Again Later ❌")
     $ui.loading(false)
-    delayClose()
+    $app.close()
+    // delayClose()
   }
 
 }
