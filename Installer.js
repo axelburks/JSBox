@@ -1,107 +1,150 @@
+/*
+脚本安装器
+- 支持文件分享安装
+- 支持 Safari 分享安装
+- 支持复制链接运行脚本安装
+- 支持长按官方链接或 .js 链接分享安装
+- 重名文件检测询问处理，可用来保留多个不同版本的脚本
+- 默认进入设置脚本名称状态，可用来删除版本号等不需要的字符，覆盖安装后无需每次重复设置取消脚本显示在不必要的位置
+- 仅推荐给某些具有强迫症的用户使用，比如我，hhhhh
+
+作者联系：https://t.me/axel_burks
+*/
+
+
 $app.strings = {
   "en": {
-    "MAIN_TITLE": "Installer",
-    "EMPTY_TIPS": "Please import script use AirDrop or File Sharing",
-    "IMPORT_DELETE": "Import & Delete",
-    "DELETE_DIRECTLY": "Delete Directly",
     "ERROR": "Running Error",
-    "OK": "OK",
+    "STILL": "Still Install",
     "Existed": "Already Existed",
     "ANOTHER": "Please input another name",
     "CANCEL": "Cancel",
     "REPLACE": "Replace",
     "RENAME": "Rename",
     "STILL_INSTALL": "Not a .js file.\nAre you still want to install it?",
+    "CANNOTOPEN": "Please Run The Script From Share Extension!",
+    "NOTSUPPORT": "Not Supported Type!",
     "SUCCESS": "Installed"
   },
   "zh-Hans": {
-    "MAIN_TITLE": "脚本安装器",
-    "EMPTY_TIPS": "请通过 AirDrop 或文件共享导入脚本",
-    "IMPORT_DELETE": "导入后删除",
-    "DELETE_DIRECTLY": "直接删除",
     "ERROR": "运行错误",
-    "OK": "好的",
+    "STILL": "继续安装",
     "Existed": "文件已存在",
     "ANOTHER": "请输入其他名称",
     "CANCEL": "取消",
     "REPLACE": "覆盖",
     "RENAME": "重命名",
     "STILL_INSTALL": "非 js 文件，\n仍然安装？",
+    "CANNOTOPEN": "请通过分享扩展运行此脚本！",
+    "NOTSUPPORT": "不支持此类型！",
     "SUCCESS": "已安装"
   }
 }
 
-var file = $context.data
-
-if (file && file.fileName) {
-  var fileName = file.fileName
-  if (fileName.indexOf(".js") == -1) {
-    error(fileName, file)
+// 从应用内启动
+if ($app.env == $env.app) {
+  if ($clipboard.link && $clipboard.link.indexOf(".js") > 0) {
+    installfromLink($clipboard.link);
   } else {
-    var addins = $addin.list
-    var addins_list = ""
-    for (var i = 0; i < addins.length; i++) {
-      addins_list = addins_list + addins[i].name + "|"
-    }
-    if (addins_list.indexOf(fileName) > -1) {
-      warning(addins_list, fileName, file)
-    } else {
-      install(fileName, file)
-    }
+    $ui.error("Not Supported URL!")
+    delayClose(1.4)
   }
-  return
+}
+// 从 Action Entension 启动
+else if ($app.env == $env.action) {
+  var contextText = $context.text;
+  var file = $context.data;
+
+  if ($context.text && $context.text.indexOf(".js") > 0) {
+    var link = $context.text.match(/https?:\/\/[^\s]+/i);
+    if (link) {
+      link = link[0];
+      installfromLink(link);
+    } else {
+      $ui.error("Not Supported URL!")
+      delayClose(1)
+    }
+  } else if (file && file.fileName) {
+    var fileName = file.fileName;
+    if (fileName.indexOf(".js") == -1) {
+      error(fileName, file);
+    } else {
+      renameFile(fileName, file);
+    }
+  } else {
+    $ui.alert({
+      title: $l10n("ERROR"),
+      message: $l10n("NOTSUPPORT"),
+      actions: [{
+        title: "OK",
+        style: "Cancel",
+        handler: function() {
+          delayClose(0.8)
+        }
+      }]
+    })
+  }
+}
+// 从 Safari 启动
+else if ($app.env == $env.safari) {
+  var link = $context.safari.items.baseURI;
+  if (link.indexOf(".js") > 0) {
+    installfromLink(link);
+  } else {
+    $ui.error("Not Supported URL!")
+    delayClose(1)
+  }
 }
 
-var scheme = "inbox://";
-var files = $file.list(scheme) || []
-
-$ui.render({
-  props: {
-    title: $l10n("MAIN_TITLE")
-  },
-  views: [{
-    type: "list",
-    props: {
-      data: files
-    },
-    layout: $layout.fill,
-    events: {
-      didSelect: function(sender, indexPath) {
-        var name = files[indexPath.row]
-        var path = scheme + name
-        function _delete() {
-          $file.delete(path)
-          sender.delete(indexPath)
-        }
-        $ui.menu({
-          items: [$l10n("IMPORT_DELETE"), $l10n("DELETE_DIRECTLY")],
-          handler: function(title, idx) {
-            if (idx == 0) {
-              install(name, $file.read(path))
-              _delete()
-            } else if (idx == 1) {
-              _delete()
-            }
-          }
-        })
-      }
+function renameFile(name, data, icon) {
+  $input.text({
+    type: $kbType.default,
+    text: name.replace('.js',''),
+    handler: function(text) {
+      installfromFile(text + '.js', data, icon);
     }
-  }, {
-    type: "label",
-    props: {
-      hidden: files.length > 0,
-      text: $l10n("EMPTY_TIPS"),
-      lines: 0,
-      align: $align.center
+  })
+}
+
+function installfromFile(fileName, file, icon) {
+  var addins = $addin.list
+  var addins_list = ""
+  for (var i = 0; i < addins.length; i++) {
+    addins_list = addins_list + "||" + addins[i].name + "||";
+  }
+  if (addins_list.indexOf("||" + fileName + "||") > -1) {
+    warning(addins_list, fileName, file, icon)
+  } else {
+    install(fileName, file, icon)
+  }
+}
+
+function installfromLink(link) {
+  var script_url = link.match(/url=(https?[^\s]+?\.js)/i)
+  if (script_url) {
+    script_url = $text.URLDecode(script_url[1]);
+  } else {
+    script_url = link.match(/https?:\/\/[^\s]+/i)[0];
+  }
+  var script_name = link.match(/&name=([^&\s]+)/);
+  var script_icon = link.match(/&icon=([^&\s]+)/);
+  script_name = script_name ? $text.URLDecode(script_name[1]):$text.URLDecode(link.match(/https?:\/\/.+\/(.+)\.js/i)[1]);
+  script_icon = script_icon ? script_icon[1]:"icon_124.png";
+
+  $ui.loading(true);
+  $http.download({
+    url: script_url,
+    progress: function (bytesWritten, totalBytes) {
+      var percentage = bytesWritten * 1.0 / totalBytes
     },
-    layout: function(make, view) {
-      make.left.right.top.bottom.inset(20)
+    handler: function(resp) {
+      $ui.loading(false)
+      renameFile(script_name, resp.data, script_icon)
     }
-  }]
-})
+  })
+}
 
-
-function error(name, data) {
+function error(name, data, icon) {
   $ui.alert({
     title: $l10n("ERROR"),
     message: $l10n("STILL_INSTALL"),
@@ -109,20 +152,19 @@ function error(name, data) {
       title: $l10n("CANCEL"),
       style: "Cancel",
       handler: function() {
-        $context.close()
-        $app.close()
+        delayClose(0.8);
       }
     },
     {
-      title: $l10n("OK"),
+      title: $l10n("STILL"),
       handler: function() {
-        install(name + ".js", data)
+        renameFile(name + ".js", data, icon);
       }
     }]
   })  
 }
 
-function warning(list, name, data) {
+function warning(list, name, data, icon) {
   $ui.alert({
     title: $l10n("Existed"),
     message: name,
@@ -130,63 +172,44 @@ function warning(list, name, data) {
         title: $l10n("CANCEL"),
         style: "Cancel",
         handler: function() {
-          $context.close()
-          $app.close()
+          delayClose(0.5);
         }
       },
       {
         title: $l10n("REPLACE"),
         handler: function() {
-          install(name, data)
+          install(name, data, icon);
         }
       },
       {
         title: $l10n("RENAME"),
         handler: function() {
-          var new_name = "0"
-          $input.text({
-            type: $kbType.default,
-            placeholder: name.replace('.js',''),
-            handler: function(text) {
-              new_name = text
-              // if (list.indexOf(new_name) > -1) {
-              //   $ui.alert({
-              //     title: $l10n("Existed"),
-              //     message: $l10n("ANOTHER"),
-              //     actions: [{
-              //       title: $l10n("OK"),
-              //       style: "Cancel",
-              //       handler: function() {
-              //         $input.text({
-              //           type: $kbType.default,
-              //           placeholder: name.replace('.js',''),
-              //           handler: function(new_text) {
-              //             new_name = new_text
-              //           }
-              //         })
-              //       }
-              //     }]
-              //   })
-              // }
-              install(new_name, data)
-            }
-          })          
+          renameFile(name, data, icon);
         }
       }
     ]
   })
 }
 
-function install(name, data) {
+function install(name, data, icon) {
   $addin.save({
     name: name,
     data: data,
-    types: 1
+    icon: icon
   })
   $ui.toast($l10n("SUCCESS"), 1)
-  $delay(1.5, function() {
-    $context.close()
-    $app.close()
-  })
+  delayClose(1.5)
 }
 
+function delayClose(time) {
+  $thread.main({
+    delay: time,
+    handler: function() {
+      if ($app.env == $env.action || $app.env == $env.safari) {
+        $context.close()
+      } else {
+        $app.close()
+      }
+    }
+  })
+}
