@@ -22,6 +22,7 @@ $app.strings = {
     "SCANMORE": "Which has more accurate recognition effect",
     "OK": "OK",
     "CANCEL": "Cancel",
+    "SCAN": "Scan",
     "CANNOTOPEN": "No available app can open the URL Scheme on the device.",
   },
   "zh-Hans": {
@@ -29,6 +30,7 @@ $app.strings = {
     "SCANMORE": "具有更佳的识别率",
     "OK": "好的",
     "CANCEL": "取消",
+    "SCAN": "扫描",
     "CANNOTOPEN": "缺少对应 App，无法打开 URL Scheme",
   }
 }
@@ -60,7 +62,11 @@ if (qr == null) {
   if (text) {
     showResult(text, true)
   } else {
-    showWarning(true)
+    if ($context.image) {
+      showWarning(true)
+    } else {
+      showWarning()
+    }
   }
 }
 
@@ -204,19 +210,39 @@ function showResult(text, runningExt) {
 }
 
 function showWarning(runningExt) {
-$ui.alert({
-  title: "QR Code Error",
-  message: "Shared Image OR Clip Content is NOT a QR Code.\n\nPlease try again.",
-  actions: [{
-    title: "OK",
-    style: "Cancel",
-    handler: function() {
-      $clipboard.clear()
-      if (runningExt)
-        $context.close()
-    }
-  }]
-})
+  if (runningExt) {
+    $ui.alert({
+      title: "QR Code Error",
+      message: "\nShared Image is NOT a QR Code.\n\nPlease try others.",
+      actions: [{
+        title: $l10n("OK"),
+        style: "Cancel",
+        handler: function() {
+          $context.close()
+        }
+      }]
+    })
+  } else {
+    $ui.alert({
+      title: "QR Code Error",
+      message: "\nClip Content is NOT a QR Code.\n\nCancel OR Scan?",
+      actions: [{
+        title: $l10n("CANCEL"),
+        style: "Cancel",
+        handler: function() {
+          $system.home()
+          $app.close()
+        }
+      },
+      {
+        title: $l10n("SCAN"),
+        handler: function() {
+          $clipboard.clear();
+          $app.openURL("jsbox://run?name=" + encodeURI($addin.current.name));
+        }
+      }]
+    })
+  }
 }
 
 function checkVersion() {
