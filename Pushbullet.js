@@ -239,7 +239,7 @@ function pushbulletClip(accesstoken, device) {
     })
   } else {
     if ($clipboard.link) {
-      sendLink($clipboard.text.replace($clipboard.link, '') || $clipboard.link, $clipboard.link, null, accesstoken, device)
+      sendLink($clipboard.text || $clipboard.link, $clipboard.link, null, accesstoken, device)
     } else {
       sendNote($clipboard.text, accesstoken, device)
     }
@@ -261,7 +261,7 @@ function pushbulletAction(accesstoken, device) {
     var link = $context.text.match(/https?:\/\/[^\s]+/i)
     if (link) {
       link = link[0]
-      sendLink($context.text.replace(link, '') || link, link, null, accesstoken, device)
+      sendLink($context.text || link, link, null, accesstoken, device)
     } else {
       sendNote($context.text, accesstoken, device)
     }
@@ -354,7 +354,7 @@ function sendNote(note, accesstoken, device) {
 function sendLink(title, link, selection, accesstoken, device) {
   $ui.loading("Loading...")
   //Change AppStore urls to ASO100 ⬇️
-  var patt = /itunes\.apple\.com\/(\w+)\/app\//;
+  var patt = /itunes\.apple\.com\/(\w+)\/app\/.*?\?mt=(?!12).*/;
   var result;
   if ((result = patt.exec(link)) != null) {
     var regex = /.+id(\d+).*/;
