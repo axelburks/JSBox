@@ -71,7 +71,7 @@ $ui.render({
       events: {
         ready: function(sender) {
           var auto = $context.query.auto || ($context.text ? true : false)
-          var content = $context.query.downloadUrl || $context.text || ($clipboard.text ? $clipboard.text : null)
+          var content = $context.query.downloadUrl || $context.link || $context.text || ($clipboard.text ? $clipboard.text : null)
           if (content != null) {
             sender.text = content
           }
