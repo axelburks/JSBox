@@ -11,14 +11,43 @@ if(content != null){
   var weico_link = content.match(/https?:\/\/.*?weico\.cc[^\s]+?weibo_id=(\d+)/i);
   var weibo_link = content.match(/https?:\/\/m\.weibo\.cn\/[^\/]+?\/(\d+)/i);
   if (weico_link) {
+    var url = weico_link[0];
     var id = weico_link[1];
     var link = "https://m.weibo.cn/status/" + id;
-    $clipboard.set({
-        "type": "public.plain-text",
-        "value": content.replace(url, link)
-      })
-    $ui.toast("Copied Success!")
-    delayClose(0.8)    
+    var scheme = "sinaweibo://detail?mblogid=" + id;
+    $ui.alert({
+      title: "Copy or Open it?",
+      message: content.replace(url, link),
+      actions: [{
+        title: "Open",
+        style: "Cancel",
+        handler: function() {
+          var preResult = $app.openURL(scheme);
+          if (preResult) {
+            delayClose(0.6) 
+          } else {
+            $ui.error("Weibo NOT installed! Copied Success!")
+            $clipboard.set({
+              "type": "public.plain-text",
+              "value": content.replace(url, link)
+            })
+            delayClose(1.4)
+          }
+        }
+      },
+      {
+        title: "Copy",
+        handler: function() {
+          $clipboard.set({
+            "type": "public.plain-text",
+            "value": content.replace(url, link)
+          })
+          $ui.toast("Copied Success!")
+          delayClose(0.8)
+        }
+      }]
+    })
+
   } else if (weibo_link) {
     var id = weibo_link[1];
     var link = "weibointernational://detail?weiboid=" + id;
@@ -26,7 +55,11 @@ if(content != null){
     if (preResult) {
       delayClose(0.6) 
     } else {
-      $ui.error("Weico NOT installed!")
+      $ui.error("Weico NOT installed! Copied Success!")
+      $clipboard.set({
+        "type": "public.plain-text",
+        "value": link
+      })
       delayClose(1.4)
     }
   } else {
