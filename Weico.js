@@ -63,8 +63,8 @@ function mid2id(mid) {
       var offset1 = i < 0 ? 0 : i;  
       var offset2 = i + 4;  
       var str = mid.substring(offset1, offset2);  
-        
-      str = str62to10(str);  
+
+      str = str62to10(str).toString();  
       if (offset1 > 0) //若不是第一组，则不足7位补0  
       {  
           while (str.length < 7)  
@@ -72,7 +72,7 @@ function mid2id(mid) {
               str = '0' + str;  
           }  
       }  
-        
+
       id = str + id;  
   }  
     
