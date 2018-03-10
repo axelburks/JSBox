@@ -353,9 +353,9 @@ function sendNote(note, accesstoken, device) {
 
 function sendLink(title, link, selection, accesstoken, device) {
   $ui.loading("Loading...")
-  //Change AppStore urls to ASO100 ⬇️
+  //Convert iOS App Store urls to ASO100 ⬇️
   var patt = /itunes\.apple\.com\/(\w+)\/app\/.*?\?mt=(?!12).*/;
-  var result;
+  var result = null;
   if ((result = patt.exec(link)) != null) {
     var regex = /.+id(\d+).*/;
     var appid = regex.exec(link)[1];
