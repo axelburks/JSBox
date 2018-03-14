@@ -267,7 +267,7 @@ function pushbulletAction(accesstoken, device) {
     }
   } else {
     var file = $context.data
-    $ui.toast("Setting URL...")
+    $ui.toast("Setting URL for file...")
     $ui.loading("Loading...")
     file_name = file.fileName
     $http.request({
@@ -330,7 +330,7 @@ function pushbulletAction(accesstoken, device) {
 }
 
 function sendNote(note, accesstoken, device) {
-  $ui.loading("Loading...")
+  $ui.loading(note)
   $http.request({
     method: "POST",
     url: "https://api.pushbullet.com/v2/pushes",
@@ -352,7 +352,6 @@ function sendNote(note, accesstoken, device) {
 }
 
 function sendLink(title, link, selection, accesstoken, device) {
-  $ui.loading("Loading...")
   //Convert iOS App Store urls to ASO100 ⬇️
   var patt = /itunes\.apple\.com\/(\w+)\/app\/.*?\?mt=(?!12).*/;
   var result = null;
@@ -362,6 +361,7 @@ function sendLink(title, link, selection, accesstoken, device) {
     link = "https://www.qimai.cn/app/baseinfo/appid/" + appid + "/country/" + result[1];
   }
   //End ⬆️
+  $ui.loading(link)
   $http.request({
     method: "POST",
     url: "https://api.pushbullet.com/v2/pushes",
