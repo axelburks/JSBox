@@ -265,7 +265,7 @@ function pushbulletAction(accesstoken, device) {
     } else {
       sendNote($context.text, accesstoken, device)
     }
-  } else {
+  } else if ($context.data) {
     var file = $context.data
     $ui.toast("Setting URL for file...")
     $ui.loading("Loading...")
