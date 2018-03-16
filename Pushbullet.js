@@ -1,21 +1,11 @@
 /*
- Pushbullet
-    支持从剪切板发送和接收 Push
-    Send:
-         TodayWidget:
-                Clipboard
-         Action Extension:
-                File 📝
-         Safari:
-                Link 🔗
-    Get:
-         TodayWidget or in App:
-                Note, Link 🔗, File 📝
-    Delete:
-         One or All
-    
-  by Nicked 
-     https://t.me/nicked
+1.App 内支持发送、接收、删除内容
+2.Today widget 支持发送剪贴板内容(Line 18 处可自行修改回原方式)
+3.Action Extension 支持自动识别发送 Note, Link，File 类型
+4.Safari Extension 运行增加获取当前页面标题、链接、选中内容
+5.Note 类型检测到链接时自动转换为 Link 类型，接收自动打开链接
+6.指定接收设备，避免发送端安装 App 的情况下也收到通知
+7.AppStore 链接自动转换为 ASO100 页面（支持 PC 查看美区等商店内容且数据更全面，Line 345 处可自行删除取消转换）
 */
 
 timeout = 3
