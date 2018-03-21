@@ -21,9 +21,9 @@ $app.strings = {
     "CANCEL": "Cancel",
     "REPLACE": "Replace",
     "RENAME": "Rename",
-    "STILL_INSTALL": "Not a .js file.\nAre you still want to install it?",
+    "STILL_INSTALL": "Not supported file (js/box/zip).\nAre you still want to install it?",
     "CANNOTOPEN": "Please Run The Script From Share Extension!",
-    "NOTSUPPORT": "Not Supported Type!",
+    "NOTSUPPORT": "Not Supported Type or URL!",
     "SUCCESS": "Installed"
   },
   "zh-Hans": {
@@ -34,102 +34,106 @@ $app.strings = {
     "CANCEL": "取消",
     "REPLACE": "覆盖",
     "RENAME": "重命名",
-    "STILL_INSTALL": "非 js 文件，\n仍然安装？",
+    "STILL_INSTALL": "未支持的文件类型 (js/box/zip)，\n仍然安装？",
     "CANNOTOPEN": "请通过分享扩展运行此脚本！",
-    "NOTSUPPORT": "不支持此类型！",
+    "NOTSUPPORT": "不支持此文件类型或链接！",
     "SUCCESS": "已安装"
   }
 }
 
 // 从应用内启动
 if ($app.env == $env.app) {
-  if ($clipboard.link && $clipboard.link.indexOf(".js") > 0) {
+  if ($clipboard.link && $clipboard.link.match(/\.(js|box|zip)/i)) {
     installfromLink($clipboard.link);
   } else {
-    $ui.error("Not Supported URL!")
+    $ui.error($l10n("NOTSUPPORT"))
     delayClose(1.4)
   }
 }
 // 从 Action Entension 启动
 else if ($app.env == $env.action) {
-  var contextText = $context.text;
   var file = $context.data;
 
-  if ($context.text && $context.text.indexOf(".js") > 0) {
-    var link = $context.text.match(/https?:\/\/[^\s]+/i);
-    if (link) {
-      link = link[0];
-      installfromLink(link);
-    } else {
-      $ui.error("Not Supported URL!")
-      delayClose(1)
-    }
+  if ($context.text && $context.text.match(/https?:\/\/[^\s]+\.(js|box|zip)/i)) {
+    installfromLink($context.text.match(/https?:\/\/[^\s]+/i)[0]);
   } else if (file && file.fileName) {
     var fileName = file.fileName;
-    if (fileName.indexOf(".js") == -1) {
-      error(fileName, file);
-    } else {
+    if (fileName.match(/\.(js|box|zip)/i)) {
       renameFile(fileName, file);
+    } else {
+      error(fileName, file);
     }
   } else {
-    $ui.alert({
-      title: $l10n("ERROR"),
-      message: $l10n("NOTSUPPORT"),
-      actions: [{
-        title: "OK",
-        style: "Cancel",
-        handler: function() {
-          delayClose(0.8)
-        }
-      }]
-    })
+    $ui.error($l10n("NOTSUPPORT"))
+    delayClose(1.4)
   }
 }
 // 从 Safari 启动
 else if ($app.env == $env.safari) {
   var link = $context.safari.items.baseURI;
-  if (link.indexOf(".js") > 0) {
+  if (link.match(/\.(js|box|zip)/i)) {
     installfromLink(link);
   } else {
-    $ui.error("Not Supported URL!")
-    delayClose(1)
+    $ui.error($l10n("NOTSUPPORT"))
+    delayClose(1.4)
   }
 }
 
-function renameFile(name, data, icon) {
+function renameFile(name, data, icon, types, author, version) {
+  var file_type = name.match(/\.js|\.box|\.zip/i)
+  if (file_type) {
+    file_type = file_type[0]
+  } else {
+    file_type = ""
+  }
   $input.text({
     type: $kbType.default,
-    text: name.replace('.js',''),
+    text: name.replace(file_type,''),
     handler: function(text) {
-      installfromFile(text + '.js', data, icon);
+      if (file_type == ".js") {
+        installfromFile(text + file_type, data, icon, types, author, version);
+      } else {
+        installfromFile(text, data, icon, types, author, version);
+      }
     }
   })
 }
 
-function installfromFile(fileName, file, icon) {
+function installfromFile(fileName, file, icon, types, author, version) {
   var addins = $addin.list
   var addins_list = ""
   for (var i = 0; i < addins.length; i++) {
     addins_list = addins_list + "||" + addins[i].name + "||";
   }
   if (addins_list.indexOf("||" + fileName + "||") > -1) {
-    warning(addins_list, fileName, file, icon)
+    warning(addins_list, fileName, file, icon, types, author, version)
   } else {
-    install(fileName, file, icon)
+    install(fileName, file, icon, types, author, version)
   }
 }
 
 function installfromLink(link) {
-  var script_url = link.match(/url=(https?[^\s]+?\.js)/i)
+  var script_url = link.match(/url=(https?[^\s]+?\.(js|box|zip))/i)
   if (script_url) {
-    script_url = $text.URLDecode(script_url[1]);
+    if (script_url[1].match(/https?%3A%2F%2F/i)) {
+      script_url = $text.URLDecode(script_url[1]);
+    } else {
+      script_url = script_url[1];
+    }
   } else {
     script_url = link.match(/https?:\/\/[^\s]+/i)[0];
   }
-  var script_name = link.match(/&name=([^&\s]+)/);
-  var script_icon = link.match(/&icon=([^&\s]+)/);
-  script_name = script_name ? $text.URLDecode(script_name[1]):$text.URLDecode(link.match(/https?:\/\/.+\/(.+)\.js/i)[1]);
-  script_icon = script_icon ? script_icon[1]:"icon_124.png";
+  var script_name = link.match(/(\?|&)name=([^&\s]+)/);
+  var script_icon = link.match(/(\?|&)icon=([^&\s]+)/);
+  var script_types = link.match(/(\?|&)types=([^&\s]+)/);
+  var script_author = link.match(/(\?|&)author=([^&\s]+)/);
+  var script_version = link.match(/(\?|&)version=([^&\s]+)/);
+
+  script_name = script_name ? $text.URLDecode(script_name[2])+$text.URLDecode(link).match(/https?:\/\/.+\/([^\/]+(\.js|\.box|\.zip))/i)[2]:$text.URLDecode($text.URLDecode(link).match(/https?:\/\/.+\/([^\/]+\.(js|box|zip))/i)[1]);
+  script_icon = script_icon ? script_icon[2]:null;
+  script_types = script_types ? script_types[2]:null;
+  script_author = script_author ? script_author[2]:null;
+  script_version = script_version ? script_version[2]:null;
 
   $ui.loading(true);
   $http.download({
@@ -139,12 +143,12 @@ function installfromLink(link) {
     },
     handler: function(resp) {
       $ui.loading(false)
-      renameFile(script_name, resp.data, script_icon)
+      renameFile(script_name, resp.data, script_icon, script_types, script_author, script_version)
     }
   })
 }
 
-function error(name, data, icon) {
+function error(name, data, icon, types, author, version) {
   $ui.alert({
     title: $l10n("ERROR"),
     message: $l10n("STILL_INSTALL"),
@@ -158,13 +162,13 @@ function error(name, data, icon) {
     {
       title: $l10n("STILL"),
       handler: function() {
-        renameFile(name + ".js", data, icon);
+        renameFile(name + ".js", data, icon, types, author, version);
       }
     }]
   })  
 }
 
-function warning(list, name, data, icon) {
+function warning(list, name, data, icon, types, author, version) {
   $ui.alert({
     title: $l10n("Existed"),
     message: name,
@@ -178,24 +182,27 @@ function warning(list, name, data, icon) {
       {
         title: $l10n("REPLACE"),
         handler: function() {
-          install(name, data, icon);
+          install(name, data, icon, types, author, version);
         }
       },
       {
         title: $l10n("RENAME"),
         handler: function() {
-          renameFile(name, data, icon);
+          renameFile(name, data, icon, types, author, version);
         }
       }
     ]
   })
 }
 
-function install(name, data, icon) {
+function install(name, data, icon, types, author, version) {
   $addin.save({
     name: name,
     data: data,
-    icon: icon
+    icon: icon,
+    types: types,
+    author: author,
+    version: version
   })
   $ui.toast($l10n("SUCCESS"), 1)
   delayClose(1.5)
