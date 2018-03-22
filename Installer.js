@@ -156,7 +156,7 @@ function error(name, data, icon, types, author, version) {
       title: $l10n("CANCEL"),
       style: "Cancel",
       handler: function() {
-        delayClose(0.8);
+        delayClose(0.4);
       }
     },
     {
@@ -176,7 +176,7 @@ function warning(list, name, data, icon, types, author, version) {
         title: $l10n("CANCEL"),
         style: "Cancel",
         handler: function() {
-          delayClose(0.5);
+          delayClose(0.4);
         }
       },
       {
@@ -205,7 +205,7 @@ function install(name, data, icon, types, author, version) {
     version: version
   })
   $ui.toast($l10n("SUCCESS"), 1)
-  delayClose(1.5)
+  delayClose(0.8)
 }
 
 function delayClose(time) {
