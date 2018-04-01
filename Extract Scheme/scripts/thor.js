@@ -40,8 +40,13 @@ function thor() {
                   $app.openURL("thor://session.gui/active")
                   $app.listen({
                     resume: function() {
-                      $app.openURL("surge3:///toggle?autoclose=true")
-                      schemes.delayClose(0.8)
+                      $app.openURL("thor://sniffer.gui/shutdown")
+                      $app.listen({
+                        resume: function() {
+                          $app.openURL("surge3:///toggle?autoclose=true")
+                          schemes.delayClose(0.8)
+                        }
+                      })
                     }
                   })
                 }
