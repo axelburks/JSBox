@@ -7,19 +7,7 @@ jsbox://run?name=Downloader&downloadUrl=https://domain.com/A.exe&auto=true
 
 作者联系：https://t.me/axel_burks
 */
-var version = 1.1
-
-var autoUpdate = $context.text ? false : true
-Object.size = function(obj) {
-  var size = 0, key;
-  for (key in obj) {
-      if (obj.hasOwnProperty(key)) size++;
-  }
-  return size;
-};
-if (autoUpdate == true && Object.size($context.query) > 0) {
-  autoUpdate = false
-}
+var file = null
 
 $ui.render({
   props: {
@@ -29,7 +17,7 @@ $ui.render({
     {
       type: "label",
       props: {
-        text: "下载地址：",
+        text: "Input URL：",
         align: $align.lefts
       },
       layout: function(make, view) {
@@ -42,16 +30,33 @@ $ui.render({
       type: "button",
       props: {
         id: "downloadButton",
-        title: "下载"
+        title: "Download"
       },
       layout: function(make) {
         make.top.inset(265)
         make.right.inset(25)
-        make.size.equalTo($size(64, 32))
+        make.size.equalTo($size(111, 32))
       },
       events: {
         tapped: function(sender) {
           download()
+        }
+      }
+    },
+    {
+      type: "button",
+      props: {
+        id: "shareButton",
+        title: "Share"
+      },
+      layout: function(make) {
+        make.top.inset(265)
+        make.right.equalTo($("downloadButton").left).inset(10)
+        make.size.equalTo($size(0, 0))
+      },
+      events: {
+        tapped: function(sender) {
+          share(file)
         }
       }
     },
@@ -76,8 +81,7 @@ $ui.render({
             sender.text = content
           }
           if (auto) {
-            // $("downloadButton").hidden = true
-            download(true)
+            download()
           } else {
             sender.focus()
           }
@@ -87,18 +91,10 @@ $ui.render({
   ]
 })
 
-if (autoUpdate == true) {
-  $thread.background({
-    handler: function() {
-      checkVersion()
-    }
-  })
-}
-
-function download(ext) {
-  var url = $("inputUrl").text.match(/^https?:\/\/[^\s]+/i)
-  if (url) {
-    $ui.toast("开始下载: " + url)
+function download() {
+  if ($("inputUrl").text.match(/^https?:\/\/[^\s]+/i)) {
+    var url = $("inputUrl").text.match(/^https?:\/\/[^\s]+/i)[0]
+    $ui.toast("Downloading ...")
     $ui.loading(true)
     $http.download({
       url: url,
@@ -107,43 +103,39 @@ function download(ext) {
       },
       handler: function(resp) {
         $ui.loading(false)
-        $share.sheet(resp.data)
-        if (ext) {
-          $delay(25, function() {
-            $context.close()
-            $app.close()
-          })
-        }
+        file = resp.data
+        $("shareButton").updateLayout(function(make) {
+          make.size.equalTo($size(100, 32))
+        })
+        share(file)
       }
     })
   } else {
-    $ui.toast("请输入正确的下载地址格式！")
-    $("downloadButton").hidden = false
+    $ui.error("请输入正确的下载地址！")
     $("inputUrl").focus()
   }
 }
 
-function checkVersion() {
-  $http.get({
-    url: "https://raw.githubusercontent.com/axelburks/JSBox/master/updateInfo",
-    handler: function(resp) {
-      var afterVersion = resp.data["Downloader"]["version"];
-      var msg = resp.data["Downloader"]["msg"];
-      if (afterVersion > version) {
-        $ui.alert({
-          title: "检测到新的版本！V" + afterVersion,
-          message: "更新说明：\n" + msg,
-          actions: [{
-            title: "更新",
-            handler: function() {
-              var url = "jsbox://install?url=https://raw.githubusercontent.com/axelburks/JSBox/master/Downloader.js&name=" + $addin.current.name.split(".js")[0] + "&icon=" + $addin.current.icon;
-              $app.openURL(encodeURI(url));
-              $app.close()
-            }
-          }, {
-            title: "取消"
-          }]
-        })
+function share(data) {
+  $share.sheet({
+    items: [data.fileName, data], // 也支持 item
+    handler: function(success) {
+      if (success) {
+        $cache.clear()
+        delayClose(0.5)
+      }
+    }
+  })
+}
+
+function delayClose(time) {
+  $thread.main({
+    delay: time,
+    handler: function() {
+      if ($app.env == $env.action || $app.env == $env.safari) {
+        $context.close()
+      } else {
+        $app.close()
       }
     }
   })
