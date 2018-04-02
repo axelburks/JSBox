@@ -8,6 +8,14 @@ jsbox://run?name=Downloader&downloadUrl=https://domain.com/A.exe&auto=true
 作者联系：https://t.me/axel_burks
 */
 var file = null
+var context_content = $context.query.downloadUrl || $context.link || $context.text
+var content = context_content || ($clipboard.text ? $clipboard.text : null)
+var auto = $context.query.auto || (context_content ? true : false)
+
+if ($app.env == $env.safari) {
+  content = $context.safari.items.baseURI
+  auto = true
+}
 
 $ui.render({
   props: {
@@ -75,8 +83,6 @@ $ui.render({
       },
       events: {
         ready: function(sender) {
-          var auto = $context.query.auto || ($context.text ? true : false)
-          var content = $context.query.downloadUrl || $context.link || $context.text || ($clipboard.text ? $clipboard.text : null)
           if (content != null) {
             sender.text = content
           }
@@ -118,7 +124,7 @@ function download() {
 
 function share(data) {
   $share.sheet({
-    items: [data.fileName, data], // 也支持 item
+    item: [data.fileName, data],
     handler: function(success) {
       if (success) {
         $cache.clear()
