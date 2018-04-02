@@ -95,16 +95,17 @@ function pushbullet(accesstoken, device) {
                 items: push.map(function(item) {
                   if (item.type == "note") {
                     if (item.body.indexOf("\n") >= 0) {
-                      return item.body.trim().split("\n")[0] + "...(👀 Multi-Lines)"
+                      return item.body.trim().split("\n")[0] + "...↩️"
                     } else {
                       return item.body
                     }
                   } else if (item.type == "link") {
-                    mkd = "[" + item.body + "]" + "(" + item.url + ")"
-                    if (item.title) {
+                    if (item.body) {
+                      return "🔗:" + item.body
+                    } else if (item.title) {
                       return "🔗:" + item.title
                     } else {
-                      return "🔗:" + mkd
+                      return "🔗:" + item.url
                     }
 
                   } else {
@@ -115,10 +116,14 @@ function pushbullet(accesstoken, device) {
                 }),
                 handler: function(title, idx) {
                   if (push[idx].type == "link") {
-
-                    $clipboard.text = "[" + push[idx].body + "]" + "(" + push[idx].url + ")"
+                    if (push[idx].body) {
+                      $clipboard.text = "[" + push[idx].body + "]" + "(" + push[idx].url + ")"
+                    } else if (push[idx].title) {
+                      $clipboard.text = "[" + push[idx].title + "]" + "(" + push[idx].url + ")"
+                    } else {
+                      $clipboard.text = push[idx].url
+                    }
                     var title = "Link and Note Copied 📌"
-
                     selectResult(title, $clipboard.text, push[idx].url)
 
                   } else if (push[idx].type == "note") {
@@ -467,9 +472,7 @@ function toast(resp) {
     $ui.toast("Request Timeout, Try Again Later ❌")
     $ui.loading(false)
     $app.close()
-    // delayClose()
   }
-
 }
 
 function delayClose() {
@@ -491,6 +494,13 @@ function selectResult(title, message, url, quicklook = 0) {
     title: title,
     message: message,
     actions: [{
+        title: "Open",
+        handler: function() {
+          $app.openURL(url)
+          delayClose()
+        }
+      },
+      {
         title: "Preview",
         handler: function() {
           if (quicklook == 0) {
