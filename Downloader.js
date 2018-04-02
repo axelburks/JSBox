@@ -98,9 +98,9 @@ $ui.render({
 })
 
 function download() {
-  if ($("inputUrl").text.match(/^https?:\/\/[^\s]+/i)) {
-    var url = $("inputUrl").text.match(/^https?:\/\/[^\s]+/i)[0]
-    $ui.toast("Downloading ...")
+  if ($("inputUrl").text.match(/^https?:\/\/[^\s]+\/[^\s]+\.\w+/i)) {
+    var url = $("inputUrl").text.match(/^https?:\/\/[^\s]+\/[^\s]+\.\w+/i)[0]
+    $ui.toast("Downloading...")
     $ui.loading(true)
     $http.download({
       url: url,
@@ -117,7 +117,7 @@ function download() {
       }
     })
   } else {
-    $ui.error("请输入正确的下载地址！")
+    $ui.error("Please Input Correct URL!", 1)
     $("inputUrl").focus()
   }
 }
