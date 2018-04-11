@@ -21,7 +21,7 @@ function thor() {
       $ui.error("No file input!")
       schemes.delayClose(1.4)
     }
-  } else {
+  } else if ($app.env == $env.app || $app.env == $env.today) {
     var thor = $app.openURL(thor_sniffer)
     if (thor) {
       $app.listen({

@@ -1,23 +1,23 @@
 {
-  "info": {
-    "name": "",
-    "url": "",
-    "version": "1.0.0",
-    "author": "",
-    "website": "",
-    "types": 0
+  "widget" : {
+    "height" : 0,
+    "tintColor" : "",
+    "iconColor" : ""
   },
-  "settings": {
-    "minSDKVer": "1.0.0",
-    "minOSVer": "10.0.0",
-    "idleTimerDisabled": false,
-    "autoKeyboardEnabled": false,
-    "keyboardToolbarEnabled": false,
-    "rotateDisabled": false
+  "info" : {
+    "url" : "",
+    "author" : "Axel",
+    "website" : "",
+    "types" : 15,
+    "name" : "Extract Scheme",
+    "version" : "1.0.0"
   },
-  "widget": {
-    "height": 0,
-    "tintColor": "",
-    "iconColor": ""
+  "settings" : {
+    "minOSVer" : "10.0.0",
+    "minSDKVer" : "1.0.0",
+    "rotateDisabled" : false,
+    "autoKeyboardEnabled" : false,
+    "keyboardToolbarEnabled" : false,
+    "idleTimerDisabled" : false
   }
 }
