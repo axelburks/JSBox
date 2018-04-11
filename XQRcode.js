@@ -132,7 +132,7 @@ function showResult(text, runningExt) {
         scheme = url.toString().replace(/https?/i,"taobao")
       } else if (isContains(url,/qr\.shouqianba\.com|qr\.alipay\.com.*PAI_LOGIN/i)) {
         scheme = "alipays://platformapi/startapp?saId=10000007"
-      } else if (isContains(url,/(qr|d)\.alipay\.com\/(kox|sux)/i)) {
+      } else if (isContains(url,/(qr|d)\.alipay\.com\/(kox|sux|stx)/i)) {
         scheme = "koubei://platformapi/startapp?saId=10000007&qrcode=" + url
       } else if (isContains(url,/(qr|d|m)\.alipay\.com|spay3\.swiftpass\.cn|tlt\.allinpay\.com|v\.ubox\.cn\/qr|i\.55tuan\.com\/rq/i)) {
         if (!isContains(url,/^[0-9A-Z\:\/\/]+$/)) {
