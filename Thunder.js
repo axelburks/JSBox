@@ -9,7 +9,7 @@
 
 var content = $context.query.downloadUrl || $context.link || $context.text || ($clipboard.text ? $clipboard.text : null)
 if(content != null){
-	var url = content.match(/(https?:\/\/|magnet:)[^\s]+/i)
+	var url = content.match(/((https?|ftp):\/\/|magnet:)[^\s]+/i)
 	var thunder_url = content.match(/thunder:\/\/[^\s]+/i)
 	if (url) {
 		url = url[0]

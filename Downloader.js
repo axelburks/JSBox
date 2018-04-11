@@ -26,7 +26,7 @@ $ui.render({
       type: "label",
       props: {
         text: "Input URL：",
-        align: $align.lefts
+        align: $align.left
       },
       layout: function(make, view) {
         make.left.inset(25)
@@ -98,7 +98,7 @@ $ui.render({
 })
 
 function download() {
-  if ($("inputUrl").text.match(/^https?:\/\/[^\s]+\/[^\s]+\.\w+/i)) {
+  if ($("inputUrl").text.match(/^(https?|ftp):\/\/[^\s]+\/[^\s]+\.\w+/i)) {
     var url = $("inputUrl").text.match(/^https?:\/\/[^\s]+\/[^\s]+\.\w+/i)[0]
     $ui.toast("Downloading...")
     $ui.loading(true)
