@@ -221,17 +221,9 @@ function pushbullet(accesstoken, device) {
 }
 
 function pushbulletClip(accesstoken, device) {
-  if ($clipboard.text == "") {
-    $ui.alert({
-      title: "WARNING",
-      message: "Clipboard is EMPTY ❌",
-      actions: [{
-        title: "Cancel",
-        handler: function() {
-          $app.close()
-        }
-      }]
-    })
+  if (!$clipboard.text || $clipboard.text == "") {
+    $ui.error("Clipboard is Empty!", 1)
+    delayClose()
   } else {
     if ($clipboard.link) {
       sendLink($clipboard.text || $clipboard.link, $clipboard.link, null, accesstoken, device)
