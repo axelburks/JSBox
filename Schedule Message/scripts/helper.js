@@ -1,14 +1,14 @@
-var Pinyin = require('scripts/Pinyin')
-var listView_idList = []
+let Pinyin = require('scripts/Pinyin')
+let listView_idList = []
 
 function saveItem(id, data) {
-  var allItems = $cache.get("messages")
+  let allItems = $cache.get("messages") || {}
   allItems[id] = data
   $cache.set("messages", allItems)
 }
 
 function getItem(id) {
-  var allItems = $cache.get("messages")
+  let allItems = $cache.get("messages")
   return allItems[id]
 }
 
@@ -21,14 +21,14 @@ function deleteItem(allItems, item_id) {
 }
 
 function sendItem(from, id_index, id_from_notify) {
-  var item_id = ""
+  let item_id = ""
   if (from == "list") {
     item_id = listView_idList[id_index]
   } else {
     item_id = id_from_notify
   }
-  var allItems = $cache.get("messages")
-  var item = allItems[item_id]
+  let allItems = $cache.get("messages")
+  let item = allItems[item_id]
   $message.sms({
     recipients: item.phonelist.split(","),
     body: item.message,
@@ -46,9 +46,9 @@ function sendItem(from, id_index, id_from_notify) {
 
 function searchItem(query) {
   function isContain(element) {
-    var rex = query.split("").join(".*")
-    var patt = new RegExp("[\u4e00-\u9fa5]")
-    var temp = ""
+    let rex = query.split("").join(".*")
+    let patt = new RegExp("[\u4e00-\u9fa5]")
+    let temp = ""
     if (patt.test(query)) {
       temp = element
     } else {
@@ -56,10 +56,10 @@ function searchItem(query) {
     }
     return new RegExp(rex,"i").test(temp)
   }
-  var allItems = $cache.get("messages")
-  var matchIds = []
+  let allItems = $cache.get("messages") || {}
+  let matchIds = []
   for (key in allItems) {
-    var content = allItems[key].receiver + " " + allItems[key].message
+    let content = allItems[key].receiver + " " + allItems[key].message
     if (isContain(content)) {
       matchIds.push(String(allItems[key].id))
     }
@@ -68,8 +68,8 @@ function searchItem(query) {
 }
 
 function updateItem(messages, status, id_list) {
-  var temp = []
-  var items_id = []
+  let temp = []
+  let items_id = []
   if (status == "search") {
     items_id = id_list
   } else {
@@ -83,9 +83,9 @@ function updateItem(messages, status, id_list) {
   listView_idList = items_id
 
   if (items_id.length > 0) {
-    for (var i = 0; i < items_id.length; i++) {
+    for (let i = 0; i < items_id.length; i++) {
 
-      var item = messages[items_id[i]]
+      let item = messages[items_id[i]]
       temp.push({
         content_receiver: {
           text: "Receiver : " + item.receiver
@@ -125,8 +125,8 @@ function updateItem(messages, status, id_list) {
 }
 
 function deleteNotify(item_id) {
-  var allItems = $cache.get("messages")
-  var nid = allItems[item_id].notify_id
+  let allItems = $cache.get("messages")
+  let nid = allItems[item_id].notify_id
   $push.cancel({id: nid})
 }
 
@@ -135,7 +135,7 @@ function sortNumber(a,b) {
 }
 
 // Array.prototype.removeByValue = function(val) {
-//   for(var i=0; i<this.length; i++) {
+//   for(let i=0; i<this.length; i++) {
 //     if(this[i] == val) {
 //       this.splice(i, 1);
 //       break;

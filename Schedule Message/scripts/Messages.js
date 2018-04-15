@@ -3,6 +3,13 @@ var helper = require('scripts/helper')
 const DeviceSIZE = $device.info.screen
 
 function init() {
+  render()
+  if ($context.query.from && $context.query.from == "schedule_ms_widget") {
+    helper.sendItem("notify", 0, $context.query.schedule_ms_id)
+  }
+}
+
+function render() {
   $ui.render({
     props: {
       id: "Main",

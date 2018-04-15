@@ -304,10 +304,14 @@ function saveButtonAction(item_id) {
       helper.deleteNotify(item_id)
     }
     $push.schedule({
-      title: "Scheduled Message To: " + $("receiver").text,
+      title: "Scheduled MS To: " + $("receiver").text,
       body: $("message").text,
       date: schedule_date,
       script: $addin.current.name.split(".js")[0],
+      query: {
+        "from": "schedule_ms_widget",
+        "schedule_ms_id": save_id
+      },
       handler: function(notify_result) {
         var data = {
           "notify_id": notify_result.id,
