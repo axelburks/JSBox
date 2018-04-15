@@ -150,7 +150,7 @@ function showActions(data, wallpaper) {
     } else if (action === ACTIONS.TRANSLATE) {
       helper.translateDetail(item)
     } else if (action === ACTIONS.SHARE_MEDIA) {
-      helper.shareMedia(item)
+      helper.shareMedia(item, "extension", "AppleMusic")
     } else if (action === ACTIONS.OPEN_APP_STORE) {
       helper.openAppStore(country, item)
     } else if (action === ACTIONS.OPEN_COLLECTION) {

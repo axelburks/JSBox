@@ -73,7 +73,7 @@ function showActions(index) {
     } else if (action === ACTIONS.TRANSLATE) {
       helper.translateDetail(item)
     } else if (action === ACTIONS.SHARE_MEDIA) {
-      helper.shareMedia(item)
+      helper.shareMedia(item, "app", "AppleMusic")
     } else if (action === ACTIONS.OPEN_APP_STORE) {
       helper.openAppStore(country, item)
     } else if (action === ACTIONS.OPEN_COLLECTION) {

@@ -98,33 +98,64 @@ function savePic(link) {
   return p
 }
 
-function shareMedia(item) {
-  showDownloading()
-  $ui.loading(true)
-  $http.download({
-    url: item.artworkUrl100.replaceAll("100x100", "1024x1024"),
-    handler: function (resp) {
-      $ui.loading(false)
-      let description = ""
-      let status = "Listening"
-      if (item.kind && item.kind.match(/movie/)) {
-        status = "Watching"
-      }
-      if (item.collectionType && item.collectionType.match(/Album/i)) {
-        description = `${status}「${item.collectionName}」by「${item.artistName}」- iTunes Store ${item.collectionViewUrl}`
-      } else {
-        description = `${status}「${item.trackName}」by「${item.artistName}」- iTunes Store ${item.trackViewUrl}`
-      }
-      $share.sheet({
-        item: [resp.data, description],
-        handler: function (success) {
-          if (success) {
+function shareMedia(item, source, platform) {
+  if (platform == "None") {
+    $ui.loading(true)
+    let artwork = $file.read('assets/cover.jpg')
+    let description = `Listening「${item.title}」by「${item.artist}」`
+    $ui.loading(false)
+    $share.sheet({
+      item: [artwork, description],
+      handler: function (success) {
+        if (success) {
+          if (source == "widget") {
+            $system.home()
+            $app.close()
+          } else {
             delayClose(0.6)
           }
         }
-      })
-    }
-  })
+      }
+    })
+  } else {
+    showDownloading()
+    $ui.loading(true)
+    $http.download({
+      url: platform == "AppleMusic" ? item.artworkUrl100.replaceAll("100x100", "1024x1024") : item.pic,
+      handler: function (resp) {
+        $ui.loading(false)
+        let description = ""
+        let status = "Listening"
+        let artwork = resp.data
+        artwork.fileName = "image.jpeg"
+        if (item.kind && item.kind.match(/movie/)) {
+          status = "Watching"
+        }
+        if (platform == "AppleMusic") {
+          if (item.collectionType && item.collectionType.match(/Album/i)) {
+            description = `${status}「${item.collectionName}」by「${item.artistName}」- iTunes Store ${item.collectionViewUrl}`
+          } else {
+            description = `${status}「${item.trackName}」by「${item.artistName}」- iTunes Store ${item.trackViewUrl}`
+          }
+        } else if (platform == "NetEase") {
+          description = `${status}「${item.title}」by「${item.singer}」- NetEase Cloud Music http://music.163.com/#/song?id=${item.id}`
+        }
+        $share.sheet({
+          item: [artwork, description],
+          handler: function (success) {
+            if (success) {
+              if (source == "widget") {
+                $system.home()
+                $app.close()
+              } else {
+                delayClose(0.6)
+              }
+            }
+          }
+        })
+      }
+    })
+  }
 }
 
 function showPreview(item, country) {
@@ -167,7 +198,6 @@ function openPreview(item) {
   if ($app.env == $env.action && !item.previewUrl.match(/video\.itunes\.apple\.com.+\.m4v/)) {
     $quicklook.open({ url: item.previewUrl })
   } else {
-    //$app.openURL(item.previewUrl)
     $safari.open({
       url: item.previewUrl,
       entersReader: false,
