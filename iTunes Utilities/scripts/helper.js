@@ -12,22 +12,18 @@ function getIcon(item) {
   }
 }
 
-async function getScreenshots(item) {
+function getScreenshots(item) {
   showDownloading()
   $ui.loading(true)
   if ($app.env == $env.action) {
     let url_list = item.screenshotUrls.map(function (url) {
       return url.replaceAll(/\d+x\d+/, "2400x2400")
     })
-    for(let i=0; i<url_list.length; i++) {
-      await savePic(url_list[i]).then(function(data){
-        if (data && i == url_list.length - 1) {
-          $ui.loading(false)
-          $ui.toast("Saved Success!", 1)
-          delayClose(0.6)
-        }
-      })
-    }
+    Promise.all(url_list.map(item => savePic(item))).then(data => {
+      $ui.loading(false)
+      $ui.toast("Saved Success!", 1)
+      delayClose(0.6)
+    })
   } else {
     $quicklook.open({
       list: item.screenshotUrls.map(function (url) {
@@ -37,22 +33,18 @@ async function getScreenshots(item) {
   }
 }
 
-async function getIpadScreenshots(item) {
+function getIpadScreenshots(item) {
   showDownloading()
   $ui.loading(true)
   if ($app.env == $env.action) {
-    let url_list = item.ipadScreenshotUrls.map(function (url) {
+    let url_list = item.screenshotUrls.map(function (url) {
       return url.replaceAll(/\d+x\d+/, "2400x2400")
     })
-    for (let i = 0; i < url_list.length; i++) {
-      await savePic(url_list[i]).then(function (data) {
-        if (data && i == url_list.length - 1) {
-          $ui.loading(false)
-          $ui.toast("Saved Success!", 1)
-          delayClose(0.6)
-        }
-      })
-    }
+    Promise.all(url_list.map(item => savePic(item))).then(data => {
+      $ui.loading(false)
+      $ui.toast("Saved Success!", 1)
+      delayClose(0.6)
+    })
   } else {
     $quicklook.open({
       list: item.ipadScreenshotUrls.map(function (url) {

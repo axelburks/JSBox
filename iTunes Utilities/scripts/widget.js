@@ -5,8 +5,9 @@ let netease_api = 'http://music.able.cat/download/api/?id='
 
 function init() {
   let Player = $objc("MPMusicPlayerController").invoke("systemMusicPlayer")
+  let state = Player.invoke("playbackState")
   let song = Player.invoke("nowPlayingItem")
-  if (song) {
+  if (state == 1 && song) {
     let title = song.invoke("valueForKey", "title").rawValue()
     let artist = song.invoke("valueForKey", "artist").rawValue()
     let albumTitle = song.invoke("valueForKey", "albumTitle").rawValue()
