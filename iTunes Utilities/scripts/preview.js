@@ -1,22 +1,5 @@
 function init(item, country) {
-  var deviceID = $cache.get("deviceID")
-  if (!$cache.get("deviceID")) {
-    $input.text({
-      type: $kbType.default,
-      placeholder: "Input your deviceuid which generated from AppzApp",
-      handler: function(text) {
-        if (text.match(/^[-A-Z0-9]{36}$/)) {
-          $cache.set("deviceID", text)
-          preview(text, item, country)
-        } else {
-          $ui.alert("Please Input Correct Deviceuid")
-          return
-        }
-      }
-    })
-  } else {
-    preview($cache.get("deviceID"), item, country)
-  }
+ preview("", item, country)
 }
 
 function preview(deviceuid, item, country) {
