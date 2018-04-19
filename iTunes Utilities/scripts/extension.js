@@ -10,8 +10,8 @@ var country = countries[0].code
 function init() {
   render()
   var link = $context.link || $context.text
-  if (link && link.match(/itunes\.apple\.com\/[a-z]+\/app\/?.*?\/id(\d+).*?\?mt=\d+/)) {
-    var result = link.match(/itunes\.apple\.com\/([a-z]+)\/app\/?.*?\/id(\d+).*?\?mt=\d+/)
+  if (link && link.match(/itunes\.apple\.com\/[a-z]+\/app\/?.*?\/id(\d+).*?mt=\d+/)) {
+    var result = link.match(/itunes\.apple\.com\/([a-z]+)\/app\/?.*?\/id(\d+).*?mt=\d+/)
     country = result[1]
     var appid = result[2]
     var search_url = `https://itunes.apple.com/lookup?id=${appid}&country=${country}`
@@ -82,7 +82,7 @@ function fetchData(url, type) {
 
 function processHtml(html) {
   var wallpaper_url = html.match(/https:\/\/.+?\/image\/thumb\/.+?\.jpg/)[0]
-  var result = html.match(/https?:\/\/itunes\.apple\.com\/([a-z]+)\/app\/?.*?\/id(\d+).*?\?mt=\d+/)
+  var result = html.match(/https?:\/\/itunes\.apple\.com\/([a-z]+)\/app\/?.*?\/id(\d+).*?mt=\d+/)
   country = result[1]
   var appid = result[2]
   var search_url = `https://itunes.apple.com/lookup?id=${appid}&country=${country}`
