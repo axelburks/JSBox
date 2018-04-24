@@ -1,5 +1,5 @@
 function init(item, country) {
- preview("", item, country)
+  preview("", item, country)
 }
 
 function preview(deviceuid, item, country) {
