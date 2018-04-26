@@ -40,7 +40,7 @@ function preview(deviceuid, item, country) {
         if (date.match(/(\d+)\s(.+)月\s(\d+)/)) {
           let date_init = date.match(/(\d+)\s(.+月)\s(\d+)/)
           date = date.replace(date_init[2], month[date_init[2]])
-          date = moment(date, "DD MMM YY").format('YYYY-MM-DD')
+          date = moment(date, "DD MMM YY").format('YYYY-M-DD')
         } else if (date.match(/(\d+)\s(\d+)\s(\d+)/)) {
           date = moment(date, "DD MM YY").format('YYYY-MM-DD')
         } else if (date.match(/(\d+)\s(\w+)\s(\d+)/)) {
