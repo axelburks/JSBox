@@ -123,7 +123,7 @@ function showResult(text, runningExt) {
       } else if (isContains(url,/(weixin|wxp):\/\/|weixin\.qq|tenpay\.com/i)) {
         scheme = "weixin://scanqrcode"
       } else if (isContains(url,/(wsk|txz|unipay)\.qq\.com/i)) {
-        scheme = "mqq://"
+        scheme = "mqqapi://qrcode/scan_qrcode?version=1&src_type=app"
       } else if (isContains(url,/zhihu\.com.*question/i)) {
         scheme = url.toString().replace(/https?/i,"zhihu")
       } else if (isContains(url,/ofo\.so\/plate/i)) {
