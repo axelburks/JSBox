@@ -14,7 +14,7 @@
 
 作者联系：https://t.me/axel_burks
 */
-var version = 0.9
+var version = 1.1
 
 $app.strings = {
   "en": {
