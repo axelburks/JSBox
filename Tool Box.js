@@ -6,10 +6,11 @@
 
 作者联系：https://t.me/axel_burks
 */
-var version = 1.3
+var version = 1.4
 
 var extensions = $cache.get("extensions") || []
 const DeviceSIZE = $device.info.screen
+var current_list = extensions
 
 if ($app.env == $env.today) {
   $ui.menu({
@@ -37,7 +38,7 @@ $ui.render({
         align: $align.center,
         clearsOnBeginEditing:true,
         bgcolor: $rgba(0, 0, 0, 0.04),
-        placeholder: "搜索"
+        placeholder: "Search"
       },
       layout: function (make, view) {
         make.top.equalTo(view.prev).inset(8)
@@ -189,7 +190,13 @@ $ui.render({
         ],
         actions: [
           {
-            title: "delete",
+            title: "Edit",
+            handler: function(sender, indexPath) {
+              editItem(indexPath)
+            }
+          },
+          {
+            title: "Delete",
             handler: function(sender, indexPath) {
               deleteItem(indexPath)
             }
@@ -334,6 +341,7 @@ function selectItem() {
 }
 
 function updateItem(data, status) {
+  current_list = data
   var temp = []
   count = data.length
   if (count > 0) {
@@ -387,7 +395,7 @@ function updateItem(data, status) {
       }]
     }
   }
-  
+
   listView.data = temp
 }
 
@@ -413,8 +421,31 @@ function insertItem(text) {
   saveItems()
 }
 
+function editItem(indexPath) {
+  var name = current_list[indexPath.row]
+  var list_index = extensions.indexOf(name)
+  if (list_index >= 0) {
+    var edit_index = $file.extensions.indexOf(name)
+    if (edit_index >= 0) {
+      var RootVC = $objc("UIApplication").invoke("sharedApplication").invoke("keyWindow").invoke("rootViewController")
+      var EditorVC = RootVC.invoke("childViewControllers.objectAtIndex", 0).invoke("childViewControllers.objectAtIndex", 0)
+
+      if (EditorVC.invoke("buttonAction") == 1) {
+        EditorVC.invoke("setButtonAction", 0)
+        RootVC.invoke("topViewController.dismiss")
+        EditorVC.invoke("startEditorAtIndex", edit_index)
+        EditorVC.invoke("setButtonAction", 1)
+      } else {
+        RootVC.invoke("topViewController.dismiss")
+        EditorVC.invoke("startEditorAtIndex", edit_index)
+      }
+    }
+
+  }
+}
+
 function deleteItem(indexPath) {
-  var text = extensions[indexPath.row]
+  var text = current_list[indexPath.row]
   var index = extensions.indexOf(text)
   if (index >= 0) {
     extensions.splice(index, 1)
@@ -423,6 +454,7 @@ function deleteItem(indexPath) {
 }
 
 function saveItems() {
+  current_list = extensions
   $cache.set("extensions", extensions)
 }
 
