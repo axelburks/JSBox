@@ -83,12 +83,16 @@ function fetchData(url, type) {
 function processHtml(html) {
   var wallpaper_url = html.match(/https:\/\/.+?\/image\/thumb\/.+?\.jpg/)[0]
   var result = html.match(/https?:\/\/itunes\.apple\.com\/([a-z]+)\/app\/?.*?\/id(\d+).*?mt=\d+/)
-  country = result[1]
-  var appid = result[2]
-  var search_url = `https://itunes.apple.com/lookup?id=${appid}&country=${country}`
-  fetchData(search_url).then(function(data){
-    showActions(data, wallpaper_url)
-  })
+  if (result) {
+    country = result[1]
+    var appid = result[2]
+    var search_url = `https://itunes.apple.com/lookup?id=${appid}&country=${country}`
+    fetchData(search_url).then(function(data){
+      showActions(data, wallpaper_url)
+    })
+  } else {
+    showActions(null, wallpaper_url)
+  }
 }
 
 function showActions(data, wallpaper) {
@@ -120,7 +124,9 @@ function showActions(data, wallpaper) {
     if (wallpaper) {
       items.splice(2, 0, ACTIONS.GET_TODAY_WALLPAPER)
     }
-    if (data.ipadScreenshotUrls && data.ipadScreenshotUrls.length > 0) {
+    if (data == null && wallpaper) {
+      items = [ACTIONS.GET_TODAY_WALLPAPER]
+    } else if (data.ipadScreenshotUrls && data.ipadScreenshotUrls.length > 0) {
       items.splice(2, 0, ACTIONS.GET_IPAD_SCREENSHOTS)
     }
   } else if (entity.code === "podcast") {
