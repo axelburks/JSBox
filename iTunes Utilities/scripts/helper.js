@@ -100,12 +100,7 @@ function shareMedia(item, source, platform) {
       item: [artwork, description],
       handler: function (success) {
         if (success) {
-          if (source == "widget") {
-            $system.home()
-            $app.close()
-          } else {
-            delayClose(0.6)
-          }
+          delayClose(0.6)
         }
       }
     })
@@ -131,17 +126,14 @@ function shareMedia(item, source, platform) {
           }
         } else if (platform == "NetEase") {
           description = `${status}「${item.title}」by「${item.singer}」- NetEase Cloud Music http://music.163.com/#/song?id=${item.id}`
+        } else if (platform == "QQMusic") {
+          description = `${status}「${item.title}」by「${item.singer}」- QQMusic https://y.qq.com/n/yqq/song/${item.id}_num.html`
         }
         $share.sheet({
           item: [artwork, description],
           handler: function (success) {
             if (success) {
-              if (source == "widget") {
-                $system.home()
-                $app.close()
-              } else {
-                delayClose(0.6)
-              }
+              delayClose(0.6)
             }
           }
         })
@@ -207,8 +199,8 @@ function delayClose(time) {
     handler: function () {
       if ($app.env == $env.action || $app.env == $env.safari) {
         $context.close()
-      } else {
-        //$app.close()
+      } else if ($app.env != $env.app) {
+        $app.close()
       }
     }
   })

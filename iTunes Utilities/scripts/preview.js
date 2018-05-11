@@ -1,3 +1,5 @@
+let showLabels = false
+
 function init(item, country) {
   preview("", item, country)
 }
@@ -25,8 +27,12 @@ function preview(deviceuid, item, country) {
     handler: function(resp) {
       let data = JSON.parse(resp.data.d)
       let content = ""
+      let date_count = 0
       let price_list = []
-      let lowest_price = "( No Price Change )"
+      let chart_list = []
+      let last_status = null
+      let showChart = false
+      let lowest_price = "Nah"
       let device_list = ["iPhone", "iPad", "iPhone & iPad", "Mac"]
       let device_type = device_list[data.Device - 1]
       let title = data.Title.match(/^.+(?=\s[-—－–])|^.+(?=[-—－–])|^.+/)[0]
@@ -40,7 +46,7 @@ function preview(deviceuid, item, country) {
         if (date.match(/(\d+)\s(.+)月\s(\d+)/)) {
           let date_init = date.match(/(\d+)\s(.+月)\s(\d+)/)
           date = date.replace(date_init[2], month[date_init[2]])
-          date = moment(date, "DD MMM YY").format('YYYY-M-DD')
+          date = moment(date, "DD MM YY").format('YYYY-MM-DD')
         } else if (date.match(/(\d+)\s(\d+)\s(\d+)/)) {
           date = moment(date, "DD MM YY").format('YYYY-MM-DD')
         } else if (date.match(/(\d+)\s(\w+)\s(\d+)/)) {
@@ -62,6 +68,15 @@ function preview(deviceuid, item, country) {
           </div>`
           content = content + update
         } else {
+          showChart = true        
+          let date_dot = moment(date, 'YYYY-MM-DD').utc().valueOf() + 8*3600000
+          if (date_count == 0) {
+            let today = new Date().getTime() + 8*3600000
+            chart_list.push(`[${today},${activities[i].PriceTo}]`)
+            date_count ++
+          }
+          chart_list.push(`[${date_dot},${activities[i].PriceTo}]`)
+          last_status = `[${date_dot},${activities[i].PriceFrom}]`
           price_list.push(activities[i].PriceFrom)
           price_list.push(activities[i].PriceTo)
           let pricefrom = activities[i].PriceFrom
@@ -99,7 +114,7 @@ function preview(deviceuid, item, country) {
       }
       if (price_list.length > 0) {
         let min = Math.min.apply(null, price_list)
-        lowest_price = `(Lowest Price: ${currency}${min})`
+        lowest_price = `${currency}${min}`
       }
       let detail = `<div class="container" name="Detail">
       <div class="box">
@@ -127,12 +142,14 @@ function preview(deviceuid, item, country) {
       </div>
       </div>`
       content = content + detail
+      chart_list.push(last_status)
+      let chart_data_set = chart_list.reverse().join(",")
       let html = `<html>
       <head>
       <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
       <title>App Preview</title>
       <style>
-      h1 {padding: 0.5em 0 0.5em 0;text-align: center;font-size: 50pt;font-weight: 600;margin: 0;}
+      h1 {padding: 0.5em 0 0.5em 0;text-align: center;font-size: 40pt;font-weight: 550;margin: 0;}
       body {font-family: sans-serif;}
       a {text-decoration: none;color: #444;}
       p {margin: 1rem 0;}
@@ -147,8 +164,12 @@ function preview(deviceuid, item, country) {
       .link {border-radius: 6px;height: 77px;line-height: 80px;display: inline-block;font-size: 20pt;border-bottom: 3px solid rgba(233,233,233,1);padding-left: 32px;padding-right: 32px;margin: 0.5em 1em;background: rgba(233,233,233,1);background-size: 40px 39px;box-shadow: 0px 2px 8px 0px rgba(158, 158, 158, 0.5);transition: border-color 0.5s;-webkit-transition: border-color 0.5s;-moz-transition: border-color 0.5s;-ms-transition: border-color 0.5s;-o-transition: border-color 0.5s;}
       .footer {margin: 5em 0}
       </style>
+      <script src="http://cdn.hcharts.cn/highcharts/highcharts.js"></script>
       <script language="javascript">
       window.onload=function(){
+        if (${showChart} == true) {
+          displayChart()
+        }
       $PriceInc=document.getElementsByName("PriceInc");
       $PriceDrop=document.getElementsByName("PriceDrop");
       $Upgrade=document.getElementsByName("Upgrade");
@@ -163,6 +184,75 @@ function preview(deviceuid, item, country) {
       document.getElementById("Upgrade").style.borderBottom="3px solid rgba(237,108,0,0.8)";
       document.getElementById("Detail").style.borderBottom="3px solid rgba(128,128,128,0.8)";
       Init();
+      }
+      
+      function displayChart() {
+        document.getElementById("price_chart").style.display="";
+        var options = {
+          credits: {
+            enabled: false
+          },
+          chart: {
+            type: 'line',
+            style: {
+              fontSize: '20px',
+              fontWeight: 'bold'
+            }
+          },
+          title: {
+            text: null
+          },
+          xAxis: {
+            type: 'datetime',
+            title: {
+              text: null
+            },
+            labels: {
+              format: '{value:%y-%m-%d}',
+              step:2,
+              align: 'center',
+              style: { "color": "#666666", "cursor": "default", "fontSize": "25px" }
+            }
+          },
+          yAxis: {
+            title: {
+              text: null
+            },
+            labels: {
+              step:2,
+              align: 'center',
+              style: { "color": "#666666", "cursor": "default", "fontSize": "20px" }
+            },
+            min: 0
+          },
+          tooltip: {
+            style: {
+              fontSize: "25px",
+              fontWeight: "blod"
+            },
+            headerFormat: '<b>{series.name}</b><br>',
+            pointFormat: '{point.x:%Y-%m-%d}: ${currency}{point.y:.2f}'
+          },
+          plotOptions: {
+            line: {
+              marker: {
+                enabled: null
+              },
+              dataLabels: {
+                enabled: ${showLabels},
+                style: {"color": "#A9A9A9", "fontSize": "18px", "textOutline": "1px 1px contrast" }
+              },
+              enableMouseTracking: true
+            }
+          },
+          series: [{
+            name: 'Price',
+            lineWidth: 4,
+            showInLegend: false,
+            data: [${chart_data_set}]
+          }]
+        };
+        var chart = Highcharts.chart('price_chart', options);
       }
       
       function getElementsByClassName(n){
@@ -312,12 +402,14 @@ function preview(deviceuid, item, country) {
       
       function Init(){
       borderDisplayReset();
-      if($Upgrade_flag){
-      document.getElementById("Upgrade").style.borderBottom="";
-      for(var i=0;i<$Upgrade.length;i++){
-      $Upgrade[i].style.display="none";
-      }
-      $Upgrade_flag=0;
+      if (${showChart} == true) {
+        if($Upgrade_flag){
+          document.getElementById("Upgrade").style.borderBottom="";
+          for(var i=0;i<$Upgrade.length;i++){
+          $Upgrade[i].style.display="none";
+          }
+          $Upgrade_flag=0;
+          }
       }
       if($Detail_flag){
       document.getElementById("Detail").style.borderBottom="";
@@ -333,7 +425,9 @@ function preview(deviceuid, item, country) {
       </head>
       
       <body>
-      <h1>${title}<div class="content">${price} ${lowest_price}<br>${device_type}</div></h1>
+      <h1>${title}<div class="content">${price} (<span style="color: rgba(76,175,80,0.8);">${lowest_price}</span>)<br><span style="font-size: 20pt;color: rgb(192,192,192);">${device_type}</span></div></h1>
+
+      <div id="price_chart" style="margin: 0px 40px 20px;min-width:400px;height:400px;display:none"></div>
       
       <div class="main">
       
