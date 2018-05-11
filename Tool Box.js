@@ -343,7 +343,7 @@ function selectItem() {
 function updateItem(data, status) {
   current_list = data
   var temp = []
-  count = data.length
+  var count = data.length
   if (count > 0) {
     for (var id = 0; id < count; id++) {
       var ext_name = data[id]
