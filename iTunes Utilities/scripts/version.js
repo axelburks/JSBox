@@ -8,32 +8,39 @@ function init(item) {
       let data = resp.data
       let dic = {}
       let time_list = []
-      for(let i=0; i<data.length; i++) {
-        let time_id = new Date(data[i].updated_at).getTime()
+      for (let i = 0; i < data.length; i++) {
+        let time_id = data[i].external_identifier
         time_list.push(time_id)
         dic[time_id] = {
           "external_identifier": data[i].external_identifier,
           "bundle_version": data[i].bundle_version,
-          "updated_at": new Date(data[i].updated_at).toLocaleDateString(),
+          "updated_at": new Date(data[i].created_at).toLocaleDateString(),
         }
       }
       time_list.sort(sortNumber)
       $ui.menu({
-        items: time_list.map(function(timestamp){
+        items: time_list.map(function(timestamp) {
           return "Version:" + dic[timestamp].bundle_version + "    Date:" + dic[timestamp].updated_at
         }),
         handler: function(title, idx) {
           $clipboard.text = dic[time_list[idx]].external_identifier
-          $ui.toast("Copied Success!", 1)
-          helper.delayClose(1)
+          $ui.alert({
+            title: "ID Copied Success",
+            message: "Version: " + dic[time_list[idx]].bundle_version + "\nID: " + dic[time_list[idx]].external_identifier,
+            actions: [{
+              title: "OK",
+              handler: function() {
+                helper.delayClose(0.2)
+              }
+            }]
+          })
         }
       })
     }
   })
 }
 
-
-function sortNumber(a,b) {
+function sortNumber(a, b) {
   return b - a
 }
 

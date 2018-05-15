@@ -8,7 +8,7 @@
 7.AppStore 链接自动转换为 ASO100 页面（支持 PC 查看美区等商店内容且数据更全面，Line 345 处可自行删除取消转换）
 */
 
-timeout = 3
+var timeout = 3
 // 从 Today Widget 启动
 if ($app.env == $env.today) {
   var accesstoken = getToken()
