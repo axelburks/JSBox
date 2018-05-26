@@ -30,10 +30,10 @@ function getNowPlaying() {
     let playbackStoreID = song.invoke("valueForKey", "playbackStoreID").rawValue()
     if (playbackStoreID != "0") {
       processMusic("AppleMusic", playbackStoreID)
-      //$app.openURL("jsbox://run?name=" + encodeURI($addin.current.name) + "&from=itunes_widget&platform=AppleMusic&songid=" + playbackStoreID + "&songtitle=" + $text.URLEncode(title) + "&songartist=" + $text.URLEncode(artist))
+      //$app.openURL("jsbox://run?name=" + encodeURIComponent($addin.current.name) + "&from=itunes_widget&platform=AppleMusic&songid=" + playbackStoreID + "&songtitle=" + $text.URLEncode(title) + "&songartist=" + $text.URLEncode(artist))
     } else {
       processMusic("NetEase", playbackStoreID, title, artist)
-      //$app.openURL("jsbox://run?name=" + encodeURI($addin.current.name) + "&from=itunes_widget&platform=NetEase&songid=" + playbackStoreID + "&songtitle=" + $text.URLEncode(title) + "&songartist=" + $text.URLEncode(artist))
+      //$app.openURL("jsbox://run?name=" + encodeURIComponent($addin.current.name) + "&from=itunes_widget&platform=NetEase&songid=" + playbackStoreID + "&songtitle=" + $text.URLEncode(title) + "&songartist=" + $text.URLEncode(artist))
     }
   } else {
     $ui.error("Nothing Played", 1)

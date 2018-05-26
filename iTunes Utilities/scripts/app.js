@@ -11,7 +11,7 @@ var results = []
 function search(text) {
   $ui.loading(true)
   $http.get({
-    url: `https://itunes.apple.com/search?term=${encodeURI(text)}&entity=${entity.code}&country=${country.code}`,
+    url: `https://itunes.apple.com/search?term=${encodeURIComponent(text)}&entity=${entity.code}&country=${country.code}`,
     handler: function(resp) {
       $ui.loading(false)
       results = resp.data.results.slice(0, 20)
