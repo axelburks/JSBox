@@ -1,87 +1,49 @@
 let showLabels = false
 
 function init(item, country) {
-  preview("", item, country)
-}
-
-function preview(deviceuid, item, country) {
   let moment = require('moment')
   let constants = require("scripts/constants")
-  let month = constants.month
   let currency = constants.currencies[country]
+  let lang = constants.langs[country]
   $ui.loading(true)
   $http.request({
-    method: "POST",
-    url: "http://mobile.appzapp.net/Service/Mobile5.asmx/GetAppDetailsLogDevice",
+    method: "GET",
+    url: `http://info.instafig.com/pricechange?appid=${item.trackId}&charts=1&lang=${lang}`,
     header: {
       "Content-Type": "application/json",
-      "User-Agent": "AppZappUniversal/6.8.2 CFNetwork/901.1 Darwin/17.5.0"
-    },
-    body: {
-      "storeKey": country,
-      "langKey": "zh-Hans-CN",
-      "appID": item.trackId,
-      "isIpad": "false",
-      "deviceuid": deviceuid
+      "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15F5079a"
     },
     handler: function(resp) {
-      let data = JSON.parse(resp.data.d)
+      let resp_data = resp.data
       let content = ""
       let date_count = 0
-      let price_list = []
       let chart_list = []
+      let price_list = []
       let last_status = null
       let showChart = false
-      let lowest_price = "Nah"
-      let device_list = ["iPhone", "iPad", "iPhone & iPad", "Mac"]
-      let device_type = device_list[data.Device - 1]
-      let title = data.Title.match(/^.+(?=\s[-—－–])|^.+(?=[-—－–])|^.+/)[0]
-      //let price = data.Price
-      let price = currency + item.price
-      let activities = data.Activities
-      let description = data.Description
-      let whatsnew = data.WhatsNew
-      for (let i = 0; i < activities.length; i++) {
-        let date = activities[i].DateWithYear
-        if (date.match(/(\d+)\s(.+)月\s(\d+)/)) {
-          let date_init = date.match(/(\d+)\s(.+月)\s(\d+)/)
-          date = date.replace(date_init[2], month[date_init[2]])
-          date = moment(date, "DD MM YY").format('YYYY-MM-DD')
-        } else if (date.match(/(\d+)\s(\d+)\s(\d+)/)) {
-          date = moment(date, "DD MM YY").format('YYYY-MM-DD')
-        } else if (date.match(/(\d+)\s(\w+)\s(\d+)/)) {
-          date = moment(date, "DD MMM YY").format('YYYY-MM-DD')
-        }
-        if (activities[i].Type.match(/Update|New/)) {
-          let version = activities[i].Version
-          let update = `<div class="container" name="Upgrade">
-          <div class="box">
-          <div class="date">
-          <p>${date}</p>
-          </div>
-          <div class="content">
-          <p><span style="color: rgba(237,108,0,0.8);">Upgrade</span> : Version ${version}</p>
-          </div>
-          </div>
-          <div class="border">
-          </div>
-          </div>`
-          content = content + update
-        } else {
-          showChart = true        
+      let lowest_price = "NaN"
+      let title = item.trackCensoredName.match(/^.+(?=\s[-—－–])|^.+(?=[-—－–])|^.+/)[0]
+      let price = item.formattedPrice
+      let description = item.description.replace(/\n/g, "<br>")
+      let whatsnew = item.releaseNotes.replace(/\n/g, "<br>")
+      if (resp_data.length > 0) {
+        price = currency + resp_data[0].current_price
+        for (let i = 0; i < resp_data.length; i++) {
+          showChart = true
+          let date = resp_data[i].change_date
           let date_dot = moment(date, 'YYYY-MM-DD').utc().valueOf() + 8*3600000
           if (date_count == 0) {
             let today = new Date().getTime() + 8*3600000
-            chart_list.push(`[${today},${activities[i].PriceTo}]`)
+            chart_list.push(`[${today},${resp_data[i].current_price}]`)
             date_count ++
           }
-          chart_list.push(`[${date_dot},${activities[i].PriceTo}]`)
-          last_status = `[${date_dot},${activities[i].PriceFrom}]`
-          price_list.push(activities[i].PriceFrom)
-          price_list.push(activities[i].PriceTo)
-          let pricefrom = activities[i].PriceFrom
-          let priceto = activities[i].PriceTo
-          if (activities[i].Type.match(/PriceIncrease/)) {
+          chart_list.push(`[${date_dot},${resp_data[i].current_price}]`)
+          last_status = `[${date_dot},${resp_data[i].previous_price}]`
+          let pricefrom = Number(resp_data[i].previous_price)
+          let priceto = Number(resp_data[i].current_price)
+          price_list.push(pricefrom, priceto)
+          let trend = priceto - pricefrom
+          if (trend > 0) {
             let increase = `<div class="container" name="PriceInc">
             <div class="box">
             <div class="date">
@@ -95,7 +57,7 @@ function preview(deviceuid, item, country) {
             </div>
             </div>`
             content = content + increase
-          } else if (activities[i].Type.match(/PriceDrop/)) {
+          } else {
             let drop = `<div class="container" name="PriceDrop">
             <div class="box">
             <div class="date">
@@ -161,29 +123,26 @@ function preview(deviceuid, item, country) {
       .content {font-size: 25pt;padding-left: 1.1rem;}
       .border {height: 3px;width: 95%;margin-left: auto;margin-right: auto;background-color: #ddd;background-image: repeating-linear-gradient(-45deg, #fff, #fff 4px, transparent 4px, transparent 10px);}
       .container:last-of-type .border {display: none;}
-      .link {border-radius: 6px;height: 77px;line-height: 80px;display: inline-block;font-size: 20pt;border-bottom: 3px solid rgba(233,233,233,1);padding-left: 32px;padding-right: 32px;margin: 0.5em 1em;background: rgba(233,233,233,1);background-size: 40px 39px;box-shadow: 0px 2px 8px 0px rgba(158, 158, 158, 0.5);transition: border-color 0.5s;-webkit-transition: border-color 0.5s;-moz-transition: border-color 0.5s;-ms-transition: border-color 0.5s;-o-transition: border-color 0.5s;}
+      .link {border-radius: 6px;height: 77px;line-height: 80px;display: inline-block;font-size: 20pt;border-bottom: 3px solid rgba(233,233,233,1);padding-left: 60px;padding-right: 60px;margin: 0.5em 1.5em;background: rgba(233,233,233,1);background-size: 40px 39px;box-shadow: 0px 2px 8px 0px rgba(158, 158, 158, 0.5);transition: border-color 0.5s;-webkit-transition: border-color 0.5s;-moz-transition: border-color 0.5s;-ms-transition: border-color 0.5s;-o-transition: border-color 0.5s;}
       .footer {margin: 5em 0}
       </style>
       <script src="http://cdn.hcharts.cn/highcharts/highcharts.js"></script>
-      <script language="javascript">
+      <script language="javascript">      
       window.onload=function(){
         if (${showChart} == true) {
           displayChart()
         }
-      $PriceInc=document.getElementsByName("PriceInc");
-      $PriceDrop=document.getElementsByName("PriceDrop");
-      $Upgrade=document.getElementsByName("Upgrade");
-      $Detail=document.getElementsByName("Detail");
-      $AllDOM=getElementsByClassName("container");
-      $PriceInc_flag=1;
-      $PriceDrop_flag=1;
-      $Upgrade_flag=1;
-      $Detail_flag=1;
-      document.getElementById("PriceInc").style.borderBottom="3px solid rgba(244,67,54,0.8)";
-      document.getElementById("PriceDrop").style.borderBottom="3px solid rgba(76,175,80,0.8)";
-      document.getElementById("Upgrade").style.borderBottom="3px solid rgba(237,108,0,0.8)";
-      document.getElementById("Detail").style.borderBottom="3px solid rgba(128,128,128,0.8)";
-      Init();
+        $PriceInc=document.getElementsByName("PriceInc");
+        $PriceDrop=document.getElementsByName("PriceDrop");
+        $Detail=document.getElementsByName("Detail");
+        $AllDOM=getElementsByClassName("container");
+        $PriceInc_flag=1;
+        $PriceDrop_flag=1;
+        $Detail_flag=1;
+        document.getElementById("PriceInc").style.borderBottom="3px solid rgba(244,67,54,0.8)";
+        document.getElementById("PriceDrop").style.borderBottom="3px solid rgba(76,175,80,0.8)";
+        document.getElementById("Detail").style.borderBottom="3px solid rgba(128,128,128,0.8)";
+        Init();
       }
       
       function displayChart() {
@@ -254,7 +213,7 @@ function preview(deviceuid, item, country) {
         };
         var chart = Highcharts.chart('price_chart', options);
       }
-      
+
       function getElementsByClassName(n){
       var classElements = [],allElements = document.getElementsByTagName('*');
       for (var i=0; i< allElements.length; i++ ){
@@ -267,7 +226,6 @@ function preview(deviceuid, item, country) {
       function borderDisplayReset(){
       if($PriceInc.length>0) $PriceInc[$PriceInc.length-1].getElementsByTagName("div")[3].style.display="";
       if($PriceDrop.length>0) $PriceDrop[$PriceDrop.length-1].getElementsByTagName("div")[3].style.display="";
-      if($Upgrade.length>0) $Upgrade[$Upgrade.length-1].getElementsByTagName("div")[3].style.display="";
       if($Detail.length>0) $Detail[$Detail.length-1].getElementsByTagName("div")[3].style.display="";
       }
       
@@ -328,31 +286,6 @@ function preview(deviceuid, item, country) {
       borderDisplaySet();
       }
       
-      function Upgrade(){
-      borderDisplayReset();
-      if($Detail_flag){
-      document.getElementById("Detail").style.borderBottom="";
-      for(var i=0;i<$Detail.length;i++){
-      $Detail[i].style.display="none";
-      }
-      $Detail_flag=0;
-      }
-      if($Upgrade_flag){
-      document.getElementById("Upgrade").style.borderBottom="";
-      for(var i=0;i<$Upgrade.length;i++){
-      $Upgrade[i].style.display="none";
-      }
-      $Upgrade_flag=0;
-      }else{
-      document.getElementById("Upgrade").style.borderBottom="3px solid rgba(237,108,0,0.8)";
-      for(var i=0;i<$Upgrade.length;i++){
-      $Upgrade[i].style.display="";
-      }
-      $Upgrade_flag=1;
-      }
-      borderDisplaySet();
-      }
-      
       function Detail(){
       borderDisplayReset();
       if($Detail_flag){
@@ -384,13 +317,6 @@ function preview(deviceuid, item, country) {
       }
       $PriceDrop_flag=0;
       }
-      if($Upgrade_flag){
-      document.getElementById("Upgrade").style.borderBottom="";
-      for(var i=0;i<$Upgrade.length;i++){
-      $Upgrade[i].style.display="none";
-      }
-      $Upgrade_flag=0;
-      }
       document.getElementById("Detail").style.borderBottom="3px solid rgba(128,128,128,0.8)";
       for(var i=0;i<$Detail.length;i++){
       $Detail[i].style.display="";
@@ -401,31 +327,40 @@ function preview(deviceuid, item, country) {
       }
       
       function Init(){
-      borderDisplayReset();
-      if (${showChart} == true) {
-        if($Upgrade_flag){
-          document.getElementById("Upgrade").style.borderBottom="";
-          for(var i=0;i<$Upgrade.length;i++){
-          $Upgrade[i].style.display="none";
+        borderDisplayReset();
+        if (${showChart} == true) {
+          if($Detail_flag){
+            document.getElementById("Detail").style.borderBottom="";
+            for(var i=0;i<$Detail.length;i++){
+            $Detail[i].style.display="none";
+            }
+            $Detail_flag=0;
+            borderDisplaySet();
           }
-          $Upgrade_flag=0;
+        } else {
+          if($PriceInc_flag){
+            document.getElementById("PriceInc").style.borderBottom="";
+            for(var i=0;i<$PriceInc.length;i++){
+            $PriceInc[i].style.display="none";
+            }
+            $PriceInc_flag=0;
           }
-      }
-      if($Detail_flag){
-      document.getElementById("Detail").style.borderBottom="";
-      for(var i=0;i<$Detail.length;i++){
-      $Detail[i].style.display="none";
-      }
-      $Detail_flag=0;
-      borderDisplaySet();
-      }
+          if($PriceDrop_flag){
+            document.getElementById("PriceDrop").style.borderBottom="";
+            for(var i=0;i<$PriceDrop.length;i++){
+            $PriceDrop[i].style.display="none";
+            }
+            $PriceDrop_flag=0;
+          }
+          borderDisplaySet();
+        }
       }
       
       </script>
       </head>
       
       <body>
-      <h1>${title}<div class="content">${price} (<span style="color: rgba(76,175,80,0.8);">${lowest_price}</span>)<br><span style="font-size: 20pt;color: rgb(192,192,192);">${device_type}</span></div></h1>
+      <h1>${title}<div class="content">${price} (<span style="color: rgba(76,175,80,0.8);">${lowest_price}</span>)</div></h1>
 
       <div id="price_chart" style="margin: 0px 40px 20px;min-width:400px;height:400px;display:none"></div>
       
@@ -434,7 +369,6 @@ function preview(deviceuid, item, country) {
       <div class="menu">
       <span class="link" id="PriceDrop" style="color: rgba(76,175,80,0.8);" onclick="PriceDrop();">Drop</span>
       <span class="link" id="PriceInc" style="color: rgba(244,67,54,0.8);" onclick="PriceInc();">Increase</span>
-      <span class="link" id="Upgrade" style="color: rgba(237,108,0,0.8);" onclick="Upgrade();">Upgrade</span>
       <span class="link" id="Detail" style="color: rgba(128,128,128,0.8);" onclick="Detail();">Detail</span>
       </div>
       
