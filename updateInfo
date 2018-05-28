@@ -1,7 +1,7 @@
 {
   "Tool Box":{
-    "version": 1.4,
-    "msg": "1.增加左滑直接编辑脚本\n2.修复搜索删除脚本错位"
+    "version": 1.5,
+    "msg": "1.Widget 运行更改为 Matrix 展示\n2.修改动作更改为 URL Scheme 方式\n3.修复某些特殊脚本名称无法运行的问题"
   },
   "XQRcode":{
     "version": 1.1,

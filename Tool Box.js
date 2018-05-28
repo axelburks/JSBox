@@ -6,18 +6,77 @@
 
 作者联系：https://t.me/axel_burks
 */
-var version = 1.4
+var version = 1.5
 
 var extensions = $cache.get("extensions") || []
 const DeviceSIZE = $device.info.screen
 var current_list = extensions
+var addins = $addin.list
+var ext_icon = new Object()
+for (var i = 0; i < addins.length; i++) {
+  ext_icon[addins[i].name.replace('.js', '')] = addins[i].icon.replace('.png', '').replace('icon_', '')
+}
 
 if ($app.env == $env.today) {
-  $ui.menu({
-    items: extensions,
-    handler: function(title, idx) {
-      $app.openExtension(title)
-    }
+  $ui.render({
+    props: {
+      title: "Tool Box"
+    },
+    views: [{
+      type: "matrix",
+      props: {
+        columns: 4,
+        itemHeight: 55,
+        spacing: 0,
+        template: [{
+            type: "blur",
+            props: {
+              radius: 1.0,
+              style: 9
+            },
+            layout: $layout.fill
+          },
+          {
+            type: "label",
+            props: {
+              id: "title",
+              textColor: $color("black"),
+              bgcolor: $color("clear"),
+              font: $font(10)
+            },
+            layout(make, view) {         
+              make.bottom.inset(0)
+              make.centerX.equalTo(view.super)
+              make.height.equalTo(19)
+            }
+          },
+          {
+            type: "image",
+            props: {
+              id: "icon",
+              bgcolor: $color("clear")
+            },
+            layout(make, view) {
+              make.top.inset(12)
+              make.centerX.equalTo(view.super)
+              make.size.equalTo(22)
+            }
+          }
+        ],
+        data: extensions.map(function(item, index) { 
+          return {
+            title: { text: item },
+            icon: { icon: $icon(ext_icon[item], $color("darkGray"), $size(20, 20)) }
+          }
+        })
+      },
+      layout: $layout.fill,
+      events: {
+        didSelect(sender, indexPath, data) {
+          $app.openExtension(data.title.text)
+        }
+      }
+    }]
   })
   return
 }
@@ -180,7 +239,7 @@ $ui.render({
                   return
                 }
                 if ($app.env == $env.app) {
-                  $app.openURL("jsbox://run?name=" + encodeURI(sender.title))
+                  $app.openURL("jsbox://run?name=" + encodeURIComponent(sender.title))
                 } else {
                   $addin.run(sender.title)
                 }
@@ -219,11 +278,6 @@ $ui.render({
   ]
 })
 
-var addins = $addin.list
-var ext_icon = new Object()
-for (var i = 0; i < addins.length; i++) {
-  ext_icon[addins[i].name.replace('.js', '')] = addins[i].icon.replace('.png', '').replace('icon_', '')
-}
 var listView = $("list")
 for (var i = 0; i < extensions.length; i++) {
   if ($file.extensions.indexOf(extensions[i]) === -1) {
@@ -423,25 +477,7 @@ function insertItem(text) {
 
 function editItem(indexPath) {
   var name = current_list[indexPath.row]
-  var list_index = extensions.indexOf(name)
-  if (list_index >= 0) {
-    var edit_index = $file.extensions.indexOf(name)
-    if (edit_index >= 0) {
-      var RootVC = $objc("UIApplication").invoke("sharedApplication").invoke("keyWindow").invoke("rootViewController")
-      var EditorVC = RootVC.invoke("childViewControllers.objectAtIndex", 0).invoke("childViewControllers.objectAtIndex", 0)
-
-      if (EditorVC.invoke("buttonAction") == 1) {
-        EditorVC.invoke("setButtonAction", 0)
-        RootVC.invoke("topViewController.dismiss")
-        EditorVC.invoke("startEditorAtIndex", edit_index)
-        EditorVC.invoke("setButtonAction", 1)
-      } else {
-        RootVC.invoke("topViewController.dismiss")
-        EditorVC.invoke("startEditorAtIndex", edit_index)
-      }
-    }
-
-  }
+  $app.openURL("jsbox://open?name=" + encodeURIComponent(name))
 }
 
 function deleteItem(indexPath) {
@@ -559,7 +595,7 @@ function checkVersion() {
             title: "更新",
             handler: function() {
               var url = "jsbox://install?url=https://raw.githubusercontent.com/axelburks/JSBox/master/Tool%20Box.js&name=" + $addin.current.name.split(".js")[0] + "&icon=" + $addin.current.icon;
-              $app.openURL(encodeURI(url));
+              $app.openURL(encodeURIComponent(url));
               $app.close()
             }
           }, {
