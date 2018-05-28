@@ -6,7 +6,7 @@
 
 作者联系：https://t.me/axel_burks
 */
-var version = 1.5
+var version = 1.51
 
 var extensions = $cache.get("extensions") || []
 const DeviceSIZE = $device.info.screen
@@ -595,7 +595,7 @@ function checkVersion() {
             title: "更新",
             handler: function() {
               var url = "jsbox://install?url=https://raw.githubusercontent.com/axelburks/JSBox/master/Tool%20Box.js&name=" + $addin.current.name.split(".js")[0] + "&icon=" + $addin.current.icon;
-              $app.openURL(encodeURIComponent(url));
+              $app.openURL(encodeURI(url));
               $app.close()
             }
           }, {
