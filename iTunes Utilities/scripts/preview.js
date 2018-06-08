@@ -25,8 +25,8 @@ function init(item, country) {
       let title = item.trackCensoredName.match(/^.+(?=\s[-—－–])|^.+(?=[-—－–])|^.+/)[0]
       let price = item.formattedPrice
       let bundleId = item.bundleId
-      let description = item.description.replace(/\n/g, "<br>").replace(/(https?:\/\/[^"\(\)\[\]\{\}<>\s]+)/g, "<a href=\"$1\">$1</a>")
-      let whatsnew = item.releaseNotes.replace(/\n/g, "<br>").replace(/(https?:\/\/[^"\(\)\[\]\{\}<>\s]+)/g, "<a href=\"$1\">$1</a>")
+      let description = item.description.replace(/\n/g, "<br>").replace(/(https?:\/\/[^"\(\)\[\]\{\}<>\s]+)/g, "<a name=\"universal_links\" href=\"$1\">$1</a>")
+      let whatsnew = item.releaseNotes.replace(/\n/g, "<br>").replace(/(https?:\/\/[^"\(\)\[\]\{\}<>\s]+)/g, "<a name=\"universal_links\" href=\"$1\">$1</a>")
       if (resp_data.length > 0) {
         price = currency + resp_data[0].current_price
         for (let i = 0; i < resp_data.length; i++) {
@@ -82,7 +82,23 @@ function init(item, country) {
       let detail = `<div class="container" name="Detail">
       <div class="box">
       <div class="detail">
-      <p>WhatsNew：</p>
+      <p>ASO100: </p>
+      </div>
+      <div class="content">
+      <p><br>
+      <a name="aso100_links" style="font-size: 27pt;margin: 0 0.5em;" href="https://www.qimai.cn/app/baseinfo/appid/${item.trackId}/country/${country}">基本信息</a>
+      <a name="aso100_links" style="font-size: 27pt;margin: 0 0.5em;" href="https://www.qimai.cn/app/version/appid/${item.trackId}/country/${country}">版本记录</a>
+      <a name="aso100_links" style="font-size: 27pt;margin: 0 0.5em;" href="https://www.qimai.cn/app/comment/appid/${item.trackId}/country/${country}">评分评论</a>
+      <a name="aso100_links" style="font-size: 27pt;margin: 0 0.5em;" href="https://www.qimai.cn/app/rank/appid/${item.trackId}/country/${country}">榜单排名</a>
+      </p></div>
+      </div>
+      <div class="border"></div>
+      </div>
+      
+      <div class="container" name="Detail">
+      <div class="box">
+      <div class="detail">
+      <p>WhatsNew: </p>
       </div>
       <div class="content">
       <p><br>${whatsnew}</p>
@@ -95,7 +111,7 @@ function init(item, country) {
       <div class="container" name="Detail">
       <div class="box">
       <div class="detail">
-      <p>Description：</p>
+      <p>Description: </p>
       </div>
       <div class="content">
       <p><br>${description}</p>
@@ -114,7 +130,7 @@ function init(item, country) {
       <style>
       h1 {padding: 0.5em 0 0.5em 0;text-align: center;font-size: 40pt;font-weight: 550;margin: 0;}
       body {font-family: sans-serif;}
-      a {text-decoration: none;}
+      a {text-decoration: none;color: #CC0099;}
       p {margin: 1rem 0;}
       .menu {margin: 0 0 3em 2%;}
       .main {padding: 0 5%;}
@@ -389,9 +405,18 @@ function init(item, country) {
           props: {
             html: html,
             script: function() {
-              let links = document.getElementsByTagName("a")
-              for (let i=0; i<links.length; ++i) {
-                let element = links[i]
+              let aso100_links = document.getElementsByName("aso100_links")
+              for (let i=0; i<aso100_links.length; ++i) {
+                let element = aso100_links[i]
+                element.onclick = function(event) {
+                  let source = event.target || event.srcElement
+                  $notify("openinSVC", {"url": source.getAttribute("href")})
+                  return false
+                }
+              }
+              let universal_links = document.getElementsByName("universal_links")
+              for (let i=0; i<universal_links.length; ++i) {
+                let element = universal_links[i]
                 element.onclick = function(event) {
                   let source = event.target || event.srcElement
                   $notify("openinSafari", {"url": source.getAttribute("href")})
@@ -401,6 +426,13 @@ function init(item, country) {
             }
           },
           events: {
+            openinSVC: function(object) {
+              $safari.open({
+                url: object.url,
+                height: 360,
+                handler: function() {}
+              })
+            },
             openinSafari: function(object) {
               $app.openURL(object.url)
             }
