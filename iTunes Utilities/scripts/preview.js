@@ -24,6 +24,7 @@ function init(item, country) {
       let lowest_price = "NaN"
       let title = item.trackCensoredName.match(/^.+(?=\s[-—－–])|^.+(?=[-—－–])|^.+/)[0]
       let price = item.formattedPrice
+      let bundleId = item.bundleId
       let description = item.description.replace(/\n/g, "<br>").replace(/(https?:\/\/[^"\(\)\[\]\{\}<>\s]+)/g, "<a href=\"$1\">$1</a>")
       let whatsnew = item.releaseNotes.replace(/\n/g, "<br>").replace(/(https?:\/\/[^"\(\)\[\]\{\}<>\s]+)/g, "<a href=\"$1\">$1</a>")
       if (resp_data.length > 0) {
@@ -360,7 +361,7 @@ function init(item, country) {
       </head>
       
       <body>
-      <h1>${title}<div class="content">${price} (<span style="color: rgba(76,175,80,0.8);">${lowest_price}</span>)</div></h1>
+      <h1>${title}<div class="content">${price} (<span style="color: rgba(76,175,80,0.8);">${lowest_price}</span>)<br><span style="font-size: 20pt;color: rgb(192,192,192);">${bundleId}</span></div></h1>
 
       <div id="price_chart" style="margin: 0px 40px 20px;min-width:400px;height:400px;display:none"></div>
       
