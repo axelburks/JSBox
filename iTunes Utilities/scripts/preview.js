@@ -24,8 +24,8 @@ function init(item, country) {
       let lowest_price = "NaN"
       let title = item.trackCensoredName.match(/^.+(?=\s[-—－–])|^.+(?=[-—－–])|^.+/)[0]
       let price = item.formattedPrice
-      let description = item.description.replace(/\n/g, "<br>")
-      let whatsnew = item.releaseNotes.replace(/\n/g, "<br>")
+      let description = item.description.replace(/\n/g, "<br>").replace(/(https?:\/\/[^"\(\)\[\]\{\}<>\s]+)/g, "<a href=\"$1\">$1</a>")
+      let whatsnew = item.releaseNotes.replace(/\n/g, "<br>").replace(/(https?:\/\/[^"\(\)\[\]\{\}<>\s]+)/g, "<a href=\"$1\">$1</a>")
       if (resp_data.length > 0) {
         price = currency + resp_data[0].current_price
         for (let i = 0; i < resp_data.length; i++) {
@@ -113,7 +113,7 @@ function init(item, country) {
       <style>
       h1 {padding: 0.5em 0 0.5em 0;text-align: center;font-size: 40pt;font-weight: 550;margin: 0;}
       body {font-family: sans-serif;}
-      a {text-decoration: none;color: #444;}
+      a {text-decoration: none;}
       p {margin: 1rem 0;}
       .menu {margin: 0 0 3em 2%;}
       .main {padding: 0 5%;}
@@ -386,7 +386,23 @@ function init(item, country) {
         views: [{
           type: "web",
           props: {
-            html: html
+            html: html,
+            script: function() {
+              let links = document.getElementsByTagName("a")
+              for (let i=0; i<links.length; ++i) {
+                let element = links[i]
+                element.onclick = function(event) {
+                  let source = event.target || event.srcElement
+                  $notify("openinSafari", {"url": source.getAttribute("href")})
+                  return false
+                }
+              }
+            }
+          },
+          events: {
+            openinSafari: function(object) {
+              $app.openURL(object.url)
+            }
           },
           layout: $layout.fill,
         }]

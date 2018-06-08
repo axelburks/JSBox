@@ -68,8 +68,8 @@ function requestGTAPI(origTextbg, origLg, transLg) {
 }
 
 function renderHtml(name, first, last, status) {
-  first = first.replaceAll("\n", "</br>").replace(/(https?:\/\/[^"\(\)\[\]\{\}<>\s]+)/, "<a href=\"$1\">$1</a>")
-  last = last.replaceAll("\n", "</br>").replace(/(https?:\/\/[^"\(\)\[\]\{\}<>\s]+)/, "<a href=\"$1\">$1</a>")
+  first = first.replaceAll("\n", "</br>").replaceAll(/(https?:\/\/[^"\(\)\[\]\{\}<>\s]+)/, "<a href=\"$1\">$1</a>")
+  last = last.replaceAll("\n", "</br>").replaceAll(/(https?:\/\/[^"\(\)\[\]\{\}<>\s]+)/, "<a href=\"$1\">$1</a>")
   let title_first = "Whats New"
   let title_last = "Description"
   if (status == "translate") {
