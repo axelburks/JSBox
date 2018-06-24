@@ -12,7 +12,9 @@ var countries = [
   { name: "🇨🇳 CN", code: "cn" },
   { name: "🇭🇰 HK", code: "hk" },
   { name: "🇬🇧 UK", code: "gb" },
-  { name: "🇯🇵 JP", code: "jp" }
+  { name: "🇯🇵 JP", code: "jp" },
+  { name: "🇦🇺 AU", code: "au" },
+  { name: "🇳🇿 NZ", code: "nz" }
 ]
 
 var currencies = {
@@ -20,7 +22,9 @@ var currencies = {
   "cn" : "￥",
   "hk" : "$",
   "gb" : "$",
-  "jp" : "$"
+  "jp" : "$",
+  "au" : "$",
+  "nz" : "$"
 }
 
 var langs = {
@@ -28,7 +32,9 @@ var langs = {
   "cn" : "zh-Hans-CN",
   "hk" : "en",
   "gb" : "en",
-  "jp" : "en"
+  "jp" : "en",
+  "au" : "en",
+  "nz" : "en"
 }
 
 module.exports = {
