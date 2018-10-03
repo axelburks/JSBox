@@ -9,14 +9,19 @@
 */
 
 var timeout = 3
-// 从 Today Widget 启动
+var accesstoken = getToken()
+var device = getDevice()
+var device_num = 1
+if (Array.isArray(device)) {
+  device_num = device.length
+}
+
+  // 从 Today Widget 启动
 if ($app.env == $env.today) {
-  var accesstoken = getToken()
-  var device = getDevice()
   if (accesstoken) {
     // pushbullet：全部功能 / pushbulletClip：发送剪贴板
     //pushbullet(accesstoken, device)
-    pushbulletClip(accesstoken, device)
+    pushbulletClip(accesstoken, device, device_num)
   } else {
     var message = {
       title: "Access Token Missing 😅",
@@ -40,41 +45,35 @@ if ($app.env == $env.today) {
 }
 // 从应用内启动
 if ($app.env == $env.app) {
-  var accesstoken = getToken();
-  var device = getDevice()
   if (accesstoken) {
-    pushbullet(accesstoken, device)
+    pushbullet(accesstoken, device, device_num)
   } else {
     settingConfig()
   }
 }
 // 从 Action Entension 启动
 if ($app.env == $env.action) {
-  var accesstoken = getToken()
-  var device = getDevice()
   if (accesstoken) {
-    pushbulletAction(accesstoken, device)
+    pushbulletAction(accesstoken, device, device_num)
   } else {
     settingConfig()
   }
 }
 // 从 Safari 启动
 if ($app.env == $env.safari) {
-  var accesstoken = getToken()
-  var device = getDevice()
   if (accesstoken) {
-    pushbulletSafari(accesstoken, device)
+    pushbulletSafari(accesstoken, device, device_num)
   } else {
     settingConfig()
   }
 }
 
-function pushbullet(accesstoken, device) {
+function pushbullet(accesstoken, device, device_num) {
   $ui.menu({
     items: ["Send ⬆️", "Get ⬇️", "Delete 🗑"],
     handler: function(title, idx) {
       if (idx == 0) {
-        pushbulletClip(accesstoken, device)
+        pushbulletClip(accesstoken, device, device_num)
       } else if (idx == 1) {
         $ui.loading("Loading...")
         $http.request({
@@ -220,37 +219,37 @@ function pushbullet(accesstoken, device) {
   })
 }
 
-function pushbulletClip(accesstoken, device) {
+function pushbulletClip(accesstoken, device, device_num) {
   if (!$clipboard.text || $clipboard.text == "") {
     $ui.error("Clipboard is Empty!", 1)
     delayClose()
   } else {
     if ($clipboard.link) {
-      sendLink($clipboard.text || $clipboard.link, $clipboard.link, null, accesstoken, device)
+      sendLink($clipboard.text || $clipboard.link, $clipboard.link, null, accesstoken, device, device_num)
     } else {
-      sendNote($clipboard.text, accesstoken, device)
+      sendNote($clipboard.text, accesstoken, device, device_num)
     }
   }
 }
 
-function pushbulletSafari(accesstoken, device) {
+function pushbulletSafari(accesstoken, device, device_num) {
   var link = $context.safari.items.baseURI
   var title = $context.safari.items.title
   var selection = $context.safari.items.selection.text
-  sendLink(title, link, selection, accesstoken, device)
+  sendLink(title, link, selection, accesstoken, device, device_num)
 }
 
-function pushbulletAction(accesstoken, device) {
+function pushbulletAction(accesstoken, device, device_num) {
   var re = /^file:\/\//i;
   if ($context.link && !re.test($context.link)) {
-    sendLink($context.text || $context.link, $context.link, null, accesstoken, device)
+    sendLink($context.text || $context.link, $context.link, null, accesstoken, device, device_num)
   } else if ($context.text) {
     var link = $context.text.match(/https?:\/\/[^\s]+/i)
     if (link) {
       link = link[0]
-      sendLink($context.text || link, link, null, accesstoken, device)
+      sendLink($context.text || link, link, null, accesstoken, device, device_num)
     } else {
-      sendNote($context.text, accesstoken, device)
+      sendNote($context.text, accesstoken, device, device_num)
     }
   } else if ($context.data) {
     var file = $context.data
@@ -288,57 +287,63 @@ function pushbulletAction(accesstoken, device) {
           timeout: 30,
           handler: function(resp) {
             toast(resp)
-            $ui.loading("Loading...")
-            $http.request({
-              method: "POST",
-              url: "https://api.pushbullet.com/v2/pushes",
-              header: {
-                "Access-Token": accesstoken,
-              },
-              body: {
-                device_iden: device,
-                type: "file",
-                file_url: file_url,
-                file_name: file_name,
-              },
-              timeout: timeout,
-              handler: function(resp) {
-                toast(resp)
-                delayClose()
-              }
-            })
-  
-          }
-  
+            sendFile(file_url, file_name, accesstoken, device, device_num)
+          }   
         })
       }
     })
   }
 }
 
-function sendNote(note, accesstoken, device) {
-  $ui.loading(note)
-  $http.request({
-    method: "POST",
-    url: "https://api.pushbullet.com/v2/pushes",
-    header: {
-      "Access-Token": accesstoken,
-      "Content-Type": "application/json"
-    },
-    body: {
-      device_iden: device,
-      type: "note",
-      body: note
-    },
-    timeout: timeout,
-    handler: function(resp) {
-      toast(resp)
+async function sendFile(file_url, file_name, accesstoken, device, device_num) {
+  $ui.loading("Loading...")
+  for (let i = 0; i < device_num; i++) {
+    let resp = await $http.request({
+      method: "POST",
+      url: "https://api.pushbullet.com/v2/pushes",
+      header: {
+        "Access-Token": accesstoken,
+      },
+      body: {
+        device_iden: device[i],
+        type: "file",
+        file_url: file_url,
+        file_name: file_name,
+      },
+      timeout: timeout
+    })
+    toast(resp)
+    if (i == device_num - 1) {
       delayClose()
     }
-  })
+  }
 }
 
-function sendLink(title, link, selection, accesstoken, device) {
+async function sendNote(note, accesstoken, device, device_num) {
+  $ui.loading(note)
+  for (let i = 0; i < device_num; i++) {
+    let resp = await $http.request({
+      method: "POST",
+      url: "https://api.pushbullet.com/v2/pushes",
+      header: {
+        "Access-Token": accesstoken,
+        "Content-Type": "application/json"
+      },
+      body: {
+        device_iden: device[i],
+        type: "note",
+        body: note
+      },
+      timeout: timeout
+    })
+    toast(resp)
+    if (i == device_num - 1) {
+      delayClose()
+    }
+  }
+}
+
+async function sendLink(title, link, selection, accesstoken, device) {
   //Convert iOS App Store urls to ASO100 ⬇️
   var patt = /itunes\.apple\.com\/(\w+)\/app\/.*?\?mt=(?!12).*/;
   var result = null;
@@ -349,26 +354,28 @@ function sendLink(title, link, selection, accesstoken, device) {
   }
   //End ⬆️
   $ui.loading(link)
-  $http.request({
-    method: "POST",
-    url: "https://api.pushbullet.com/v2/pushes",
-    header: {
-      "Access-Token": accesstoken,
-      "Content-Type": "application/json"
-    },
-    body: {
-      device_iden: device,
-      type: "link",
-      title: title,
-      body: selection,
-      url: link,
-    },
-    timeout: timeout,
-    handler: function(resp) {
-      toast(resp)
+  for (let i = 0; i < device_num; i++) {
+    let resp = await $http.request({
+      method: "POST",
+      url: "https://api.pushbullet.com/v2/pushes",
+      header: {
+        "Access-Token": accesstoken,
+        "Content-Type": "application/json"
+      },
+      body: {
+        device_iden: device,
+        type: "link",
+        title: title,
+        body: selection,
+        url: link,
+      },
+      timeout: timeou
+    })
+    toast(resp)
+    if (i == device_num - 1) {
       delayClose()
     }
-  })
+  }
 }
 
 function deleteItem(accesstoken) {
@@ -447,7 +454,8 @@ function getDevice() {
   if ($file.exists("device.txt")) {
     var file = $file.read("device.txt")
     if (file.string && file.string != "") {
-      return file.string.replace(/(\r|\n)/gi, "")
+      let devices = file.string.replace(/(\r|\n)/gi, "").split(",")
+      return devices
     } else {
       return ""
     }
@@ -457,13 +465,13 @@ function getDevice() {
 }
 
 function toast(resp) {
-  if (resp.response.statusCode == 200) {
-    $ui.toast("Request Succeeded💡")
-    $ui.loading(false)
-  } else if (resp.response.statusCode == 400) {
+  if (resp.response.statusCode == 400) {
     console.info(resp.response)
     console.info(resp.data)
     $ui.toast("Error! Please check the console log!")
+    $ui.loading(false)
+  } else if (resp.response) {
+    $ui.toast("Request Succeeded💡")
     $ui.loading(false)
   } else {
     $ui.toast("Request Timeout, Try Again Later ❌")
@@ -586,7 +594,7 @@ function settingConfig() {
         type: "text",
         props: {
           id: "message_device",
-          text: "\nYou can specify a device with the identity.\nPlease input nothing if you want to send to all.",
+          text: "\nYou can specify one or more devices(split with ',') with the identity.\nPlease input nothing if you want to send to all.",
           font: $font(16),
           editable: 0
         },
