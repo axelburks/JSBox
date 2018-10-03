@@ -446,19 +446,24 @@ function getToken() {
 function getDevice() {
   if ($file.exists("device.txt")) {
     var file = $file.read("device.txt")
-    if (file.string) {
-      return file.string
+    if (file.string && file.string != "") {
+      return file.string.replace(/(\r|\n)/gi, "")
     } else {
-      return 0
+      return ""
     }
   } else {
-    return 0
+    return ""
   }
 }
 
 function toast(resp) {
-  if (resp.response) {
+  if (resp.response.statusCode == 200) {
     $ui.toast("Request Succeeded💡")
+    $ui.loading(false)
+  } else if (resp.response.statusCode == 400) {
+    console.info(resp.response)
+    console.info(resp.data)
+    $ui.toast("Error! Please check the console log!")
     $ui.loading(false)
   } else {
     $ui.toast("Request Timeout, Try Again Later ❌")

@@ -123,7 +123,7 @@ function showResult(text, runningExt) {
       } else if (isContains(url,/(weixin|wxp):\/\/|weixin\.qq|tenpay\.com/i)) {
         scheme = "weixin://scanqrcode"
       } else if (isContains(url,/(wsk|txz|unipay)\.qq\.com/i)) {
-        scheme = "mqqapi://qrcode/scan_qrcode?version=1&src_type=app"
+        scheme = "tim://qrcode/scan_qrcode?version=1&src_type=app"
       } else if (isContains(url,/zhihu\.com.*question/i)) {
         scheme = url.toString().replace(/https?/i,"zhihu")
       } else if (isContains(url,/ofo\.so\/plate/i)) {
@@ -132,7 +132,7 @@ function showResult(text, runningExt) {
         scheme = url.toString().replace(/https?/i,"taobao")
       } else if (isContains(url,/qr\.shouqianba\.com|qr\.alipay\.com.*PAI_LOGIN/i)) {
         scheme = "alipays://platformapi/startapp?saId=10000007"
-      } else if (isContains(url,/(qr|d)\.alipay\.com\/(kox|sux|stx)/i)) {
+      } else if (isContains(url,/(qr|d)\.(alipay|koubei)\.com\/(ord\/kox|kox|sux|stx)/i)) {
         scheme = "koubei://platformapi/startapp?saId=10000007&qrcode=" + url
       } else if (isContains(url,/(qr|d|m)\.alipay\.com|spay3\.swiftpass\.cn|tlt\.allinpay\.com|v\.ubox\.cn\/qr|i\.55tuan\.com\/rq/i)) {
         if (!isContains(url,/^[0-9A-Z\:\/\/]+$/)) {
