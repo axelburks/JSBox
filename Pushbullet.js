@@ -69,154 +69,68 @@ if ($app.env == $env.safari) {
 }
 
 function pushbullet(accesstoken, device, device_num) {
-  $ui.menu({
-    items: ["Send ⬆️", "Get ⬇️", "Delete 🗑"],
-    handler: function(title, idx) {
-      if (idx == 0) {
-        pushbulletClip(accesstoken, device, device_num)
-      } else if (idx == 1) {
-        $ui.loading("Loading...")
-        $http.request({
-          method: "GET",
-          url: "https://api.pushbullet.com/v2/pushes?active=true",
-          header: {
-            "Access-Token": accesstoken
-          },
-          timeout: timeout,
-          handler: function(resp) {
-            toast(resp)
-            var push = resp.data.pushes
-            if (push.length == 0) {
-              $ui.alert("NO PUSHES ❌")
-              $app.close()
-            } else {
-              $ui.menu({
-                items: push.map(function(item) {
-                  if (item.type == "note") {
-                    if (item.body.indexOf("\n") >= 0) {
-                      return item.body.trim().split("\n")[0] + "...↩️"
-                    } else {
-                      return item.body
-                    }
-                  } else if (item.type == "link") {
-                    if (item.body) {
-                      return "🔗:" + item.body
-                    } else if (item.title) {
-                      return "🔗:" + item.title
-                    } else {
-                      return "🔗:" + item.url
-                    }
-
-                  } else {
-                    var filename = item.file_url
-                    return "📝:" + filename.substr(filename.lastIndexOf('/') + 1)
-
-                  }
-                }),
-                handler: function(title, idx) {
-                  if (push[idx].type == "link") {
-                    if (push[idx].body) {
-                      $clipboard.text = "[" + push[idx].body + "]" + "(" + push[idx].url + ")"
-                    } else if (push[idx].title) {
-                      $clipboard.text = "[" + push[idx].title + "]" + "(" + push[idx].url + ")"
-                    } else {
-                      $clipboard.text = push[idx].url
-                    }
-                    var title = "Link and Note Copied 📌"
-                    selectResult(title, $clipboard.text, push[idx].url)
-
-                  } else if (push[idx].type == "note") {
-                    $clipboard.text = push[idx].body
-                    var link = $detector.link(push[idx].body)
-                    if (link.length == 1) {
-                      var title = "Note Copied 📌"
-                      var message = "Find 🔗: " + link
-                      selectResult(title, message, link)
-
-                    } else if (link.length > 1) {
-                      $ui.toast("Note Copied 📌 Multi-Links Dectected 🔗")
-                      $ui.menu({
-                        items: link,
-                        handler: function(title, idx) {
-                          $clipboard.text = link[idx]
-                          selectResult2("Link Copied 📌", link[idx])
-
-                        }
-                      })
-                    } else {
-                      $ui.toast("Copied 📌")
+  let auto_input = $context.query.Pushbullet_Content
+  if (auto_input) {
+    auto_input = decodeURIComponent(auto_input)
+    let patt = /(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/;
+    let result = null;
+    if ((result = patt.exec(auto_input)) != null) {
+      sendLink(auto_input, result[0], null, accesstoken, device, device_num, true)
+    } else {
+      sendNote(auto_input, accesstoken, device, device_num, true)
+    }
+  } else {
+    $ui.menu({
+      items: ["Send ⬆️", "Get ⬇️", "Delete 🗑"],
+      handler: function(title, idx) {
+        if (idx == 0) {
+          pushbulletClip(accesstoken, device, device_num)
+        } else if (idx == 1) {
+          getItem(accesstoken)
+        } else if (idx == 2) {
+          $ui.alert({
+            title: "Delete Confirm 🗑",
+            message: "One Or All?",
+            actions: [{
+                title: "One",
+                handler: function() {
+                  deleteItem(accesstoken)
+                }
+              }, {
+                title: "All",
+                handler: function() {
+                  $ui.loading("Loading...")
+                  $http.request({
+                    method: "DELETE",
+                    url: "https://api.pushbullet.com/v2/pushes",
+                    header: {
+                      "Access-Token": accesstoken
+                    },
+                    timeout: timeout,
+                    handler: function(resp) {
+                      toast(resp)
                       delayClose()
                     }
-
-                  } else {
-                    var title = "Pushbullet File 📝"
-
-                    var url = push[idx].file_url
-                    $clipboard.text = url
-                    $ui.toast("File URL Copied 📌")
-                    selectResult2(title, url)
-
-                  }
-                },
-                finished: function(cancelled) {
-                  if (cancelled) {
-
-                    $app.close()
-
-                  }
+                  })
                 }
-
-              })
-
-            }
-
-          }
-
-        })
-
-      } else if (idx == 2) {
-        $ui.alert({
-          title: "Delete Confirm 🗑",
-          message: "One Or All?",
-          actions: [{
-              title: "One",
-              handler: function() {
-                deleteItem(accesstoken)
+              },
+              {
+                title: "Cancel",
+                handler: function() {
+                  $app.close()
+                }
               }
-            }, {
-              title: "All",
-              handler: function() {
-                $ui.loading("Loading...")
-                $http.request({
-                  method: "DELETE",
-                  url: "https://api.pushbullet.com/v2/pushes",
-                  header: {
-                    "Access-Token": accesstoken
-                  },
-                  timeout: timeout,
-                  handler: function(resp) {
-                    toast(resp)
-                    delayClose()
-                  }
-                })
-              }
-            },
-            {
-              title: "Cancel",
-              handler: function() {
-                $app.close()
-              }
-            }
-          ]
-        })
+            ]
+          })
+        }
+      },
+      finished: function(cancelled) {
+        if (cancelled) {
+          $app.close()
+        }
       }
-    },
-    finished: function(cancelled) {
-      if (cancelled) {
-        $app.close()
-      }
-    }
-  })
+    })
+  }
 }
 
 function pushbulletClip(accesstoken, device, device_num) {
@@ -314,12 +228,12 @@ async function sendFile(file_url, file_name, accesstoken, device, device_num) {
     })
     toast(resp)
     if (i == device_num - 1) {
-      delayClose()
+      delayClose(toHomescreen)
     }
   }
 }
 
-async function sendNote(note, accesstoken, device, device_num) {
+async function sendNote(note, accesstoken, device, device_num, toHomescreen) {
   $ui.loading(note)
   for (let i = 0; i < device_num; i++) {
     let resp = await $http.request({
@@ -338,12 +252,12 @@ async function sendNote(note, accesstoken, device, device_num) {
     })
     toast(resp)
     if (i == device_num - 1) {
-      delayClose()
+      delayClose(toHomescreen)
     }
   }
 }
 
-async function sendLink(title, link, selection, accesstoken, device) {
+async function sendLink(title, link, selection, accesstoken, device, toHomescreen) {
   //Convert iOS App Store urls to ASO100 ⬇️
   var patt = /itunes\.apple\.com\/(\w+)\/app\/.*?\?mt=(?!12).*/;
   var result = null;
@@ -373,58 +287,174 @@ async function sendLink(title, link, selection, accesstoken, device) {
     })
     toast(resp)
     if (i == device_num - 1) {
-      delayClose()
+      delayClose(toHomescreen)
     }
   }
 }
 
-function deleteItem(accesstoken) {
+function getItem(accesstoken, last_cursor) {
   $ui.loading("Loading...")
+  let cursor_param = ""
+  if (last_cursor) {
+    cursor_param = `&cursor=${last_cursor}`
+  }
   $http.request({
     method: "GET",
-    url: "https://api.pushbullet.com/v2/pushes?active=true",
+    url: `https://api.pushbullet.com/v2/pushes?active=true&limit=500${cursor_param}`,
     header: {
       "Access-Token": accesstoken
     },
     timeout: timeout,
     handler: function(resp) {
       $ui.loading(false)
-      var push = resp.data.pushes
-      if (push.length == 0) {
+      let pushes = resp.data.pushes
+      let cursor = resp.data.cursor
+      if (pushes.length == 0 && !cursor) {
         $ui.alert("NO PUSHES❌")
         $app.close()
+      } else if (pushes.length == 0 && cursor) {
+        getItem(accesstoken, cursor)
       } else {
+        let list = pushes.map(function(item) {
+          if (item.type == "note") {
+            if (item.body.indexOf("\n") >= 0) {
+              return item.body.trim().split("\n")[0] + "...↩️"
+            } else {
+              return item.body
+            }
+          } else if (item.type == "link") {
+            if (item.body) {
+              return "🔗:" + item.body
+            } else if (item.title) {
+              return "🔗:" + item.title
+            } else {
+              return "🔗:" + item.url
+            }
+
+          } else {
+            var filename = item.file_url
+            return "📝:" + filename.substr(filename.lastIndexOf('/') + 1)
+          }
+        })
+        if (cursor) {
+          list.push("➤ ➤ Next Page ➤ ➤")
+        }
         $ui.menu({
-          items: push.map(function(item) {
-            if (item.type == "note") {
-              return item.body.replace(/\n/g," ")
-            } else if (item.type == "link") {
-              if (item.body) {
-                return "🔗:[" + item.body.replace(/\n/g,"") + "]" + "(" + item.title.replace(/\n/g,"") + ")"
-              } else if (item.title) {
-                return "🔗:[" + item.title.replace(/\n/g,"") + "]" + "(" + item.url + ")"
+          items: list,
+          handler: function(title, idx) {
+            if (title == "➤ ➤ Next Page ➤ ➤") {
+              getItem(accesstoken, cursor)
+            } else if (pushes[idx].type == "link") {
+              if (pushes[idx].body) {
+                $clipboard.text = "[" + pushes[idx].body + "]" + "(" + pushes[idx].url + ")"
+              } else if (pushes[idx].title) {
+                $clipboard.text = "[" + pushes[idx].title + "]" + "(" + pushes[idx].url + ")"
               } else {
-                return "🔗:" + item.url
+                $clipboard.text = pushes[idx].url
+              }
+              var title = "Link and Note Copied 📌"
+              selectResult(title, $clipboard.text, pushes[idx].url)
+            } else if (pushes[idx].type == "note") {
+              $clipboard.text = pushes[idx].body
+              var link = $detector.link(pushes[idx].body)
+              if (link.length == 1) {
+                var title = "Note Copied 📌"
+                var message = "Find 🔗: " + link
+                selectResult(title, message, link)
+              } else if (link.length > 1) {
+                $ui.toast("Note Copied 📌 Multi-Links Dectected 🔗")
+                $ui.menu({
+                  items: link,
+                  handler: function(title, idx) {
+                    $clipboard.text = link[idx]
+                    selectResult2("Link Copied 📌", link[idx])
+                  }
+                })
+              } else {
+                $ui.toast("Copied 📌")
+                delayClose()
               }
             } else {
-              var filename = item.file_url
-              return "📝:" + filename.substr(filename.lastIndexOf('/') + 1)
+              var title = "Pushbullet File 📝"
+              var url = pushes[idx].file_url
+              $clipboard.text = url
+              $ui.toast("File URL Copied 📌")
+              selectResult2(title, url)
             }
-          }),
+          },
+          finished: function(cancelled) {
+            if (cancelled) {
+              $app.close()
+            }
+          }
+        })
+      }
+    }
+  })
+}
+
+function deleteItem(accesstoken, last_cursor) {
+  $ui.loading("Loading...")
+  let cursor_param = ""
+  if (last_cursor) {
+    cursor_param = `&cursor=${last_cursor}`
+  }
+  $http.request({
+    method: "GET",
+    url: `https://api.pushbullet.com/v2/pushes?active=true&limit=500${cursor_param}`,
+    header: {
+      "Access-Token": accesstoken
+    },
+    timeout: timeout,
+    handler: function(resp) {
+      $ui.loading(false)
+      let pushes = resp.data.pushes
+      let cursor = resp.data.cursor
+      if (pushes.length == 0 && !cursor) {
+        $ui.alert("NO PUSHES❌")
+        $app.close()
+      } else if (pushes.length == 0 && cursor) {
+        deleteItem(accesstoken, cursor)
+      } else {
+        let list = pushes.map(function(item) {
+          if (item.type == "note") {
+            return item.body.replace(/\n/g," ")
+          } else if (item.type == "link") {
+            if (item.body) {
+              return "🔗:[" + item.body.replace(/\n/g,"") + "]" + "(" + item.title.replace(/\n/g,"") + ")"
+            } else if (item.title) {
+              return "🔗:[" + item.title.replace(/\n/g,"") + "]" + "(" + item.url + ")"
+            } else {
+              return "🔗:" + item.url
+            }
+          } else {
+            let filename = item.file_url
+            return "📝:" + filename.substr(filename.lastIndexOf('/') + 1)
+          }
+        })
+        if (cursor) {
+          list.push("➤ ➤ Next Page ➤ ➤")
+        }
+        $ui.menu({
+          items: list,
           handler: function(title, idx) {
-            var iden = push[idx].iden
-            $http.request({
-              method: "DELETE",
-              url: "https://api.pushbullet.com/v2/pushes/" + iden,
-              header: {
-                "Access-Token": accesstoken
-              },
-              timeout: timeout,
-              handler: function(resp) {
-                toast(resp)
-                deleteItem(accesstoken)
-              }
-            })
+            if (title == "➤ ➤ Next Page ➤ ➤") {
+              deleteItem(accesstoken, cursor)
+            } else {
+              let iden = pushes[idx].iden
+              $http.request({
+                method: "DELETE",
+                url: "https://api.pushbullet.com/v2/pushes/" + iden,
+                header: {
+                  "Access-Token": accesstoken
+                },
+                timeout: timeout,
+                handler: function(resp) {
+                  toast(resp)
+                  deleteItem(accesstoken, cursor)
+                }
+              })
+            }
           },
           finished: function(cancelled) {
             if (cancelled) {
@@ -441,7 +471,7 @@ function getToken() {
   if ($file.exists("pushbullet.txt")) {
     var file = $file.read("pushbullet.txt")
     if (file.string) {
-      return file.string
+      return file.string.replace(/(\r|\n)/gi, "")
     } else {
       return 0
     }
@@ -480,13 +510,14 @@ function toast(resp) {
   }
 }
 
-function delayClose() {
+function delayClose(toHomescreen) {
   $thread.main({
     delay: 0.8,
     handler: function() {
       if ($app.env == $env.action || $app.env == $env.safari) {
         $context.close()
       } else {
+        if (toHomescreen) { $system.home() }
         $app.close()
       }
 
