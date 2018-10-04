@@ -363,13 +363,13 @@ async function sendLink(title, link, selection, accesstoken, device) {
         "Content-Type": "application/json"
       },
       body: {
-        device_iden: device,
+        device_iden: device[i],
         type: "link",
         title: title,
         body: selection,
         url: link,
       },
-      timeout: timeou
+      timeout: timeout
     })
     toast(resp)
     if (i == device_num - 1) {
