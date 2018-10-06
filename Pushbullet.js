@@ -19,9 +19,9 @@ if (Array.isArray(device)) {
   // 从 Today Widget 启动
 if ($app.env == $env.today) {
   if (accesstoken) {
-    // pushbullet：全部功能 / pushbulletClip：发送剪贴板
+    // pushbullet：全部功能 / pushbulletCnt：发送内容
     //pushbullet(accesstoken, device)
-    pushbulletClip(accesstoken, device, device_num)
+    pushbulletCnt($clipboard.text, accesstoken, device, device_num)
   } else {
     var message = {
       title: "Access Token Missing 😅",
@@ -72,19 +72,13 @@ function pushbullet(accesstoken, device, device_num) {
   let auto_input = $context.query.Pushbullet_Content
   if (auto_input) {
     auto_input = decodeURIComponent(auto_input)
-    let patt = /(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/;
-    let result = null;
-    if ((result = patt.exec(auto_input)) != null) {
-      sendLink(auto_input, result[0], null, accesstoken, device, device_num, true)
-    } else {
-      sendNote(auto_input, accesstoken, device, device_num, true)
-    }
+    pushbulletCnt(auto_input, accesstoken, device, device_num, "toHomescreen")
   } else {
     $ui.menu({
       items: ["Send ⬆️", "Get ⬇️", "Delete 🗑"],
       handler: function(title, idx) {
         if (idx == 0) {
-          pushbulletClip(accesstoken, device, device_num)
+          pushbulletCnt($clipboard.text, accesstoken, device, device_num)
         } else if (idx == 1) {
           getItem(accesstoken)
         } else if (idx == 2) {
@@ -133,15 +127,17 @@ function pushbullet(accesstoken, device, device_num) {
   }
 }
 
-function pushbulletClip(accesstoken, device, device_num) {
-  if (!$clipboard.text || $clipboard.text == "") {
+function pushbulletCnt(content, accesstoken, device, device_num, redirect) {
+  if (!content || content == "") {
     $ui.error("Clipboard is Empty!", 1)
-    delayClose()
+    delayClose(redirect)
   } else {
-    if ($clipboard.link) {
-      sendLink($clipboard.text || $clipboard.link, $clipboard.link, null, accesstoken, device, device_num)
+    let patt = /(https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]/;
+    let result = null;
+    if ((result = patt.exec(content)) != null) {
+      sendLink(content, result[0], null, accesstoken, device, device_num, redirect)
     } else {
-      sendNote($clipboard.text, accesstoken, device, device_num)
+      sendNote(content, accesstoken, device, device_num, redirect)
     }
   }
 }
@@ -228,12 +224,12 @@ async function sendFile(file_url, file_name, accesstoken, device, device_num) {
     })
     toast(resp)
     if (i == device_num - 1) {
-      delayClose(toHomescreen)
+      delayClose(redirect)
     }
   }
 }
 
-async function sendNote(note, accesstoken, device, device_num, toHomescreen) {
+async function sendNote(note, accesstoken, device, device_num, redirect) {
   $ui.loading(note)
   for (let i = 0; i < device_num; i++) {
     let resp = await $http.request({
@@ -252,12 +248,12 @@ async function sendNote(note, accesstoken, device, device_num, toHomescreen) {
     })
     toast(resp)
     if (i == device_num - 1) {
-      delayClose(toHomescreen)
+      delayClose(redirect)
     }
   }
 }
 
-async function sendLink(title, link, selection, accesstoken, device, toHomescreen) {
+async function sendLink(title, link, selection, accesstoken, device, redirect) {
   //Convert iOS App Store urls to ASO100 ⬇️
   var patt = /itunes\.apple\.com\/(\w+)\/app\/.*?\?mt=(?!12).*/;
   var result = null;
@@ -287,7 +283,7 @@ async function sendLink(title, link, selection, accesstoken, device, toHomescree
     })
     toast(resp)
     if (i == device_num - 1) {
-      delayClose(toHomescreen)
+      delayClose(redirect)
     }
   }
 }
@@ -510,17 +506,18 @@ function toast(resp) {
   }
 }
 
-function delayClose(toHomescreen) {
+function delayClose(redirect) {
   $thread.main({
     delay: 0.8,
     handler: function() {
       if ($app.env == $env.action || $app.env == $env.safari) {
         $context.close()
       } else {
-        if (toHomescreen) { $system.home() }
+        if (redirect && redirect == "toHomescreen") {
+          $system.home();
+        }
         $app.close()
       }
-
     }
   })
 }
