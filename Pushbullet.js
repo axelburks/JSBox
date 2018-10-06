@@ -451,7 +451,7 @@ function deleteItem(accesstoken, last_cursor) {
                 timeout: timeout,
                 handler: function(resp) {
                   toast(resp)
-                  deleteItem(accesstoken, cursor)
+                  deleteItem(accesstoken, last_cursor)
                 }
               })
             }
