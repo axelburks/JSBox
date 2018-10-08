@@ -253,7 +253,7 @@ async function sendNote(note, accesstoken, device, device_num, redirect) {
   }
 }
 
-async function sendLink(title, link, selection, accesstoken, device, redirect) {
+async function sendLink(title, link, selection, accesstoken, device, device_num, redirect) {
   //Convert iOS App Store urls to ASO100 ⬇️
   var patt = /itunes\.apple\.com\/(\w+)\/app\/.*?\?mt=(?!12).*/;
   var result = null;
