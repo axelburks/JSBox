@@ -98,7 +98,7 @@ $ui.render({
               },
               events: {
                 tapped: function(sender) {
-                  showImage($clipboard.image)
+                  showImage($clipboard.image);
                 }
               }
             },
@@ -241,20 +241,21 @@ $ui.render({
 let um = $("clipContent").runtimeValue().$undoManager();
 
 if ($clipboard.text) {
-  let links = $detector.link($clipboard.text)
+  let links = $detector.link($clipboard.text);
   if(links.length > 0){
-    $("LinkButton").hidden = 0
-    $("LinkButton").info = links
+    $("LinkButton").hidden = 0;
+    $("LinkButton").info = links;
   }
 }
 
 if ($clipboard.image) {
-  $("ImageButton").hidden = 0
+  $("ImageButton").hidden = 0;
 }
 
 $widget.height = TextViewHeight + 20;
 
 function showImage(imageData) {
+  $("clipContent").blur();
   let initLocation = new Array;
   $ui.push({
     props: {
@@ -268,8 +269,8 @@ function showImage(imageData) {
           data: imageData
         },
         layout: function(make, view) {
-          make.center.equalTo(view.super)
-          make.size.equalTo($size(200, 200))
+          make.center.equalTo(view.super);
+          make.size.equalTo($size(200, 200));
         }
       }
     ],
@@ -279,7 +280,10 @@ function showImage(imageData) {
       },
       touchesEnded: function(sender, location) {
         if (Math.abs(location.x - initLocation.x) > 2 || Math.abs(location.y - initLocation.y) > 2) {
-          $ui.pop()
+          $ui.pop();
+          $delay(0.6, function() {
+            $("clipContent").focus();
+          })
         }
       },
       doubleTapped: function(sender) {
@@ -295,7 +299,10 @@ function showImage(imageData) {
           item: ["QRImage.png", imageData],
           handler: function(success) {
             if (success) {
-              $ui.pop()
+              $ui.pop();
+              $delay(0.6, function() {
+                $("clipContent").focus();
+              })
             }
           }
         })
