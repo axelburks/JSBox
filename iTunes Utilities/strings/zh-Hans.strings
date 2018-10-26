@@ -21,3 +21,5 @@
 "OPEN_TRACK_VIEW" = "🎯 打开媒体页面";
 "OPEN_PREVIEW" = "🍥 媒体预览";
 "DOWNLOADING" = "获取中...";
+"STRUCTURED_VIEW" = "结构化视图";
+"FORMAT_ERROR" = "不是一个合法的 JSON";

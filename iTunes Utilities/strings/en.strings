@@ -21,3 +21,5 @@
 "OPEN_TRACK_VIEW" = "🎯 Open Track View";
 "OPEN_PREVIEW" = "🍥 Media Preview";
 "DOWNLOADING" = "Downloading...";
+"STRUCTURED_VIEW" = "Structured View";
+"FORMAT_ERROR" = "Not a valid JSON";

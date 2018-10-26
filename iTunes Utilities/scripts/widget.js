@@ -1,8 +1,8 @@
 //Set your region of Apple Music: us cn hk gb jp
 let country = "cn"
 let helper = require("scripts/helper")
-let netease_api = 'http://music.able.cat/download/api/?id='
-let qqmusic_api = 'http://music.able.cat/download/api/?t=qq&id='
+let netease_api = 'http://api.able.cat/music/?t=wy&id='
+let qqmusic_api = 'http://api.able.cat/music/?t=qq&id='
 
 function init() {
   preGetNowPlaying()
@@ -20,6 +20,7 @@ function preGetNowPlaying() {
 }
 
 function getNowPlaying() {
+  $ui.toast("Waiting...")
   let Player = $objc("MPMusicPlayerController").invoke("systemMusicPlayer")
   let state = Player.invoke("playbackState")
   let song = Player.invoke("nowPlayingItem")
