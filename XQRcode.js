@@ -156,6 +156,12 @@ function showResult(text, runningExt) {
           if (!result) {
             result = $app.openURL(url);
           }
+        } else if (isContains(scheme,/tim:\/\/qrcode/i)) {
+          scheme = scheme.replace("tim://","mqqapi://");
+          result = $app.openURL(scheme);
+          if (!result) {
+            result = $app.openURL(url);
+          }
         } else {
           result = $app.openURL(url);
         }
