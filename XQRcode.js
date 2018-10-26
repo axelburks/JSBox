@@ -111,11 +111,11 @@ function showResult(text, runningExt) {
     "type": "public.plain-text",
     "value": text
   })
-  var scheme = text.match(/^(?!ssr?:\/\/)\w+:\/\/[^\s]*/i)
+  var scheme = text.match(/^(?!ssr?:\/\/)[\w-]+:\/\/[^\s]*/i)
   if (scheme) {
     var result = ""
     scheme = scheme[0]
-    var url = text.match(/^(https?|weixin|wxp):\/\/[^\s]+/i)
+    var url = text.match(/^(https?|weixin|wxp|itms-services):\/\/[^\s]+/i)
     if (url) {
       url = url[0]
       if (isContains(url,/weibo\.cn/i)) {
@@ -132,7 +132,7 @@ function showResult(text, runningExt) {
         scheme = url.toString().replace(/https?/i,"taobao")
       } else if (isContains(url,/qr\.shouqianba\.com|qr\.alipay\.com.*PAI_LOGIN/i)) {
         scheme = "alipays://platformapi/startapp?saId=10000007"
-      } else if (isContains(url,/(qr|d)\.(alipay|koubei)\.com\/(ord\/kox|kox|sux|stx)/i)) {
+      } else if (isContains(url,/(qr|d)\.(alipay|koubei)\.com\/(\w+\/)?(kox|kox|sux|stx)/i)) {
         scheme = "koubei://platformapi/startapp?saId=10000007&qrcode=" + url
       } else if (isContains(url,/(qr|d|m)\.alipay\.com|spay3\.swiftpass\.cn|tlt\.allinpay\.com|v\.ubox\.cn\/qr|i\.55tuan\.com\/rq/i)) {
         if (!isContains(url,/^[0-9A-Z\:\/\/]+$/)) {
