@@ -10,17 +10,17 @@ var country = countries[0].code
 function init() {
   render()
   var link = $context.link || $context.text
-  if (link && link.match(/itunes\.apple\.com\/[a-z]+\/app\/?.*?\/id(\d+).*?mt=\d+/)) {
-    var result = link.match(/itunes\.apple\.com\/([a-z]+)\/app\/?.*?\/id(\d+).*?mt=\d+/)
-    country = result[1]
-    var appid = result[2]
+  if (link && link.match(/(itunes|apps)\.apple\.com\/[a-z]+\/app\/?.*?\/id(\d+).*?(mt=\d+)?/)) {
+    var result = link.match(/(itunes|apps)\.apple\.com\/([a-z]+)\/app\/?.*?\/id(\d+).*?(mt=\d+)?/)
+    country = result[2]
+    var appid = result[3]
     var search_url = `https://itunes.apple.com/lookup?id=${appid}&country=${country}`
     fetchData(search_url).then(function(data){
       showActions(data)
     })
-  } else if (link && link.match(/itunes\.apple\.com\/[a-z]+\/story\/?.*?\/id(\d+)/)) {
+  } else if (link && link.match(/(itunes|apps)\.apple\.com\/[a-z]+\/story\/?.*?\/id(\d+)/)) {
     var html = ""
-    var story_url = link.match(/https?:\/\/itunes\.apple\.com\/[a-z]+\/story\/?.*?\/id(\d+)/)[0]
+    var story_url = link.match(/https?:\/\/(itunes|apps)\.apple\.com\/[a-z]+\/story\/?.*?\/id(\d+)/)[0]
     if ($context.data) {
       processHtml($context.data.string)
     } else {
@@ -28,14 +28,14 @@ function init() {
         processHtml(data)
       })
     }
-  } else if (link && link.match(/itunes\.apple\.com\/[a-z]+\/album\/.+?\/\d+/)) {
-    var result = link.match(/itunes\.apple\.com\/([a-z]+)\/album\/.+?\/(\d+)/)
-    country = result[1]
-    var albumid = result[2]
+  } else if (link && link.match(/(itunes|music)\.apple\.com\/[a-z]+\/album\/.+?\/\d+/)) {
+    var result = link.match(/(itunes|music)\.apple\.com\/([a-z]+)\/album\/.+?\/(\d+)/)
+    country = result[2]
+    var albumid = result[3]
     var search_url = `https://itunes.apple.com/lookup?id=${albumid}&country=${country}`
     if (link.match(/itunes\.apple\.com\/[a-z]+\/album\/.+?\/\d+\?i=(\d+)/)) {
       entity = entities[3]
-      var songid = link.match(/itunes\.apple\.com\/[a-z]+\/album\/.+?\/\d+\?i=(\d+)/)[1]
+      var songid = link.match(/(itunes|music)\.apple\.com\/[a-z]+\/album\/.+?\/\d+\?i=(\d+)/)[2]
       search_url = `https://itunes.apple.com/lookup?id=${songid}&country=${country}`
     } else {
       entity = { name: $l10n("ALBUM"), code: "album" }
@@ -50,11 +50,11 @@ function init() {
     fetchData(search_url).then(function(data){
       showActions(data)
     })
-  } else if (link && link.match(/itunes\.apple\.com\/[a-z]+\/podcast\/.+?\/id(\d+)/)) {
+  } else if (link && link.match(/(itunes|podcasts)\.apple\.com\/[a-z]+\/podcast\/.+?\/id(\d+)/)) {
     entity = entities[5]
-    var result = link.match(/itunes\.apple\.com\/([a-z]+)\/podcast\/.+?\/id(\d+)/)
-    country = result[1]
-    var podcastid = result[2]
+    var result = link.match(/(itunes|podcasts)\.apple\.com\/([a-z]+)\/podcast\/.+?\/id(\d+)/)
+    country = result[2]
+    var podcastid = result[3]
     var search_url = `https://itunes.apple.com/lookup?id=${podcastid}&country=${country}`
     fetchData(search_url).then(function(data){
       showActions(data)
@@ -82,10 +82,10 @@ function fetchData(url, type) {
 
 function processHtml(html) {
   var wallpaper_url = html.match(/https:\/\/.+?\/image\/thumb\/.+?\.jpg/)[0]
-  var result = html.match(/https?:\/\/itunes\.apple\.com\/([a-z]+)\/app\/?.*?\/id(\d+).*?mt=\d+/)
+  var result = html.match(/https?:\/\/(itunes|apps)\.apple\.com\/([a-z]+)\/app\/?.*?\/id(\d+).*?mt=\d+/)
   if (result) {
-    country = result[1]
-    var appid = result[2]
+    country = result[2]
+    var appid = result[3]
     var search_url = `https://itunes.apple.com/lookup?id=${appid}&country=${country}`
     fetchData(search_url).then(function(data){
       showActions(data, wallpaper_url)

@@ -38,6 +38,7 @@ function getNowPlaying() {
     }
   } else {
     $ui.error("Nothing Played", 1)
+    $app.close()
   }
 }
 
