@@ -1,0 +1,23 @@
+{
+  "settings" : {
+    "minOSVer" : "11.0.0",
+    "minSDKVer" : "1.0.0",
+    "idleTimerDisabled" : false,
+    "autoKeyboardEnabled" : false,
+    "keyboardToolbarEnabled" : false,
+    "rotateDisabled" : true
+  },
+  "info" : {
+    "version" : "1.0.0",
+    "author" : "coo11",
+    "types" : 11,
+    "website" : "",
+    "name" : "",
+    "url" : ""
+  },
+  "widget" : {
+    "iconColor" : "",
+    "height" : 0,
+    "tintColor" : ""
+  }
+}

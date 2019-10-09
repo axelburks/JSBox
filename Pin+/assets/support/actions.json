@@ -1,0 +1,397 @@
+[{
+        "name": "自用模块",
+        "items": [{
+                "name": "花式字体",
+                "pattern": "word_art"
+            },
+            {
+                "name": "百度地图",
+                "pattern": "bdmap"
+            },
+            {
+                "name": "区域切换",
+                "pattern": "appstore_shift"
+            },
+            {
+                "name": "链接转换",
+                "pattern": "url_convert"
+            },
+            {
+                "name": "网页快照",
+                "pattern": "web_capture"
+            },
+            {
+                "name": "汇率查询",
+                "pattern": "exchange_rate"
+            },
+            {
+                "name": "数据转换",
+                "pattern": "data_convert"
+            },
+            {
+                "name": "Bilibili视频封面",
+                "pattern": "bili_cover"
+            },
+            {
+                "name": "Weib(c)o",
+                "pattern": "weibco"
+            },
+            {
+                "name": "Files",
+                "pattern": "shareddocuments://"
+            },
+            {
+                "name": "掷骰子",
+                "pattern": "dice"
+            },
+            {
+                "name": "Cord",
+                "pattern": "cord"
+            },
+            {
+                "name": "10010",
+                "pattern": "10010"
+            },
+            {
+                "name": "文本编码/解码",
+                "pattern": "dencode"
+            }
+        ]
+    },
+    {
+        "name": "支付宝 URL Scheme",
+        "items": [{
+                "name": "搜索",
+                "pattern": "alipayqr://platformapi/startapp?saId=20001003"
+            },
+            {
+                "name": "卡券",
+                "pattern": "alipayqr://platformapi/startapp?saId=20000021"
+            },
+            {
+                "name": "乘车码",
+                "pattern": "alipays://platformapi/startapp?appId=200011235"
+            },
+            {
+                "name": "中国联通",
+                "pattern": "alipays://platformapi/startapp?appId=2018121862582302"
+            },
+            {
+                "name": "中国移动",
+                "pattern": "alipays://platformapi/startapp?appId=2018112062226732"
+            },
+            {
+                "name": "中国电信",
+                "pattern": "alipays://platformapi/startapp?appId=2018121962599426"
+            }
+        ]
+    },
+    {
+        "name": "地图 URL Scheme",
+        "items": [{
+                "name": "谷歌地图",
+                "pattern": "comgooglemaps://?q=%@"
+            },
+            {
+                "name": "高德地图",
+                "pattern": "iosamap://poi?sourceApplication=pin&backScheme=pin:&name=%@"
+            },
+            {
+                "name": "百度地图",
+                "pattern": "baidumap://map/geocoder?address=%@"
+            },
+            {
+                "name": "腾讯地图",
+                "pattern": "qqmap://map/"
+            }
+        ]
+    },
+    {
+        "name": "编写",
+        "items": [{
+                "name": "提醒事项",
+                "pattern": "compose://?id=com.apple.reminders.RemindersEditorExtension"
+            },
+            {
+                "name": "备忘录",
+                "pattern": "compose://?id=com.apple.mobilenotes.SharingExtension"
+            },
+            {
+                "name": "Evernote",
+                "pattern": "compose://?id=com.evernote.iPhone.Evernote.EvernoteShare"
+            },
+            {
+                "name": "印象笔记",
+                "pattern": "compose://?id=com.yinxiang.iPhone.ShareExtension"
+            },
+            {
+                "name": "微博",
+                "pattern": "compose://?id=com.apple.share.SinaWeibo.post"
+            },
+            {
+                "name": "Facebook",
+                "pattern": "compose://?id=com.apple.share.Facebook.post"
+            },
+            {
+                "name": "Twitter",
+                "pattern": "compose://?id=com.apple.share.Twitter.post"
+            },
+            {
+                "name": "OneNote",
+                "pattern": "compose://?id=com.microsoft.onenote.shareextension"
+            },
+            {
+                "name": "Drafts",
+                "pattern": "compose://?id=com.agiletortoise.Drafts5.Drafts-Share"
+            },
+            {
+                "name": "Outlook",
+                "pattern": "compose://?id=com.microsoft.Office.Outlook.compose-shareextension"
+            },
+            {
+                "name": "QQ 邮箱",
+                "pattern": "compose://?id=com.tencent.qqmail.shareextension"
+            },
+            {
+                "name": "Day One",
+                "pattern": "compose://?id=com.bloombuilt.dayone-ios.Share"
+            }
+        ]
+    },
+    {
+        "name": "打开为",
+        "items": [{
+                "name": "链接",
+                "pattern": "open-url://%@"
+            },
+            {
+                "name": "分享面板",
+                "pattern": "share-sheet://"
+            },
+            {
+                "name": "邮件",
+                "pattern": "mailto:%@"
+            },
+            {
+                "name": "电话",
+                "pattern": "tel:%@"
+            },
+            {
+                "name": "短信",
+                "pattern": "sms:%@"
+            },
+            {
+                "name": "Facetime",
+                "pattern": "facetime:%@"
+            }
+        ]
+    },
+    {
+        "name": "搜索",
+        "items": [{
+                "name": "默认搜索",
+                "pattern": "x-web-search://?%@"
+            },
+            {
+                "name": "谷歌",
+                "pattern": "https://www.google.com/search?=1&q=%@"
+            },
+            {
+                "name": "雅虎",
+                "pattern": "https://search.yahoo.com/search?p=%@"
+            },
+            {
+                "name": "必应",
+                "pattern": "http://cn.bing.com/search?q=%@"
+            },
+            {
+                "name": "百度",
+                "pattern": "https://www.baidu.com/s?wd=%@"
+            },
+            {
+                "name": "多吉",
+                "pattern": "https://www.dogedoge.com/results?q=%@"
+            },
+            {
+                "name": "DuckDuckGo",
+                "pattern": "https://duckduckgo.com/?q=%@"
+            },
+            {
+                "name": "Wolfram Alpha",
+                "pattern": "http://www.wolframalpha.com/input/?i=%@"
+            }
+        ]
+    },
+    {
+        "name": "学术",
+        "items": [{
+                "name": "谷歌学术",
+                "pattern": "https://scholar.google.com/scholar?hl=zh-CN&q=%@"
+            },
+            {
+                "name": "百度学术",
+                "pattern": "http://xueshu.baidu.com/s?wd=%@"
+            },
+            {
+                "name": "必应学术",
+                "pattern": "https://cn.bing.com/academic/search?q=%@"
+            },
+            {
+                "name": "SciVerse",
+                "pattern": "https://www.ncbi.nlm.nih.gov/pmc/?term=%@"
+            }
+        ]
+    },
+    {
+        "name": "社交",
+        "items": [{
+                "name": "知乎",
+                "pattern": "https://www.zhihu.com/search?type=content&q=%@"
+            },
+            {
+                "name": "微博",
+                "pattern": "https://s.weibo.com/weibo?q=%@"
+            },
+            {
+                "name": "Twitter",
+                "pattern": "https://mobile.twitter.com/search?q=%@"
+            },
+            {
+                "name": "豆瓣",
+                "pattern": "https://m.douban.com/search/?query=%@"
+            }
+        ]
+    },
+    {
+        "name": "词典",
+        "items": [{
+                "name": "有道词典",
+                "pattern": "http://m.youdao.com/dict?&q=%@"
+            },
+            {
+                "name": "必应词典",
+                "pattern": "http://cn.bing.com/dict/search?q=%@"
+            },
+            {
+                "name": "百度词典",
+                "pattern": "http://dict.baidu.com/s?wd=%@"
+            },
+            {
+                "name": "爱词霸",
+                "pattern": "http://www.iciba.com/%@"
+            },
+            {
+                "name": "欧路词典",
+                "pattern": "http://dict.eudic.net/mdicts/en/%@"
+            }
+        ]
+    },
+    {
+        "name": "翻译",
+        "items": [{
+                "name": "谷歌翻译",
+                "pattern": "http://translate.google.cn/?hl=en#auto/zh-CN/%@"
+            },
+            {
+                "name": "百度翻译",
+                "pattern": "http://fanyi.baidu.com/#en/zh/%@"
+            }
+        ]
+    },
+    {
+        "name": "百科",
+        "items": [{
+                "name": "维基百科",
+                "pattern": "https://zh.wikipedia.org/wiki/%@"
+            },
+            {
+                "name": "百度百科",
+                "pattern": "http://baike.baidu.com/item/%@"
+            },
+            {
+                "name": "互动百科",
+                "pattern": "http://so.baike.com/doc/%@"
+            },
+            {
+                "name": "萌娘百科",
+                "pattern": "https://mzh.moegirl.org/index.php?search=%@"
+            }
+        ]
+    },
+    {
+        "name": "图片",
+        "items": [{
+                "name": "谷歌图片",
+                "pattern": "https://www.google.com/search?tbm=ischq=%@&"
+            },
+            {
+                "name": "必应图片",
+                "pattern": "http://cn.bing.com/images/search?q=%@"
+            },
+            {
+                "name": "百度图片",
+                "pattern": "http://image.baidu.com/search/wiseala?tn=wiseala&word=%@"
+            },
+            {
+                "name": "Flickr",
+                "pattern": "https://www.flickr.com/search/?text=%@"
+            }
+        ]
+    },
+    {
+        "name": "视频",
+        "items": [{
+                "name": "Youtube",
+                "pattern": "https://www.youtube.com/results?search_query=%@"
+            },
+            {
+                "name": "优酷",
+                "pattern": "http://www.soku.com/search_video/q_%@"
+            },
+            {
+                "name": "土豆",
+                "pattern": "http://www.soku.com/t/nisearch/%@"
+            },
+            {
+                "name": "搜狐",
+                "pattern": "http://so.tv.sohu.com/mts?wd=%@"
+            },
+            {
+                "name": "爱奇艺",
+                "pattern": "http://www.iqiyi.com/search.html?key=%@"
+            }
+        ]
+    },
+    {
+        "name": "应用",
+        "items": [{
+                "name": "少数派",
+                "pattern": "http://sspai.com/search/?q=%@"
+            },
+            {
+                "name": "最美应用",
+                "pattern": "http://zuimeia.com/search/?keyword=%@"
+            },
+            {
+                "name": "Product Hunt",
+                "pattern": "http://www.producthunt.com/?#!/s/posts/%@"
+            }
+        ]
+    },
+    {
+        "name": "购物",
+        "items": [{
+                "name": "淘宝",
+                "pattern": "taobao://s.taobao.com/?q=%@"
+            },
+            {
+                "name": "京东",
+                "pattern": "http://m.jd.com/ware/search.action?keyword=%@"
+            },
+            {
+                "name": "亚马逊",
+                "pattern": "http://www.amazon.cn/s/field-keywords=%@"
+            }
+        ]
+    }
+]

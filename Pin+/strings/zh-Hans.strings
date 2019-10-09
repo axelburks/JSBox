@@ -1,0 +1,158 @@
+"DONE" = "完成";
+"CLIPBOARD" = "剪贴板";
+"ACTION" = "动作";
+"SETTINGS" = "设置项";
+"CREATE" = "创建";
+"COPIED" = "已复制";
+"EDIT" = "编辑";
+"SEARCH" = "搜索";
+"CLEAR" = "清除";
+"CREATE_ACTION" = "创建动作";
+"LAUNCH" = "启动";
+"MAKE_ICON" = "制作图标";
+"USE_DEFAULT_ICON" = "使用默认图标";
+"PHOTO_LIBRARY" = "从照片中选取";
+
+"ACTION_JSBOX" = "JSBox 脚本";
+"ACTION_LIST" = "动作列表";
+"ACTION_SHARE" = "分享扩展";
+"ACTION_CUSTOM" = "自定义动作";
+"ACTION_NAME" = "动作名称";
+"ACTION_PATTERN" = "动作模式";
+"ACTION_ICON" = "动作图标";
+"DONT_ENCODE_URL" = "不进行 URL 编码";
+"ENCODE_TIPS" = "在大多数时候我们需要对链接里面的参数进行 URL 编码，但有些应用在解析参数的时候不会进行解码，所以会出现错误，在这种情况下你可以打开这个选项。";
+
+"ACTION_QUICK" = "快捷动作";
+"ACTION_SEARCH" = "搜索";
+"ACTION_COMPOSE" = "编写";
+"ACTION_OPEN" = "打开为";
+"ACTION_DICTIONARY" = "词典";
+"ACTION_TRANSLATE" = "翻译";
+"ACTION_WIKI" = "百科";
+"ACTION_MAPS" = "地图";
+"ACTION_IMAGE" = "图片";
+"ACTION_VIDEO" = "视频";
+"ACTION_APPS" = "应用";
+"ACTION_SHOPPING" = "购物";
+
+"AS_DEFAULT" = "默认搜索";
+"AS_GOOGLE" = "谷歌";
+"AS_YAHOO" = "雅虎";
+"AS_BING" = "必应";
+"AS_BAIDU" = "百度";
+"AS_DUCKDUCKGO" = "DuckDuckGo";
+"AS_WOLFRAM" = "Wolfram Alpha";
+
+"AC_REMINDER" = "提醒事项";
+"AC_NOTES" = "备忘录";
+"AC_EVERNOTES" = "印象笔记";
+"AC_WEIBO" = "微博";
+"AC_FACEBOOK" = "Facebook";
+"AC_TWITTER" = "Twitter";
+"AC_ONENOTE" = "OneNote";
+"AC_DRAFTS" = "Drafts";
+"AC_OUTLOOK" = "Outlook";
+"AC_QQMAIL" = "QQ 邮箱";
+"AC_DAYONE" = "Day One";
+
+"AO_URL" = "链接";
+"AO_SHARESHEET" = "分享面板";
+"AO_MAILTO" = "邮件";
+"AO_TEL" = "电话";
+"AO_SMS" = "短信";
+"AO_FACETIME" = "Facetime";
+
+"AD_YOUDAO" = "有道词典";
+"AD_BING" = "必应词典";
+"AD_BAIDU" = "百度词典";
+"AD_ICIBA" = "爱词霸";
+"AD_EUDIC" = "欧路词典";
+
+"AT_GOOGLE" = "谷歌翻译";
+"AT_BAIDU" = "百度翻译";
+
+"AW_WIKI" = "维基百科";
+"AW_BAIDU" = "百度百科";
+"AW_BAIKE" = "互动百科";
+
+"AM_APPLE" = "苹果地图";
+"AM_GOOGLE" = "谷歌地图";
+"AM_AMAP" = "高德地图";
+"AM_BAIDU" = "百度地图";
+"AM_QQMAPS" = "腾讯地图";
+
+"AI_GOOGLE" = "谷歌图片";
+"AI_BING" = "必应图片";
+"AI_BAIDU" = "百度图片";
+"AI_FLICKR" = "Flickr";
+
+"AV_YOUTUBE" = "YouTube";
+"AV_YOUKU" = "优酷";
+"AV_TUDOU" = "土豆";
+"AV_SOHU" = "搜狐";
+
+"AA_APPSTORE" = "App Store";
+"AA_SSPAI" = "少数派";
+"AA_ZUIMEI" = "最美应用";
+"AA_PRODUCTHUNT" = "Product Hunt";
+
+"AS_TAOBAO" = "淘宝";
+"AS_JD" = "京东";
+"AS_AMAZON" = "亚马逊";
+
+"THANKS" = "感谢使用本咸鱼的作品。\n如果有任何问题或建议，\n在TG私聊@coo11即可。";
+"ENCOURAGE_ZFB" = "通过支付宝支持一下";
+"ENCOURAGE_WX" = "保存二维码到相册并打开微信扫一扫支持一下";
+"RIGHT" = "好";
+"NOPE" = "算了";
+
+"TEXTAPART" = "分词";
+"SELECTEDCOPIED" = "选中部分已复制";
+"NOTHING_SELECTED_OR_RECORDED" = "未选择或已复制";
+"TOPPING" = "置顶";
+"T_GENERAL" = "分词:常规";
+"T_ELIMINATE" = "分词:剔除模式";
+"SELECTEDELIMINATED" = "选中部分已剔除";
+"MODE_CHANGED" = "模式已改变";
+
+"URL_INPUT_ERROR" = "网址输入有误";
+"LENGTHENED&COPIED" = "短链接已还原并复制";
+"SHORT_URL_COPIED" = "短链接已复制";
+"SHORTEN_FAILED" = "短连接生成失败";
+
+"GENERAL" = "通用";
+"WIDGET" = "通知中心";
+"CLEAR_ALL_ITEMS" = "清空记录列表";
+"SET_SEARCH_ENGINE" = "设置搜索引擎";
+"BOTTOM_DISPLAY_MODE" = "底栏显示方式";
+"DISPLAY_PAGING" = "分页显示";
+"DISPLAY_SLIDING" = "滑动显示";
+"DISPLAY_DISABLED" = "禁用滚动";
+"BOTTOM_COLUNM_QUANTITY" = "底栏同屏图标数";
+"SET_FONTSIZE" = "字体大小";
+"FONT_L" = "大";
+"FONT_M" = "中";
+"FONT_S" = "小";
+"RESET" = "重置";
+"SUPPORT" = "支持鼓励";
+"UPDATE" = "检测更新";
+"README" = "使用说明";
+"SURE" = "确认";
+"OTHERS" = "其他";
+"FIND_NEW_VERSION" = "发现新版本";
+"UPDATE_OR_NOT" = "\n是否更新？";
+"YES" = "是";
+"NO" = "否";
+"LATEST_VERSION" = "您这是最新版本^_^";
+"UPDATE_COMPLETE" = "更新完毕";
+
+"NO_CHANGE" ="没有改动";
+"SAVED_TO_CLIP" ="已保存至剪贴板";
+"NO_REDO" ="重做不可用";
+"NO_UNDO" ="撤销不可用";
+"NO_CONTENT" ="无内容";
+"CLIP_NO_IMAGE" ="剪贴板没有图片";
+"QR_SAVED" ="二维码已保存至相册";
+"QR_IMG_SAVED"="图片或二维码已保存";
+"IMAGE_SAVED" = "图片已保存";
