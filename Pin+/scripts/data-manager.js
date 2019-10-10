@@ -1,4 +1,5 @@
-let _sync, _list;
+let _sync, _list,
+  ui = require("./ui");
 
 const local = "assets/text-items.json";
 const cloud = "drive://Pin+/text-items.json";
@@ -37,7 +38,11 @@ function init() {
   //将记录数据填入list
   $("itemlist").data = [];
   tmp = tmp.map(i => {
-    return { itemtext: { text: i } };
+    let flag = i.indexOf("\n") >= 0;
+    return { itemtext: {
+      text: i,
+      textColor: flag? ui.color.general_n:ui.color.general
+    } };
   });
   $("itemlist").data = tmp;
 }

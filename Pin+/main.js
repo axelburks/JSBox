@@ -79,4 +79,4 @@ if (n === 2) {
 
 let module = require(`scripts/${m[n]}`);
 
-module.init();
+module.init($context.query);

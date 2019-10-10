@@ -10,6 +10,8 @@ let dataManager = require("./data-manager"),
 const dark = Number($device.isDarkMode);
 const COLOR = $cache.get(dark ? "dark" : "color");
 const ver = parseInt($device.info.version.split(".")[0]) - 12;
+const env = $app.env.toString().slice(0, 1) - 1;
+const borderWidth = 1.0 / $device.info.screen.scale;
 
 const layout = (make, view, name) => {
   ui.shadow(view, COLOR);
@@ -125,7 +127,7 @@ function init() {
         borderWidth: 1.0 / $device.info.screen.scale,
         borderColor: ui.color.border,
         textColor: ui.color.general,
-        placeholder: "剪贴板无内容",
+        placeholder: $clipboard.image ? "🌁 ‣ Long-Press to Show" : "剪贴板无内容",
         font: $font(_prefs[1]),
         bgcolor: ui.rgba(200),
         align: $align.left,
@@ -139,6 +141,13 @@ function init() {
         make.right.equalTo(view.prev.left).offset(-8);
       },
       events: {
+        longPressed: sender => {
+          if (sender.sender.placeholder == "🌁 ‣ Long-Press to Show") {
+            showImage($clipboard.image);
+          } else {
+            $app.openURL("jsbox://run?name=" + encodeURI($addin.current.name) + "&from=1&clipindex=" + ($clipboard.text ? "0" : "-1"));
+          }
+        },
         ready: view => ui.placeholderTextColor(view),
         returned: sender => saveInput(sender),
         changed: sender => saveInput(sender)// $input 方法 Bug
@@ -154,7 +163,65 @@ function init() {
   $ui.render({ props: { id: "main" }, views: views });
   dataManager.init();
   !_prefs[4] && initActionButtons();
-  $delay(0, () => ($("i2clip").text = $clipboard.text || ""));
+  let flag = $clipboard.text.indexOf("\n") >= 0;
+  $delay(0.1, () => ((($("i2clip").text = $clipboard.text) && ($("i2clip").textColor = flag ? ui.color.general_n:ui.color.general)) || ""));
+}
+
+function showImage(imageData) {
+  let { width, height } = $ui.window.frame;
+  let ratio = imageData.image.size.width/imageData.image.size.height;
+  env == 1 && ($widget.height = width);
+  let view = {
+    type: "blur",
+    props: {
+      id: "bg",
+      alpha: 0,
+      style: dark ? 3 : 1
+    },
+    layout: (make, view) => {
+      ui.shadow(view, "black");
+      if (env == 1) {
+        view.borderWidth = borderWidth;
+        view.borderColor = ui.color.border;
+        view.radius = 8;
+        make.bottom.left.right.inset(4);
+        make.top.inset(0);
+      } else make.edges.equalTo(view.super);
+    },
+    views: [
+      {
+        type: "image",
+        props: {
+          bgcolor: $color("white"),
+          image: imageData.image
+        },
+        layout: (make, view) => {
+          make.size.equalTo($size($widget.height*ratio, $widget.height));
+          make.center.equalTo(view.super);
+        },
+        events: {
+          tapped: () => {
+            $device.taptic(0);
+            $widget.height = 180;
+            ui.appear(0, "itemlist");
+          },
+          doubleTapped: () => {
+            $app.openURL("jsbox://run?name=" + encodeURI($addin.current.name) + "&from=1&clipindex=" + ($clipboard.text ? "0" : "-1"));
+          },
+          longPressed: () => {
+            $device.taptic(1);
+            $photo.save({
+              data: imageData,
+              handler: success =>
+                success && ui.toast({ text: "已保存至相册" })
+            });
+          }
+        }
+      }
+    ]
+  };
+  $ui.window.add(view);
+  ui.appear(1, "itemlist");
 }
 
 function saveInput(sender) {
@@ -220,7 +287,11 @@ function initActionButtons() {
           tapped(sender) {
             $device.taptic(1);
             helper.runAction(sender.info);
-          }
+          },
+          longPressed(sender) {
+            $device.taptic(2);
+            helper.runLongAction(sender.sender.info);
+          },
         }
       };
     actionView.add(button);

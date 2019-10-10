@@ -3,6 +3,30 @@
     "name": "自用模块",
     "items": [
       {
+        "name": "Pushbullet/PushMoreBot",
+        "pattern": "pushbullet"
+      },
+      {
+        "name": "下载文件/Thunder",
+        "pattern": "download"
+      },
+      {
+        "name": "Thunder",
+        "pattern": "thunder"
+      },
+      {
+        "name": "图片删除/多删",
+        "pattern": "delete_photo"
+      },
+      {
+        "name": "图片检索/上传",
+        "pattern": "search_image"
+      },
+      {
+        "name": "Opener/Auto",
+        "pattern": "opener://"
+      },
+      {
         "name": "花式字体",
         "pattern": "word_art"
       },

@@ -283,7 +283,9 @@ function show() {
             { setTitle: { text: "重置" } },
             { setTitle: { text: "支持鼓励" } },
             { setTitle: { text: "使用说明" } },
-            { setTitle: { text: "检查更新" } }
+            { setTitle: { text: "检查更新" } },
+            { setTitle: { text: "备份动作" } },
+            { setTitle: { text: "恢复动作" } }
           ]
         }
       ]
@@ -326,7 +328,13 @@ function show() {
               case 3:
                 check();
                 break;
-            }
+              case 4:
+                backup("backup");
+                break;
+              case 5:
+                backup("restore");
+                break;
+          }
         }
       }
     }
@@ -578,6 +586,23 @@ function support() {
       builder.createPushView("支持鼓励")
     ]
   });
+}
+
+function backup(action) {
+  let CloudBKPath = "drive://MyPinAction.json"
+  if (action == "backup") {
+    let success = $file.write({
+      data: $data({ string: JSON.stringify($cache.get("actions")) }),
+      path: CloudBKPath
+    });
+    success && ui.toast({text: "Backup Success"});
+  } else {
+    if ($file.exists(CloudBKPath)) {
+      $cache.set("actions", JSON.parse($file.read(CloudBKPath).string));
+      ui.toast({text: "Restore Success"});
+      $delay(1, () => { $addin.restart(); });
+    } else $ui.error("No Backup File");
+  }
 }
 
 async function check() {

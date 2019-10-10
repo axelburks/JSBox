@@ -19,7 +19,7 @@ function activeMenu(i) {
   }
 }
 
-function init() {
+function init(context) {
   let topColunm = {
     type: "blur",
     props: { style: [1, 3][dark], bgcolor },
@@ -88,6 +88,13 @@ function init() {
           tapped(sender) {
             $("actionlist").hidden == 1
               ? addNewItem()
+              : $ui
+                  .menu(["新建底栏动作", "新建预览动作"])
+                  .then(resp => resp && createNewActionItem(resp.index));
+          },
+          longPressed(sender) {
+            $("actionlist").hidden == 1
+              ? addNewItem($clipboard.text, show=true)
               : $ui
                   .menu(["新建底栏动作", "新建预览动作"])
                   .then(resp => resp && createNewActionItem(resp.index));
@@ -220,24 +227,14 @@ function init() {
     ]
   });
   dataManager.init();
+  if (context && $context.query.clipindex) {
+    addNewItem($context.query.clipindex >= 0 ? $("itemlist").data[$context.query.clipindex].itemtext.text : "", show=true)
+  }
 }
 
-function addNewItem() {
-  $input.text().then(text => {
-    if (text) {
-      let items = dataManager.getTextItems();
-      $clipboard.set({ type: "public.plain-text", value: text });
-      if (items.indexOf(text) == -1 && text.length > 0) {
-        $("itemlist").insert({
-          index: 0,
-          value: { itemtext: { text: text } }
-        });
-        items.unshift(text);
-        items = [...new Set(items)];
-        dataManager.saveTextItems(items);
-      } else return;
-    }
-  });
+function addNewItem(text, show) {
+  let editor = require("./editor");
+  editor.clipEditor(text, show);
 }
 
 function createNewActionItem(i) {

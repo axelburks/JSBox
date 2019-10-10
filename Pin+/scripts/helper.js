@@ -1,5 +1,92 @@
 let ui = require("./ui");
 
+function runLongAction(action) {
+  let isToday = $app.env == 2,
+  pattern = action.pattern,
+  stext = isToday ? $("i2clip").text : "",
+  clipText = $clipboard.text || stext,
+  hasPlaceholder = pattern.indexOf("%@") != -1,
+  replacement = action.noenc ? clipText : encodeURIComponent(clipText);
+
+  pattern = pattern.replace("%@", replacement);
+
+  if (_hasPrefix(pattern, "pushbullet")) {
+    let tgpmbot_url = "";
+    $file.exists("tgpmbot.txt") && $file.read("tgpmbot.txt").string && (tgpmbot_url = $file.read("tgpmbot.txt").string.replace(/(\r|\n)/gi, ""));
+    if (tgpmbot_url) {
+      ui.toast({text: "Sending...", time:5})
+      $http.post({
+        header: {
+          "Content-Type": "text/plain"
+        },
+        url: tgpmbot_url,
+        body: clipText,
+        handler: function(resp) {
+          if(resp.data == "OK"){
+            ui.toast({text: "Send Success"})
+          } else $ui.error(resp.data);;
+        }
+      })
+    } else ui.toast({ text: "None Bot Webhook", icon: "225", inset: 7 });
+    return;
+  }
+
+  if (_hasPrefix(pattern, "download")) {
+    let thunder = require("./plugins/thunder");
+    thunder.run();
+    return;
+  }
+
+  if (_hasPrefix(pattern, "delete_photo")) {
+    let dp = require("./plugins/delete-photo");
+    dp.run();
+    return;
+  }
+
+  if (_hasPrefix(pattern, "search_image")) {
+    var up = require("./plugins/search-image");
+    up.run(search=false);
+    return;
+  }
+
+  if (_hasPrefix(pattern, "eudic://dict")) {
+    $app.openURL("http://fanyi.baidu.com/#en/zh/" + replacement);
+    return;
+  }
+
+  if (_hasPrefix(pattern, "taobao://s.taobao.com")) {
+    $app.openURL("openapp.jdmobile://virtual?params=" + encodeURIComponent("{\"des\":\"productList\",\"keyWord\":\"" + clipText + "\",\"category\":\"jump\",\"from\":\"search\"}"));
+    return;
+  }
+
+  if (_hasPrefix(pattern, "opener://")) {
+    ($detector.link(clipText) != "") ? $app.openURL("opener://x-callback-url/show-options?allow-auto-open=true&url=" + replacement) : ui.toast({ text: "No URL", icon: "225", inset: 7 });
+    return;
+  }
+
+  if (_hasPrefix(pattern, "https://www.baidu.com/s?wd=")) {
+    $app.openURL("pin://xsearch");
+    return;
+  }
+
+  if (_hasPrefix(pattern, "url_convert")) {
+    if (isToday) {
+      if (stext == "") $("i2clip").focus();
+      else if (stext) webCapture(stext);
+      else return;
+    } else if (clipText != "") webCapture(clipText);
+    else return;
+  }
+
+  if (_hasPrefix(pattern, "dencode")) {
+    let dc = require("./plugins/data-convert");
+    dc.show();
+    return;
+  }
+
+  $app.openURL(pattern);
+}
+
 function runAction(action) {
   let isToday = $app.env == 2,
     pattern = action.pattern,
@@ -9,6 +96,36 @@ function runAction(action) {
     replacement = action.noenc ? clipText : encodeURIComponent(clipText);
 
   pattern = pattern.replace("%@", replacement);
+
+  if (_hasPrefix(pattern, "pushbullet")) {
+    var pb = require("./plugins/pushbullet");
+    pb.run();
+    return;
+  }
+
+  if (_hasPrefix(pattern, "download")) {
+    ($detector.link(clipText) != "") ? $app.openURL("x-icabmobile://x-callback-url/download?url=" + replacement) : ui.toast({ text: "No URL", icon: "225", inset: 7 });
+    return;
+  }
+
+  if (_hasPrefix(pattern, "delete_photo")) {
+    $photo.delete({
+      count: 1,
+      handler: function(success) {}
+    });
+    return;
+  }
+
+  if (_hasPrefix(pattern, "search_image")) {
+    var searchimage = require("./plugins/search-image");
+    searchimage.run();
+    return;
+  }
+
+  if (_hasPrefix(pattern, "opener://")) {
+    ($detector.link(clipText) != "") ? $app.openURL("opener://x-callback-url/show-options?allow-auto-open=false&url=" + replacement) : ui.toast({ text: "No URL", icon: "225", inset: 7 });
+    return;
+  }
 
   if (_hasPrefix(pattern, "10010")) {
     let cn10010 = require("./plugins/10010");
@@ -363,4 +480,7 @@ function webCapture(content) {
   } else ui.toast({ text: "URL 输入有误", icon: "225", inset: 7 });
 }
 
-module.exports = { runAction: runAction };
+module.exports = { 
+  runAction: runAction,
+  runLongAction: runLongAction
+};

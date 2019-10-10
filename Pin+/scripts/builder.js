@@ -119,6 +119,19 @@ function createClipboardView() {
           }
         },
         {
+          title: "编辑",
+          color: $color("#009999"),
+          handler: (sender, indexPath) => {
+            let text = sender.object(indexPath).itemtext.text;
+            if (env == 1) {
+              $app.openURL("jsbox://run?name=" + encodeURI($addin.current.name) + "&from=" + env + "&clipindex=" + indexPath.row);
+            } else {
+              let editor = require("./editor");
+              editor.clipEditor(text);
+            }
+          }
+        },
+        {
           title: "同步",
           color: $color("#F39B36"),
           handler: (sender, indexPath) => {
@@ -158,7 +171,9 @@ function createClipboardView() {
         $device.taptic(1);
         let text = data.itemtext.text;
         $clipboard.text = text;
-        env == 1 && ($("i2clip").text = text);
+        let flag = text.indexOf("\n") >= 0;
+        env != 1 && ui.toast({ text: "Copied Success" });
+        env == 1 && ($("i2clip").text = text) && ($("i2clip").textColor = flag? ui.color.general_n:ui.color.general) && ($("i2clip").placeholder = "剪贴板无内容");
       },
       pulled: sender => {
         sender.endRefreshing();
