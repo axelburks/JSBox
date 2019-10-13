@@ -383,9 +383,9 @@ function syncMenu() {
           _sync = i;
           $cache.set("sync", i);
           if (_sync !== 0) {
-            let path = "drive://Pin+/text-items.json";
+            let path = "drive://XPin/text-items.json";
             if (!$file.exists(path)) {
-              $file.mkdir("drive://Pin+/");
+              $file.mkdir("drive://XPin/");
               $file.write({
                 data: $data({ string: JSON.stringify([]) }),
                 path: path

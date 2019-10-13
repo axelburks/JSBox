@@ -100,9 +100,9 @@ function show() {
                   $cache.set("sync", i);
                   $cache.set("list", 0);
                   if (i !== 0) {
-                    let path = "drive://Pin+/text-items.json";
+                    let path = "drive://XPin/text-items.json";
                     if (!$file.exists(path)) {
-                      $file.mkdir("drive://Pin+/");
+                      $file.mkdir("drive://XPin/");
                       $file.write({
                         data: $data({ string: JSON.stringify([]) }),
                         path: path
@@ -437,7 +437,7 @@ function support() {
           {
             type: "label",
             props: {
-              text: "Pin+",
+              text: "XPin",
               font: $font(72),
               align: $align.right
             },
@@ -607,8 +607,8 @@ function backup(action) {
 
 async function check() {
   ui.guide(5, "检查中，请勿连续点击…");
-  let res = await $http.get("http://t.cn/AiWvsbMn");
-  let ver = res.data.pinp;
+  let res = await $http.get("https://raw.githubusercontent.com/axelburks/JSBox/master/version.json");
+  let ver = res.data.xpin;
   if (ver <= cv) {
     ui.toast({ text: "您这是最新版本^_^" });
     return;
@@ -620,7 +620,7 @@ async function check() {
     actions: ["否", "是"]
   });
   if (index == 0) return;
-  let url = "http://t.cn/Ai0mhtx6";
+  let url = "https://github.com/axelburks/JSBox/raw/master/XPin/.output/XPin.box";
   let { displayName, name } = $addin.current;
   $http.download({
     url: url,

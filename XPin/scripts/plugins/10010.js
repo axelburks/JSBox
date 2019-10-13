@@ -489,7 +489,7 @@ exports.show = () => {
       }
     ]
   });
-  $app.tips("长按返回 Pin+,\n在统计视图中轻点右上角返回。");
+  $app.tips("长按返回 XPin,\n在统计视图中轻点右上角返回。");
 };
 
 function earliestLoadAnimate(t, view) {

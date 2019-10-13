@@ -2,7 +2,7 @@ let _sync, _list,
   ui = require("./ui");
 
 const local = "assets/text-items.json";
-const cloud = "drive://Pin+/text-items.json";
+const cloud = "drive://XPin/text-items.json";
 
 const getTextItems = (isCloud = _list) => JSON.parse($file.read(isCloud ? cloud : local).string);
 const setTextItems = (data, isCloud = _list) =>
