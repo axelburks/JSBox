@@ -31,15 +31,16 @@ function clipEditor(text, show=false) {
           type: $kbType.default,
           bgcolor: ver ? ui.color.editor_text_bg : $rgba(100, 100, 100, 0.1),
           textColor,
+          darkKeyboard: $device.isDarkMode ? true : false,
           font: $font(15),
           radius: 10,
           accessoryView: {
             type: "view",
             props: {
               height: 40,
-              bgcolor: $color("#eeeeee"),
+              bgcolor: $device.isDarkMode ? $color("#080808") : $color("#eeeeee"),
               borderWidth: 0.5,
-              borderColor: $color("#cccccc")
+              borderColor: $device.isDarkMode ? $color("clear") : $color("#cccccc")
             },
             views: [
               {
@@ -49,10 +50,9 @@ function clipEditor(text, show=false) {
                   title: "⃔",
                   radius: 6,
                   font: $font(14),
-                  titleColor: $color("#333333"),
-                  bgcolor: $color("#ffffff"),
+                  bgcolor: $device.isDarkMode ? $color("#404040") : $color("#ffffff"),
                   borderWidth: 0.5,
-                  borderColor: $color("#cccccc")
+                  borderColor: $device.isDarkMode ? $color("#606060") : $color("#cccccc")
                 },
                 layout: function(make, view) {
                   make.top.inset(5);
@@ -78,10 +78,9 @@ function clipEditor(text, show=false) {
                   title: "⃕",
                   radius: 6,
                   font: $font(14),
-                  titleColor: $color("#333333"),
-                  bgcolor: $color("#ffffff"),
+                  bgcolor: $device.isDarkMode ? $color("#404040") : $color("#ffffff"),
                   borderWidth: 0.5,
-                  borderColor: $color("#cccccc")
+                  borderColor: $device.isDarkMode ? $color("#606060") : $color("#cccccc")
                 },
                 layout: function(make, view) {
                   make.top.equalTo($("UndoButton").top);
@@ -123,7 +122,7 @@ function clipEditor(text, show=false) {
                 type: "button",
                 props: {
                   id: "ShareButton",
-                  icon: $icon("022", $color("gray"), $size(20, 20)),
+                  icon: $icon("022", $device.isDarkMode ? $color("#C0C0C0") : $color("gray"), $size(20, 20)),
                   font: $font("bold", 25),
                   bgcolor: $color("clear"),
                   hidden: 0
@@ -147,7 +146,7 @@ function clipEditor(text, show=false) {
                 type: "button",
                 props: {
                   id: "QRButton",
-                  icon: $icon("017", $color("gray"), $size(20, 20)),
+                  icon: $icon("017", $device.isDarkMode ? $color("#C0C0C0") : $color("gray"), $size(20, 20)),
                   font: $font("bold", 25),
                   bgcolor: $color("clear"),
                   hidden: 0
@@ -198,9 +197,9 @@ function clipEditor(text, show=false) {
                   id: "saveButton",
                   title: "Save",
                   font: $font("bold", 14),
-                  bgcolor: $color("tint"),
+                  bgcolor: $device.isDarkMode ? $color($cache.get("dark")) : $color("tint"),
                   borderWidth: 0.5,
-                  borderColor: $color("#cccccc")
+                  borderColor: $device.isDarkMode ? $color("clear") : $color("#cccccc")
                 },
                 layout: function(make, view) {
                   make.top.equalTo($("UndoButton").top);
@@ -220,9 +219,9 @@ function clipEditor(text, show=false) {
                   id: "cancelButton",
                   title: "Cancel",
                   font: $font("bold", 14),
-                  bgcolor: $color("lightGray"),
+                  bgcolor: $device.isDarkMode ? $color("#383838") : $color("lightGray"),
                   borderWidth: 0.5,
-                  borderColor: $color("#cccccc")
+                  borderColor: $device.isDarkMode ? $color("clear") : $color("#cccccc")
                 },
                 layout: function(make, view) {
                   make.top.equalTo($("UndoButton").top);

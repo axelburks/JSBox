@@ -127,6 +127,7 @@ function init() {
         borderWidth: 1.0 / $device.info.screen.scale,
         borderColor: ui.color.border,
         textColor: ui.color.general,
+        darkKeyboard: $device.isDarkMode ? true : false,
         placeholder: $clipboard.image ? "🌁 ‣ Long-Press to Show" : "剪贴板无内容",
         font: $font(_prefs[1]),
         bgcolor: ui.rgba(200),
@@ -142,6 +143,7 @@ function init() {
       },
       events: {
         longPressed: sender => {
+          $device.taptic(0);
           if (sender.sender.placeholder == "🌁 ‣ Long-Press to Show") {
             showImage($clipboard.image);
           } else {
@@ -164,7 +166,7 @@ function init() {
   dataManager.init();
   !_prefs[4] && initActionButtons();
   let flag = $clipboard.text.indexOf("\n") >= 0;
-  $delay(0.1, () => ((($("i2clip").text = $clipboard.text) && ($("i2clip").textColor = flag ? ui.color.general_n:ui.color.general)) || ""));
+  $delay(0, () => ((($("i2clip").text = $clipboard.text) && ($("i2clip").textColor = flag ? ui.color.general_n:ui.color.general)) || ""));
 }
 
 function showImage(imageData) {
@@ -193,7 +195,7 @@ function showImage(imageData) {
         type: "image",
         props: {
           bgcolor: $color("white"),
-          image: imageData.image
+          image: imageData.image.jpg(0.5).image
         },
         layout: (make, view) => {
           make.size.equalTo($size($widget.height*ratio, $widget.height));

@@ -127,7 +127,7 @@ function createClipboardView() {
               $app.openURL("jsbox://run?name=" + encodeURI($addin.current.name) + "&from=" + env + "&clipindex=" + indexPath.row);
             } else {
               let editor = require("./editor");
-              editor.clipEditor(text);
+              editor.clipEditor(text, show=true);
             }
           }
         },
