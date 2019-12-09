@@ -353,29 +353,30 @@ function urlConvert(content) {
 }
 
 function shortenUrl(url) {
-  $ui.menu(["tinyurl.com", "u.nu"]).then(resp => {
-    if (!resp) return;
-    let i = resp.index;
-    url = encodeURIComponent(url);
-    let pre = i
-      ? "https://u.nu/api.php?action=shorturl&format=json&url="
-      : "https://tinyurl.com/create.php?source=indexpage&url=";
-    $http.get(`${pre}${url}`).then(res => {
-      if (res) {
-        let code = res.response.statusCode;
-        if (i == 0) {
-          url = res.data.match(/<div.*?indent.*?<b>(.*?)<\/b>/)[1];
-          code == 200 && url
-            ? shortened(url)
-            : ui.toast({ text: "短链接生成失败", icon: "225", inset: 7 });
-        } else {
-          code == 200 && typeof res.data == "object"
-            ? shortened(res.data.shorturl)
-            : ui.toast({ text: "短链接生成失败", icon: "225", inset: 7 });
+  $ui.menu({
+    items: ["tinyurl.com", "u.nu"],
+    handler: function(title, idx) {
+      url = encodeURIComponent(url);
+      let pre = idx
+        ? "https://u.nu/api.php?action=shorturl&format=json&url="
+        : "https://tinyurl.com/create.php?source=indexpage&url=";
+      $http.get(`${pre}${url}`).then(res => {
+        if (res) {
+          let code = res.response.statusCode;
+          if (idx == 0) {
+            url = res.data.match(/<div.*?indent.*?<b>(.*?)<\/b>/)[1];
+            code == 200 && url
+              ? shortened(url)
+              : ui.toast({ text: "短链接生成失败", icon: "225", inset: 7 });
+          } else {
+            code == 200 && typeof res.data == "object"
+              ? shortened(res.data.shorturl)
+              : ui.toast({ text: "短链接生成失败", icon: "225", inset: 7 });
+          }
         }
-      }
-    });
-  });
+      });
+    }
+  })
 
   function shortened(link) {
     let dataManager = require("./data-manager");
@@ -399,27 +400,29 @@ function dencode(t) {
     "SHA256",
     "转换为拼音"
   ];
-  $ui.menu(menu).then(resp => {
-    if (resp) {
-      let i = resp.index,
-        x;
-      if (i == 0) x = $text.base64Encode(t);
-      else if (i == 1) x = $text.base64Decode(t);
-      else if (i == 2) x = $text.URLEncode(t);
-      else if (i == 3) x = $text.URLDecode(t);
-      else if (i == 4) x = $text.HTMLEscape(t);
-      else if (i == 5) x = $text.HTMLUnescape(t);
-      else if (i == 6) x = t.toLowerCase();
-      else if (i == 7) x = t.toUpperCase();
-      else if (i == 8) x = $text.MD5(t);
-      else if (i == 9) x = $text.SHA1(t);
-      else if (i == 10) x = $text.SHA256(t);
+
+  $ui.menu({
+    items: menu,
+    handler: function(title, idx) {
+      let x;
+      if (idx == 0) x = $text.base64Encode(t);
+      else if (idx == 1) x = $text.base64Decode(t);
+      else if (idx == 2) x = $text.URLEncode(t);
+      else if (idx == 3) x = $text.URLDecode(t);
+      else if (idx == 4) x = $text.HTMLEscape(t);
+      else if (idx == 5) x = $text.HTMLUnescape(t);
+      else if (idx == 6) x = t.toLowerCase();
+      else if (idx == 7) x = t.toUpperCase();
+      else if (idx == 8) x = $text.MD5(t);
+      else if (idx == 9) x = $text.SHA1(t);
+      else if (idx == 10) x = $text.SHA256(t);
       else x = $text.convertToPinYin(t);
       let dataManager = require("./data-manager");
       dataManager.copyAndSaveText(x);
       ui.toast({ text: "Done", inset: 7 });
     }
-  });
+  })
+
 }
 
 function webCapture(content) {
@@ -470,10 +473,10 @@ function webCapture(content) {
             items: items.map(item => {
               return item.name;
             }),
-            handler: (t, idx) => {
+            handler: function(title, idx) {
               $app.openURL(items[idx].link);
             }
-          });
+          })
         });
       }
     });

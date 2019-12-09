@@ -368,7 +368,7 @@ function createPushView(title, button) {
 
 function refreshList() {
   dataManager.init();
-  if (env == 2) $("i2clip").text = $clipboard.text || [];
+  if (env == 1) (($("i2clip").text = $clipboard.text) && ($("i2clip").textColor = $clipboard.text.indexOf("\n") >= 0 ? ui.color.general_n:ui.color.general)) || ($("i2clip").text = "");
   let t = dataManager.getTextItems();
   let total = `已记录 ${t.length} 条`;
   ui.toast({ text: total, inset: 7 });

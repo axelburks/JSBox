@@ -104,6 +104,7 @@ function init() {
         }
       },
       long: () => {
+        $device.taptic(0);
         let t = $("i2clip").text;
         if (t == "") ui.blink($("i2clip"));
         else if ($detector.link(t) != "") $app.openURL($detector.link(t)[0]);
