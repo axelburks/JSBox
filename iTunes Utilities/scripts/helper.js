@@ -164,6 +164,33 @@ function showDetails(item) {
   }
 }
 
+function genRSSHubURL(country, type, item) {
+  $ui.menu({
+    items: [$l10n("RSS_UPDATE"), $l10n("RSS_PRICE"), $l10n("RSS_INAPP")],
+    handler: function(title, idx) {
+      let rss_url = "https://rsshub.app/appstore/";
+      if (idx == 0) {
+        rss_url = rss_url + `update/${country}/id${item.trackId}`;
+      } else if (idx == 1) {
+        rss_url = rss_url + `price/${country}/${type}/id${item.trackId}`;
+      } else {
+        rss_url = rss_url + `iap/${country}/id${item.trackId}`;
+      }
+      $clipboard.set({
+        "type": "public.plain-text",
+        "value": rss_url
+      });
+      $ui.toast("Copied: " + rss_url);
+      delayClose(1);
+    },
+    finished: function(cancelled) {
+      if (cancelled) {
+        delayClose(0.6);
+      }
+    }
+  })
+}
+
 function openAppStore(country, item) {
   $app.openURL(`https://itunes.apple.com/${country.code}/app/id${item.trackId}`)
 }
@@ -271,6 +298,7 @@ module.exports = {
   showDetails: showDetails,
   showPreview: showPreview,
   showVersionID: showVersionID,
+  genRSSHubURL: genRSSHubURL,
   shareMedia: shareMedia,
   openAppStore: openAppStore,
   openCollection: openCollection,

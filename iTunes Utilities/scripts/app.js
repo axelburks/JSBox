@@ -31,6 +31,7 @@ function showActions(index) {
     SHOW_DETAILS: $l10n("SHOW_DETAILS"),
     APP_PREVIEW: $l10n("APP_PREVIEW"),
     APP_VERSIONID: $l10n("APP_VERSIONID"),
+    RSS_LINK: $l10n("RSS_LINK"),
     TRANSLATE: $l10n("TRANSLATE"),
     SHARE_MEDIA: $l10n("SHARE_MEDIA"),
     OPEN_APP_STORE: $l10n("OPEN_APP_STORE"),
@@ -43,7 +44,7 @@ function showActions(index) {
   var items = []
 
   if (entity.code.match(/software|iPadSoftware|macSoftware/)) {
-    items = [ACTIONS.GET_ICON, ACTIONS.GET_SCREENSHOTS, ACTIONS.SHOW_DETAILS, ACTIONS.OPEN_APP_STORE, ACTIONS.TRANSLATE, ACTIONS.APP_PREVIEW]
+    items = [ACTIONS.GET_ICON, ACTIONS.GET_SCREENSHOTS, ACTIONS.SHOW_DETAILS, ACTIONS.OPEN_APP_STORE, ACTIONS.TRANSLATE, ACTIONS.RSS_LINK, ACTIONS.APP_PREVIEW]
     if (entity.code.match(/^software|iPadSoftware/)) {
       items.splice(5, 0, ACTIONS.APP_VERSIONID)
     }
@@ -70,6 +71,14 @@ function showActions(index) {
       helper.showPreview(item, country.code)
     } else if (action === ACTIONS.APP_VERSIONID) {
       helper.showVersionID(item)
+    } else if (action === ACTIONS.RSS_LINK) {
+      if (entity.code.match(/software|iPadSoftware/)) {
+        helper.genRSSHubURL(country.code, "iOS", item);
+      } else if (entity.code.match(/macSoftware/)) {
+        helper.genRSSHubURL(country.code, "mac", item);
+      } else {
+        $ui.error("Not supported app type");
+      }
     } else if (action === ACTIONS.TRANSLATE) {
       helper.translateDetail(item)
     } else if (action === ACTIONS.SHARE_MEDIA) {

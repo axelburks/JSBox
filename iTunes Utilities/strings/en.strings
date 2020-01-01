@@ -23,3 +23,7 @@
 "DOWNLOADING" = "Downloading...";
 "STRUCTURED_VIEW" = "Structured View";
 "FORMAT_ERROR" = "Not a valid JSON";
+"RSS_LINK" = "®️ RSSHub";
+"RSS_UPDATE" = "Update";
+"RSS_PRICE" = "App Price";
+"RSS_INAPP" = "In-App Purchase";

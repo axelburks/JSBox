@@ -23,3 +23,7 @@
 "DOWNLOADING" = "获取中...";
 "STRUCTURED_VIEW" = "结构化视图";
 "FORMAT_ERROR" = "不是一个合法的 JSON";
+"RSS_LINK" = "®️ RSSHub";
+"RSS_UPDATE" = "应用更新";
+"RSS_PRICE" = "价格更新";
+"RSS_INAPP" = "内购价格更新";
