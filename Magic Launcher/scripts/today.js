@@ -8,7 +8,7 @@ function setupTodayView() {
   let itemHeight = 35
   let wantToClose = false
   let showView = []
-  if(utils.getCache("pullToClose")) {
+  if($app.widgetIndex == -1 && utils.getCache("pullToClose")) {
     showView = [{
       type: "matrix",
       props: {
@@ -78,28 +78,6 @@ function setupTodayView() {
     }]
   } else {
     showView = [{
-      type: "button",
-      props: {
-        title: "CLOSE",
-        bgcolor: $color("clear"),
-        titleColor: $rgba(100, 100, 100, 0.3),
-        font: $font("bold", 15),
-        hidden: false,
-        radius: 15,
-      },
-      layout: function(make, view) {
-        make.centerX.equalTo(view.super)
-        make.top.inset(0)
-        make.width.equalTo(120)
-        make.height.equalTo(30)
-      },
-      events: {
-        tapped: function(sender) {
-          $device.taptic(2)
-          $app.close(0.1)
-        }
-      }
-    },{
       type: "matrix",
       props: {
         id: "rowsShow",
@@ -140,8 +118,8 @@ function setupTodayView() {
     views: showView,
   })
 
-  if(!utils.getCache("staticHeight")) {
-    if($app.widgetIndex == -1 && utils.getCache("pullToClose")) {
+  if($app.widgetIndex == -1 && !utils.getCache("staticHeight")) {
+    if(utils.getCache("pullToClose")) {
       $widget.height = 215
     } else {
       $widget.height = 245

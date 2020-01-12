@@ -40,7 +40,7 @@ function setupWidgetView() {
 
 function pushFolderView(folderID) {
   let items = ui.addButtonMore(utils.getCache(folderID, []))
-  let columns = utils.getCache("foldercolumns")
+  let columns = utils.getCache("widgetcolumns") - 1
   let itemHeight = 35
   let view = {
     props: {
@@ -51,7 +51,7 @@ function pushFolderView(folderID) {
       type: "matrix",
       props: {
         id: "folderrowsShow",
-        columns: 8, //横行个数
+        columns: columns, //横行个数
         itemHeight: itemHeight, //图标到字之间得距离
         spacing: 8, //每个边框与边框之间得距离
         template: ui.genTemplate(folderID),
