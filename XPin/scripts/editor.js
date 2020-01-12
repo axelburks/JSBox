@@ -14,7 +14,7 @@ const ver = parseInt($device.info.version.split(".")[0]) - 12;
 const textColor = ui.color.general;
 
 function clipEditor(text, show=false) {
-  let TextViewHeight = $device.info.screen.height - 500;
+  let TextViewHeight = $device.info.screen.height - 110;
 
   $ui.render({
     props: {
@@ -25,10 +25,13 @@ function clipEditor(text, show=false) {
     },
     views: [
       {
-        type: "text",
+        type: "code",
         props: {
           id: "clipContent",
+          theme: "dracula",
           type: $kbType.default,
+          adjustInsets: true,
+          lineNumbers: true,
           bgcolor: ver ? ui.color.editor_text_bg : $rgba(100, 100, 100, 0.1),
           textColor,
           darkKeyboard: $device.isDarkMode ? true : false,
