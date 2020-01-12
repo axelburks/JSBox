@@ -1,0 +1,24 @@
+{
+  "widget" : {
+    "staticSize" : false,
+    "tintColor" : "",
+    "height" : 0,
+    "iconColor" : ""
+  },
+  "info" : {
+    "types" : 15,
+    "author" : "Axel",
+    "website" : "",
+    "name" : "Preview",
+    "url" : "",
+    "version" : "1.0.0"
+  },
+  "settings" : {
+    "minOSVer" : "11.0.0",
+    "minSDKVer" : "1.55.0",
+    "rotateDisabled" : false,
+    "autoKeyboardEnabled" : false,
+    "keyboardToolbarEnabled" : false,
+    "idleTimerDisabled" : false
+  }
+}
