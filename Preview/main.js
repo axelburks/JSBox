@@ -385,6 +385,18 @@ $ui.render({
           }
         }
       },
+      {
+        title: "Json Viewer",
+        symbol: "j.circle",
+        handler: function () {
+          let helper = require("scripts/helper");
+          let text = $("codeContent").text || "";
+            let json = helper.parseJson(text || "{}");
+            if (json) {
+              helper.renderJson(json);
+            }
+        }
+      },
       naviaddButton
     ]
   }

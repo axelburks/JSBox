@@ -249,7 +249,7 @@ function renderJson(json, title) {
   
   var string = JSON.stringify(json, null, 2);
   var theme = "atom-one-light.min.css";
-  var html = "<html><link rel='stylesheet' href='http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/" + theme + "'><style>*{margin:0;padding:0;font-size:24px;word-wrap:break-word;word-break:break-all;}</style><script src='http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js'></script><script>hljs.initHighlightingOnLoad();</script><pre><code class='hljs'>" + string + "</code></pre></html>";
+  var html = "<html><link rel='stylesheet' href='http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/" + theme + "'><style>*{margin:0;padding:0;font-size:24px;word-wrap:break-word;word-break:break-all;white-space:pre-wrap;}</style><script src='http://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js'></script><script>hljs.initHighlightingOnLoad();</script><pre><code class='hljs'>" + string + "</code></pre></html>";
   var view = {
     props: { title: title },
     views: [
