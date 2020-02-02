@@ -1,4 +1,4 @@
-let today = $cache.get("today") || [[0, 1], 12, 0, 6, 0, 0];
+let today = $cache.get("today") || [[0, 1], 12, 0, 9, 0, 0];
 let builder = require("./builder");
 let ui = require("./ui");
 

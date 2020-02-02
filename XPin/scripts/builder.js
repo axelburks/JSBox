@@ -44,7 +44,7 @@ const listInsets = (h = 50) => {
       indicatorInsets: $insets(44, 0, 50, 0),
       header: {
         type: "view",
-        props: { height: 44, bgcolor: $color("clear") }
+        props: { height: 30, bgcolor: $color("clear") }
       },
       footer: {
         type: "view",
@@ -127,7 +127,7 @@ function createClipboardView() {
               $app.openURL("jsbox://run?name=" + encodeURI($addin.current.name) + "&from=" + env + "&clipindex=" + indexPath.row);
             } else {
               let editor = require("./editor");
-              editor.clipEditor(text, show=true);
+              editor.clipEditor(text, true);
             }
           }
         },
@@ -164,7 +164,10 @@ function createClipboardView() {
         make.top.inset(30);
         make.bottom.inset(_prefs[4] ? 0 : 30);
       } else if (env == 2) make.top.bottom.inset(49);
-      else make.top.bottom.equalTo(view.super.safeArea);
+      else {
+        make.top.equalTo(view.super.safeArea).inset(50);
+        make.bottom.equalTo(view.super.safeArea);
+      }
     },
     events: {
       didSelect: (sender, indexPath, data) => {

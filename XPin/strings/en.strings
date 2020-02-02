@@ -156,3 +156,5 @@
 "QR_SAVED" ="QRCode Saved";
 "QR_IMG_SAVED"="QR/Image Saved";
 "IMAGE_SAVED" = "Image Saved";
+
+"NO_MATCH_ITEM" = "No Match Item";

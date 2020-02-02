@@ -12,9 +12,15 @@
 let ui = require("./ui");
 const ver = parseInt($device.info.version.split(".")[0]) - 12;
 const textColor = ui.color.general;
+let search_result = [];
+let search_result_index = 0;
+let replaced = false;
 
 function clipEditor(text, show=false) {
   let TextViewHeight = $device.info.screen.height - 110;
+  search_result_index = 0;
+  search_result = [];
+  replaced = false;
 
   $ui.render({
     props: {
@@ -113,7 +119,7 @@ function clipEditor(text, show=false) {
                 },
                 layout: function(make, view) {
                   make.top.bottom.inset(0);
-                  make.centerX.equalTo(view.super).offset(22);
+                  make.centerX.equalTo(view.super).offset(0);
                 },
                 events: {
                   tapped: function(sender) {
@@ -238,12 +244,62 @@ function clipEditor(text, show=false) {
                     closeView();
                   }
                 }
+              },
+              {
+                type: "button",
+                props: {
+                  id: "searchButton",
+                  icon: $icon("023", $device.isDarkMode ? $color("#C0C0C0") : $color("gray"), $size(20, 20)),
+                  font: $font("bold", 25),
+                  bgcolor: $color("clear"),
+                },
+                layout: function(make, view) {
+                  make.top.bottom.inset(0);
+                  make.right.equalTo($("cancelButton").left).inset(20);
+                },
+                events: {
+                  tapped: function(sender) {
+                    $device.taptic(0);
+                    search_result = [];
+                    search_result_index = 0;
+                    replaced = false;
+                    $("search_input").text = "";
+                    $("replace_input").text = "";
+                    if ($("button_next").hidden) {
+                      $("button_next").hidden = false;
+                      $("button_prev").hidden = false;
+                      $("search_count").hidden = false;
+                      $("search_input").hidden = false;
+                      $("button_replace").hidden = false;
+                      $("button_replaceall").hidden = false;
+                      $("replace_input").hidden = false;
+                      $("clipContent").updateLayout(function(make) {
+                        make.height.equalTo($device.info.screen.height - 503);
+                      })
+                      $("search_input").focus();
+                    } else {
+                      $("search_input").text = "";
+                      $("search_count").text = "0/0";
+                      $("button_next").hidden = true;
+                      $("button_prev").hidden = true;
+                      $("search_count").hidden = true;
+                      $("search_input").hidden = true;
+                      $("button_replace").hidden = true;
+                      $("button_replaceall").hidden = true;
+                      $("replace_input").hidden = true;  
+                      $("clipContent").updateLayout(function(make) {
+                        make.height.equalTo(TextViewHeight);
+                      })
+                      $("clipContent").focus();
+                    }
+                  }
+                }
               }
             ]
           }
         },
         layout: function(make, view) {
-          make.top.equalTo(view.super.safeAreaTop).offset(20);
+          make.top.equalTo(view.super.safeAreaTop).offset(0);
           make.right.left.inset(10);
           make.height.equalTo(TextViewHeight);
         },
@@ -256,6 +312,219 @@ function clipEditor(text, show=false) {
               showImage($clipboard.image);
             } else {
               sender.focus();
+            }
+          }
+        }
+      },
+      {
+        type: "button",
+        props: {
+          id: "button_next",
+          symbol: "arrowtriangle.right.fill",
+          bgcolor: $color("#7EC0EE"),
+          hidden: true
+        },
+        layout: function(make, view) {
+          make.top.equalTo(view.prev.bottom).inset(7);
+          make.right.inset(10);
+          make.width.equalTo(35);
+          make.height.equalTo(27);
+        },
+        events: {
+          tapped: function(sender) {
+            if (search_result.length > 0) {
+              $device.taptic(0);
+              $("clipContent").focus();
+              if (replaced) {
+                if (search_result_index >= search_result.length) {
+                  search_result_index = 0;
+                }
+              } else {
+                search_result_index = (search_result_index == search_result.length - 1) ? 0 : search_result_index + 1;
+              }
+              replaced = false;
+              $("clipContent").selectedRange = $range(search_result[search_result_index][1], search_result[search_result_index][0].length);
+              $("search_count").text = (search_result_index + 1) + "/" + search_result.length;
+            } else if ($("search_input").text.length == 0) {
+              $ui.toast("Please Input Query First");
+            }
+          }
+        }
+      },
+      {
+        type: "button",
+        props: {
+          id: "button_prev",
+          symbol: "arrowtriangle.left.fill",
+          bgcolor: $color("#7EC0EE"),
+          hidden: true
+        },
+        layout: function(make, view) {
+          make.top.equalTo(view.prev.top);
+          make.right.equalTo(view.prev.left).inset(5);
+          make.width.equalTo(view.prev.width);
+          make.height.equalTo(view.prev.height);
+        },
+        events: {
+          tapped: function(sender) {
+            if (search_result.length > 0) {
+              $device.taptic(0);
+              $("clipContent").focus();
+              search_result_index = (search_result_index  == 0) ?  search_result.length - 1 : search_result_index - 1;
+              replaced = false;
+              $("clipContent").selectedRange = $range(search_result[search_result_index][1], search_result[search_result_index][0].length);
+              $("search_count").text = (search_result_index + 1) + "/" + search_result.length;
+            } else if ($("search_input").text.length == 0) {
+              $ui.toast("Please Input Query First");
+            }
+          }
+        }
+      },
+      {
+        type: "label",
+        props: {
+          id: "search_count",
+          text: "0/0",
+          bgcolor: $color("#9C9C9C"),
+          radius: 5,
+          autoFontSize: true,
+          align: $align.center,
+          hidden: true
+        },
+        layout: function(make, view) {
+          make.top.equalTo(view.prev.top);
+          make.right.equalTo(view.prev.left).inset(5);
+          make.width.equalTo(60);
+          make.height.equalTo(view.prev.height);
+        }
+      },
+      {
+        type: "input",
+        props: {
+          id: "search_input",
+          hidden: true,
+          type: $kbType.search,
+          darkKeyboard: true
+        },
+        layout: function(make, view) {
+          make.top.equalTo(view.prev.top);
+          make.right.equalTo(view.prev.left).inset(5);
+          make.height.equalTo(view.prev.height);
+          make.left.inset(10);
+        },
+        events: {
+          didBeginEditing: function(sender) {
+            search_result = [];
+            search_result_index = 0;
+            replaced = false;
+            $("search_count").text = "0/0";
+          },
+          returned: function(sender) {
+            search_result = [];
+            search_result_index = 0;
+            replaced = false;
+            $("search_count").text = "0/0";
+            let search_query = sender.text.replace(/\\(?=$|\\)/g, "\\\\");
+            let regex1 = RegExp(search_query, 'ig');
+            let array1;
+            while ((array1 = regex1.exec($("clipContent").text)) !== null) {
+              search_result.push([array1[0], regex1.lastIndex - array1[0].length]);
+            }
+            if (search_result.length > 0) {
+              $("clipContent").focus();
+              $("clipContent").selectedRange = $range(search_result[search_result_index][1], search_result[search_result_index][0].length);
+              $("search_count").text = "1/" + search_result.length;
+            } else {
+              $ui.error("No Match Content");
+            }
+          }
+        }
+      },
+      {
+        type: "button",
+        props: {
+          id: "button_replace",
+          title: "Replace",
+          bgcolor: $color("#8968CD"),
+          hidden: true
+        },
+        layout: function(make, view) {
+          make.top.equalTo(view.prev.bottom).inset(7);
+          make.right.inset(10);
+          make.width.equalTo(85);
+          make.height.equalTo(view.prev.height);
+        },
+        events: {
+          tapped: function(sender) {
+            if (search_result.length > 0 && $("clipContent").selectedRange.length > 0) {
+              $device.taptic(0);
+              $("clipContent").focus();
+              $("clipContent").text = $("clipContent").text.slice(0, search_result[search_result_index][1]) + $("replace_input").text + $("clipContent").text.slice(search_result[search_result_index][1] + search_result[search_result_index][0].length);
+              $("clipContent").selectedRange = $range(search_result[search_result_index][1] + $("replace_input").text.length, 0);
+              search_result.splice(search_result_index, 1);
+              for (let i = search_result_index; i < search_result.length; i++) {
+                search_result[i][1] = search_result[i][1] + ($("replace_input").text.length - search_result[i][0].length);
+              }
+              replaced = true;
+            } else if ($("search_input").text.length == 0) {
+              $ui.toast("Please Input Query First");
+            }
+          }
+        }
+      },
+      {
+        type: "button",
+        props: {
+          id: "button_replaceall",
+          title: "All",
+          bgcolor: $color("#8968CD"),
+          hidden: true
+        },
+        layout: function(make, view) {
+          make.top.equalTo(view.prev.top);
+          make.right.equalTo(view.prev.left).inset(5);
+          make.width.equalTo(50);
+          make.height.equalTo(view.prev.height);
+        },
+        events: {
+          tapped: function(sender) {
+            if (search_result.length > 0) {
+              $device.taptic(0);
+              let search_query = $("search_input").text.replace(/\\(?=$|\\)/g, "\\\\");
+              let regex1 = RegExp(search_query, 'ig');
+              $("clipContent").text = $("clipContent").text.replace(regex1, $("replace_input").text);
+              $("clipContent").focus();
+              $("clipContent").selectedRange = $range(search_result[0][1] + $("replace_input").text.length, 0);
+              search_result = [];
+              search_result_index = 0;
+              replaced = false;
+              $("search_count").text = "0/0";
+            } else if ($("search_input").text.length == 0) {
+              $ui.toast("Please Input Query First");
+            }
+          }
+        }
+      },
+      {
+        type: "input",
+        props: {
+          id: "replace_input",
+          hidden: true,
+          type: $kbType.search,
+          darkKeyboard: true
+        },
+        layout: function(make, view) {
+          make.top.equalTo(view.prev.top);
+          make.right.equalTo(view.prev.left).inset(5);
+          make.height.equalTo(view.prev.height);
+          make.left.inset(10);
+        },
+        events: {
+          returned: function(sender) {
+            if (search_result.length > 0) {
+              replaced = false;
+              $("clipContent").focus();
+              $("clipContent").selectedRange = $range(search_result[search_result_index][1], search_result[search_result_index][0].length);
             }
           }
         }

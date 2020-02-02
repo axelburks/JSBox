@@ -94,7 +94,7 @@ function init(context) {
           },
           longPressed(sender) {
             $("actionlist").hidden == 1
-              ? addNewItem($clipboard.text, show=true)
+              ? addNewItem($clipboard.text, true)
               : $ui
                   .menu(["新建底栏动作", "新建预览动作"])
                   .then(resp => resp && createNewActionItem(resp.index));
@@ -190,6 +190,7 @@ function init(context) {
             $("title").hidden = i === 0;
             $("tabview").hidden = i !== 0;
             $("create").hidden = i === 2;
+            $("searchInput").hidden = i > 0;
             $("title").text = i === 2 ? "设置" : "动作";
             activeMenu(i);
           }
@@ -208,9 +209,45 @@ function init(context) {
     ]
   };
 
+  let searchInputview = {
+    type: "input",
+    props: {
+      id: "searchInput",
+      type: $kbType.search,
+      darkKeyboard: true,
+      align: $align.center,
+      clearsOnBeginEditing: true,
+      bgcolor: $color("lightGray"),
+      placeholder: "Search"
+    },
+    layout: (make, view) => {
+      make.top.equalTo($("create").bottom).inset(4);
+      make.height.equalTo(30);
+      make.left.right.inset(5);
+    },
+    events: {
+      didBeginEditing: function (sender) {
+        let all_items = dataManager.getTextItems();
+        if ($("itemlist").data.length != all_items.length) {
+          updateItem(all_items);
+        }
+      },
+      returned: function (sender) {
+        if (sender.text) {
+          sender.blur();
+          searchItem(sender.text);
+        } else {
+          sender.blur();
+          let all_items = dataManager.getTextItems();
+          updateItem(all_items);
+        }
+      }
+    }
+  }
+
   dark && topColunm.views.pop();
   dark && bottomColunm.views.pop();
-
+  
   $ui.render({
     props: {
       id: "main",
@@ -223,12 +260,13 @@ function init(context) {
       setting.show(),
       builder.createClipboardView(),
       topColunm,
+      searchInputview,
       bottomColunm
     ]
   });
   dataManager.init();
   if (context && $context.query.clipindex) {
-    addNewItem($context.query.clipindex >= 0 ? $("itemlist").data[$context.query.clipindex].itemtext.text : "", show=true)
+    addNewItem($context.query.clipindex >= 0 ? $("itemlist").data[$context.query.clipindex].itemtext.text : "", true)
   }
 }
 
@@ -249,6 +287,38 @@ function createNewActionItem(i) {
     $cache.set("actions", items);
     builder.reloadActionItems();
   }, i);
+}
+
+function updateItem(data) {
+  if (data.length == 0) {
+    $("itemlist").data = [];
+    $ui.alert({
+      title: "Error",
+      message: $l10n("NO_MATCH_ITEM"),
+    });
+  } else {
+    $("itemlist").data = [];
+    let tmp = data.map(i => {
+      let flag = i.indexOf("\n") >= 0;
+      return { itemtext: {
+        text: i,
+        textColor: flag? ui.color.general_n:ui.color.general
+      } };
+    });
+    $("itemlist").data = tmp;
+  }
+  
+}
+
+function searchItem(query) {
+  function isContain(element) {
+    let rex = query.replace(/\\(?=$|\\)/g, "\\\\");
+    let rexx = RegExp(rex,"im");
+    return rexx.test(element);
+  }
+  let all_items = dataManager.getTextItems();
+  let result = all_items.filter(isContain);
+  updateItem(result);
 }
 
 module.exports = { init: init };

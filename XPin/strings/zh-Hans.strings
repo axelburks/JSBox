@@ -156,3 +156,5 @@
 "QR_SAVED" ="二维码已保存至相册";
 "QR_IMG_SAVED"="图片或二维码已保存";
 "IMAGE_SAVED" = "图片已保存";
+
+"NO_MATCH_ITEM" = "无匹配条目";

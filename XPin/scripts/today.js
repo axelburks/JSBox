@@ -1,6 +1,6 @@
 let _sync = $cache.get("sync");
 let _list = $cache.get("list");
-let _prefs = $cache.get("today") || [[0, 1], 12, 0, 6, 0, 0];
+let _prefs = $cache.get("today") || [[0, 1], 12, 0, 9, 0, 0];
 
 let dataManager = require("./data-manager"),
   builder = require("./builder"),
