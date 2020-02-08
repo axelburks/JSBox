@@ -35,7 +35,7 @@ function renderJson(json) {
         },
         events: {
           tapped: function() {
-            $("jsonWebview").eval({
+            $("jsonWebview").exec({
               script: "document.body.contentEditable='true';document.designMode='on';",
               handler: function(result, error) {
             

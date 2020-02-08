@@ -1,6 +1,6 @@
 let view_blank = 10;
 let view_width = $device.info.screen.width - view_blank * 2;
-let shareItems = [], naviaddButton = {}, addCount = 0, um;
+let shareItems = [], naviaddButton = {}, jsonButton = {}, addCount = 0, um;
 
 let textContent = "";
 if ($context.safari) {
@@ -41,6 +41,19 @@ if (!textContent) {
       } else {
         $ui.error("You can only add once");
       }
+    }
+  };
+} else {
+  jsonButton = {
+    title: "Json Viewer",
+    symbol: "j.circle",
+    handler: function () {
+      let helper = require("scripts/helper");
+      let text = $("codeContent").text || "";
+        let json = helper.parseJson(text || "{}");
+        if (json) {
+          helper.renderJson(json);
+        }
     }
   };
 }
@@ -246,7 +259,7 @@ let textView = {
               let curLoc = $("codeContent").info;
               let oriLines = oriText.split("\n");
 
-              charCount = 0;
+              let charCount = 0;
               for (let lineIndex in oriLines) {
                 charCount = charCount + oriLines[lineIndex].length + 1;
                 if (charCount > curLoc) {
@@ -283,7 +296,7 @@ let textView = {
               let curLoc = $("codeContent").info;
               let oriLines = oriText.split("\n");
 
-              charCount = 0;
+              let charCount = 0;
               for (let lineIndex in oriLines) {
                 let lastlineLoc = charCount;
                 charCount = charCount + oriLines[lineIndex].length + 1;
@@ -385,18 +398,7 @@ $ui.render({
           }
         }
       },
-      {
-        title: "Json Viewer",
-        symbol: "j.circle",
-        handler: function () {
-          let helper = require("scripts/helper");
-          let text = $("codeContent").text || "";
-            let json = helper.parseJson(text || "{}");
-            if (json) {
-              helper.renderJson(json);
-            }
-        }
-      },
+      jsonButton,
       naviaddButton
     ]
   }
