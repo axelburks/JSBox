@@ -1,7 +1,13 @@
-function sayHello() {
-  $ui.alert($l10n("HELLO_WORLD"));
+function init() {
+  let textContent = "";
+  if ($clipboard.text) {
+    textContent = $clipboard.text;
+  }
+
+  let editor = require("./editor");
+  editor.show(textContent);
 }
 
 module.exports = {
-  sayHello: sayHello
-};
+  init: init
+}
