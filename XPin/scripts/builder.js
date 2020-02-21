@@ -99,7 +99,7 @@ function createClipboardView() {
                   let indexPath = view
                     .invoke("indexPathForCell", cell)
                     .jsValue();
-                  itemPreview(indexPath, text.trim());
+                  itemPreview(indexPath, text);
                 }
               }
             }
@@ -388,7 +388,6 @@ function pushViewListLayout() {
 function itemPreview(indexPath, text) {
   let { width, height } = $ui.window.frame;
   let size = $text.sizeThatFits({ text, width: width * 0.9, font: $font(14) });
-  let isCenter = size.height < 25 || size.width < width * 0.8; //14pt:16.8
   let textHeight = Math.min(size.height + 8, height);
   let view = {
     type: "blur",
@@ -490,11 +489,11 @@ function itemPreview(indexPath, text) {
           {
             type: "label",
             props: {
-              align: isCenter ? $align.center : $align.left,
+              align: $align.left,
               textColor: ui.color.general,
               bgcolor: $color("clear"),
               font: $font(14),
-              lines: Math.floor(size.height / 16.8),
+              lines: 0,
               text
             },
             layout: (make, view) => {

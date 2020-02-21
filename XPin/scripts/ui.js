@@ -14,7 +14,7 @@ const color = {
   border: rgba(100),
   general: [$color("#333"), $color("#FFF")][dark],
   general_n: [$color("#325793"), $color("#009999")][dark],
-  editor_bg: [$color("#FFFFFF"), $color("#202020")][dark],
+  editor_bg: [$color("#FFFFFF"), $color("#282828")][dark],
   editor_text_bg: [$rgba(100, 100, 100, 0.1), $color("#404040")][dark],
   title: [$color("000"), $color("#FFF")][dark],
   cell: [$color("#FFF"), $color("#191919")][dark],
