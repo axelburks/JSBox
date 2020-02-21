@@ -161,7 +161,7 @@ function viewSet(conTitle, item_id, item) {
           tapped: function(sender) {
             var date_init = new Date()
             if (item_id) {
-              var date_init = new Date(item.date)
+              date_init = new Date(item.date)
             }
             $picker.date({
               props: {
