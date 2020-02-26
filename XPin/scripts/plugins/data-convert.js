@@ -199,7 +199,7 @@ function rgbCopyMenu() {
   let color = [$("Red").text, $("Green").text, $("Blue").text];
   if (!color.includes(""))
     $ui.menu([`rgb(${color.join(",")})`, color.join(",")]).then(resp => {
-      if (resp) {
+      if ('index' in resp) {
         $clipboard.text = resp.title;
         ui.toast({ text: "已复制", inset: 34 });
       }
@@ -209,7 +209,7 @@ function rgbCopyMenu() {
 function hexCopyMenu() {
   let value = $("Hex").text;
   $ui.menu(["#" + value, "0x" + value]).then(resp => {
-    if (resp) {
+    if ('index' in resp) {
       $clipboard.text = resp.title;
       ui.toast({ text: "已复制", inset: 34 });
     }
@@ -491,7 +491,7 @@ function menuHandler(sender) {
   $("down").hidden = 1;
   $("up").hidden = 0;
   $ui.menu(convertTitle).then(resp => {
-    if (resp) {
+    if ('index' in resp) {
       if (type == resp.index) return;
       else type = resp.index;
       $cache.set("converType", type);

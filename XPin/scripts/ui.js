@@ -17,11 +17,12 @@ const color = {
   editor_bg: [$color("#FFFFFF"), $color("#282828")][dark],
   editor_text_bg: [$rgba(100, 100, 100, 0.1), $color("#404040")][dark],
   title: [$color("000"), $color("#FFF")][dark],
-  cell: [$color("#FFF"), $color("#191919")][dark],
+  cell: [$color("#FFF"), $color("#1C1C1E")][dark],//#191919
   bg: [
     [rgba(255, 0.28), $color("clear")][ver],
     [rgba(0, 1), $color("clear")][_env]
   ][dark],
+  todaybg: [rgba(200), rgba(100)][dark],
   cellbg: [$color("#F2F2F7"), rgba(0, 1)][dark]
 };
 exports.color = color;
@@ -138,7 +139,7 @@ const toast = ({ text, inset = 9, icon = "064", time = 0.6 }) => {
       borderWidth: 0.4,
       borderColor: rgba(100),
       userInteractionEnabled: 0,
-      bgcolor: [[rgba(255, 1), rgba(200)][_env], rgba(0, 0.4)][dark]
+      bgcolor: [[rgba(255, 1), rgba(200)][_env], rgba(0,.6)][dark]
     },
     layout: (make, view) => {
       let textSize = $text.sizeThatFits({
@@ -378,7 +379,7 @@ exports.blink = view => {
   let orignColor = view.bgcolor;
   $ui.animate({
     duration: 0.3,
-    animation: () => (view.bgcolor = rgba(100)),
+    animation: () => (view.bgcolor = dark && env == 1 ? $color("clear") : rgba(100)),
     completion: () => {
       $ui.animate({
         duration: 0.3,

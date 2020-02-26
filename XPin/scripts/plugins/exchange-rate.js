@@ -269,7 +269,7 @@ function show() {
                   tapped(sender) {
                     $device.taptic(0);
                     $ui.menu(names).then(selected => {
-                      if (selected) {
+                      if ('index' in selected) {
                         let idx = selected.index;
                         $cache.set("selectedCurrency", symbols[idx]);
                         selectedCurrency = symbols[idx];

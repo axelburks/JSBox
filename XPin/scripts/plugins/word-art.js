@@ -98,27 +98,25 @@ exports.start = text => {
     "¹²³",
     "₁₂₃"
   ];
-  $ui.menu(["仅数字", "仅字母", "同时转换"]).then(resp => {
-    const digitMenu = x =>
-      $delay(0, () => {
-        $ui.menu(menu2).then(res => {
-          if (res) convert(text, x, res.index);
-        });
+  const digitMenu = x =>
+    $delay(0, () => {
+      $ui.menu(menu2).then(res => {
+        if ('index' in res) convert(text, x, res.index);
       });
-    if (resp) {
-      if (resp.index == 0) digitMenu(undefined);
-      else
-        $delay(0, () => {
-          $ui.menu(menu1).then(res => {
-            if (res) {
-              if (resp.index == 2) {
-                if (res.index < 7) convert(text, res.index, res.index);
-                else digitMenu(res.index);
-                //菜单的前 8 种数字和字母是同类或者相似的系列。
-              } else convert(text, res.index);
-            }
-          });
-        });
+    });
+  $ui.menu(["仅数字", "仅字母", "同时转换", "恢复正常字符"]).then(resp => {
+    if ('index' in resp) {
+      let idx = resp.index;
+      if (idx == 0) digitMenu(undefined);
+      else if (idx == 3) recover(text);
+      else $delay(0, () => $ui.menu(menu1).then(res => {
+        if ('index' in res) {
+          if (idx == 2) {
+            if (res.index < 7) convert(text, res.index, res.index);
+            else digitMenu(res.index);
+          } else convert(text, res.index);
+        }
+      }));
     }
   });
 };
@@ -130,8 +128,37 @@ const convert = (text, α = undefined, β = undefined) => {
     else if (/\d/.test(i) && β !== undefined) x += digit[i][β];
     else x += i;
   }
+  add2Clip(x);
+};
+
+const recover = text => {
+  let x = "";
+  for (let i of text) {
+    let isMatched;
+    for (let j in digit) {
+      if (digit[j].includes(i)) {
+        x += j;
+        isMatched = true;
+        break;
+      }
+    }
+    if (isMatched) continue;
+    for (let k in letter) {
+      if (letter[k].includes(i)) {
+        x += k;
+        isMatched = true;
+        break;
+      }
+    }
+    if (isMatched) continue;
+    else x += i;
+  }
+  add2Clip(x);
+};
+
+function add2Clip(result) {
   let dataManager = require("../data-manager"),
     ui = require("../ui");
-  dataManager.copyAndSaveText(x);
+  dataManager.copyAndSaveText(result);
   ui.toast({ text: "Done" });
-};
+}

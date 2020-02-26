@@ -272,7 +272,7 @@ function init(context) {
 
 function addNewItem(text, show) {
   let editor = require("./editor");
-  editor.clipEditor(text, show);
+  editor.showEditor(text, show);
 }
 
 function createNewActionItem(i) {

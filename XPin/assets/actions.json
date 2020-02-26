@@ -7,12 +7,8 @@
         "pattern": "pushbullet"
       },
       {
-        "name": "下载文件/Thunder",
+        "name": "iCab下载/Thunder",
         "pattern": "download"
-      },
-      {
-        "name": "Thunder",
-        "pattern": "thunder"
       },
       {
         "name": "图片删除/多删",
@@ -39,7 +35,7 @@
         "pattern": "appstore_shift"
       },
       {
-        "name": "链接转换",
+        "name": "链接转换/网页快照",
         "pattern": "url_convert"
       },
       {
@@ -79,7 +75,7 @@
         "pattern": "10010"
       },
       {
-        "name": "文本编码/解码",
+        "name": "编码解码/数据转换",
         "pattern": "dencode"
       }
     ]
@@ -236,7 +232,7 @@
         "pattern": "http://cn.bing.com/search?q=%@"
       },
       {
-        "name": "百度",
+        "name": "百度/XSearch",
         "pattern": "https://www.baidu.com/s?wd=%@"
       },
       {
@@ -317,6 +313,10 @@
       {
         "name": "欧路词典",
         "pattern": "http://dict.eudic.net/mdicts/en/%@"
+      },
+      {
+        "name": "欧陆词典App/百度翻译",
+        "pattern": "eudic://dict/%@"
       }
     ]
   },
@@ -421,7 +421,7 @@
     "name": "购物",
     "items": [
       {
-        "name": "淘宝",
+        "name": "淘宝/京东",
         "pattern": "taobao://s.taobao.com/?q=%@"
       },
       {

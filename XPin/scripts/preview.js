@@ -17,15 +17,16 @@ const redirect = (site, content) => {
 };
 
 exports.show = content => {
+  let bgcolor = $color("clear");
   if ($app.env == 2) $widget.height = 400;
-  else if ($app.env == 32) $keyboard.height = 400;
+  else if ($app.env == 32) ($keyboard.height = 400) && (bgcolor = $device.isDarkMode ? $color("black") : $color("white"));
   const openUrl = { name: "链接", pattern: "link" };
   let engines = $cache.get("actions")[1];
   if ($detector.link(content).length > 0) engines.unshift(openUrl);
   let tabUrl = engines[0].pattern;
   $ui.window.add({
     type: "view",
-    props: { id: "bg", alpha: 0 },
+    props: { id: "bg", alpha: 0, bgcolor },
     views: [
       {
         type: "tab",
@@ -71,7 +72,7 @@ exports.show = content => {
               ui.appear(0);
               $device.taptic(0);
               if ($app.env == 2) $widget.height = 180;
-              else if ($app.env == 32) $keyboard.height = 314;
+              else if ($app.env == 32) ($keyboard.height = 314) && ($keyboard.barHidden = false);
             }
           }),
           ui.button({

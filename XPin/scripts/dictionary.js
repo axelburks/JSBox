@@ -27,15 +27,17 @@ const searchEngines = [
     pattern: "http://cn.bing.com/dict/search?q="
   }
 ];
-const env = $app.env;
-const COLOR = $cache.get($device.isDarkMode ? "dark" : "color");
+const dark = Number($device.isDarkMode);
+const env = $app.env.toString().slice(0, 1);  // 1/2/3 - app/today/keyboard
+const COLOR = $cache.get(dark ? "dark" : "color");
 
 function show() {
-  if (env == 3) $keyboard.height = 267;
+  let bgcolor = $color("clear");
+  if (env == 3) bgcolor = dark ? $color("black") : $color("white");
   const borderWidth = 1.0 / $device.info.screen.scale;
   $ui.window.add({
     type: "view",
-    props: { id: "bg", alpha: 0 },
+    props: { id: "bg", alpha: 0, bgcolor },
     layout: (make, view) => {
       make.left.right.bottom.inset(0);
       make.top.inset(0.2);
@@ -78,6 +80,7 @@ function show() {
               ui.appear(0);
               $device.taptic(0);
               if (env == 3) {
+                $keyboard.barHidden = false;
                 $keyboard.height = 314;
                 timer.invalidate();
               }
@@ -121,7 +124,7 @@ function show() {
             },
             events: {
               ready(view) {
-                $device.isDarkMode &&
+                dark &&
                   $delay(
                     0.1,
                     () => (view.views[0].textColor = $color("#A2A2A2"))
@@ -213,7 +216,7 @@ function show() {
                   make.height.equalTo(22);
                   make.top.equalTo(view.prev.bottom).offset(6);
                   make.width.equalTo(view.super).multipliedBy(0.5);
-                  $device.isDarkMode && (view.bgcolor = ui.rgba(255));
+                  dark && (view.bgcolor = ui.rgba(255));
                 },
                 events: {
                   changed: sender => {

@@ -1,11 +1,12 @@
 let dataManager = require("./data-manager"),
   aparter = require("./apart-items"),
+  editor = require("./editor"),
   helper = require("./helper"),
   ui = require("./ui");
 
 let _sync = $cache.get("sync");
 let _list = $cache.get("list");
-let _prefs = $cache.get("today") || [0, 12, 0, 0, 0];
+let _prefs = $cache.get("today") || [[0, 1], 0, 12, 9, 0, 0];
 let actions = $cache.get("actions");
 
 const textColor = ui.color.general;
@@ -54,6 +55,22 @@ const listInsets = (h = 50) => {
 };
 
 function createClipboardView() {
+  let kbSendButton = env != 2 ? {} : {
+    type: "button",
+    props: { bgcolor: $color("clear") },
+    layout: (make, view) => {
+      make.left.top.bottom.inset(0);
+      make.width.equalTo(view.super).dividedBy(6);
+    },
+    events: {
+      tapped: sender => {
+        $device.taptic(0);
+        let text = sender.super.views[0].text;
+        $keyboard.insert(text);
+      }
+    }
+  };
+
   let view = {
     type: "list",
     props: {
@@ -63,7 +80,7 @@ function createClipboardView() {
       showsVerticalIndicator: 1,
       rowHeight: [44, 30, 36][env],
       separatorColor: ui.color.separator,
-      bgcolor: ver && env == 1 ? ui.rgba(200) : $color("clear"),
+      bgcolor: ver && env == 1 ? ui.rgba(80) : $color("clear"),
       template: {
         props: { bgcolor: $color("clear") },
         views: [
@@ -73,7 +90,7 @@ function createClipboardView() {
               textColor,
               id: "itemtext",
               align: $align.left,
-              font: $font(env == 1 ? _prefs[1] : 14)
+              font: $font(env == 1 ? _prefs[2] : 14)
             },
             layout: (make, view) => {
               make.right.inset(0);
@@ -92,7 +109,7 @@ function createClipboardView() {
               tapped: sender => {
                 $device.taptic(0);
                 let text = sender.super.views[0].text;
-                if (env == 2) $keyboard.insert(text);
+                if (env == 2) editor.showEditor(text, true);
                 else {
                   let cell = sender.super.super;
                   let view = $("itemlist").ocValue();
@@ -103,7 +120,8 @@ function createClipboardView() {
                 }
               }
             }
-          }
+          },
+          kbSendButton
         ]
       },
       actions: [
@@ -126,8 +144,7 @@ function createClipboardView() {
             if (env == 1) {
               $app.openURL("jsbox://run?name=" + encodeURI($addin.current.name) + "&from=" + env + "&clipindex=" + indexPath.row);
             } else {
-              let editor = require("./editor");
-              editor.clipEditor(text, true);
+              editor.showEditor(text, true);
             }
           }
         },
@@ -163,7 +180,7 @@ function createClipboardView() {
       if (env == 1) {
         make.top.inset(30);
         make.bottom.inset(_prefs[4] ? 0 : 30);
-      } else if (env == 2) make.top.bottom.inset(49);
+      } else if (env == 2) make.top.inset(40) && make.bottom.inset(4);
       else {
         make.top.equalTo(view.super.safeArea).inset(50);
         make.bottom.equalTo(view.super.safeArea);
@@ -370,7 +387,7 @@ function createPushView(title, button) {
 }
 
 function refreshList() {
-  dataManager.init();
+  dataManager.init("RefreshList");
   if (env == 1) (($("i2clip").text = $clipboard.text) && ($("i2clip").textColor = $clipboard.text.indexOf("\n") >= 0 ? ui.color.general_n:ui.color.general)) || ($("i2clip").text = "");
   let t = dataManager.getTextItems();
   let total = `已记录 ${t.length} 条`;

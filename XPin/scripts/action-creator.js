@@ -183,10 +183,10 @@ function showActionMenu(i) {
     };
   }
   $ui.menu(options).then(selected => {
-    if (selected) {
+    if ('index' in selected) {
       let idx = selected.index;
       if (idx == 0) {
-        ui.toast({ text: "请用 %@ 代替含有关键字等参数的 URL" });
+        ui.toast({ text: "请用 %@ 代替含有关键字等参数的 URL", time: 2 });
         $input.text({
           type: $kbType.url,
           text: patternLabel().text || "",

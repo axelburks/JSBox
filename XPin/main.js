@@ -9,7 +9,7 @@ if (bakStamp) {
 let m = ["app", "today", "keyboard"];
 let n = $app.env.toString().slice(0, 1) - 1;
 
-$cache.get("color") === undefined && $cache.set("color", "#007BFF");
+$cache.get("color") === undefined && $cache.set("color", "#403F68");
 $cache.get("dark") === undefined && $cache.set("dark", "#0A85FF");
 $cache.get("sync") === undefined && $cache.set("sync", 0);
 $cache.get("list") === undefined && $cache.set("list", 0);
@@ -32,7 +32,7 @@ $cache.get("actions") === undefined &&
         "pattern": "download",
         "noenc": false,
         "icon": "icon_165.png",
-        "name": "下载文件"
+        "name": "iCab下载/Thunder"
       },
       {
         "pattern": "opener://",
@@ -121,11 +121,6 @@ $cache.get("actions") === undefined &&
       }
     ]
   ]);
-
-if (n === 2) {
-  $keyboard.barHidden = 1;
-  $keyboard.height = 268;
-}
 
 let module = require(`scripts/${m[n]}`);
 

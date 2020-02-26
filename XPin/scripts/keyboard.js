@@ -7,73 +7,6 @@ let dataManager = require("./data-manager"),
 
 const COLOR = $cache.get($device.isDarkMode ? "dark" : "color");
 
-//连续删除
-$define({
-  type: "EventEmitter: NSObject",
-  props: ["timer", "charCnt", "callCnt"],
-  events: {
-    "deleteOnce:": sender => {
-      $keyboard.playInputClick();
-      $keyboard.delete();
-    },
-    "touchDown:": sender => self.$enableTimer(),
-    "touchUp:": sender => self.$disableTimer(),
-    "enableTimer": () => {
-      self.$disableTimer();
-      self.$setCharCnt(1);
-      self.$setCallCnt(0);
-
-      const timer = $objc(
-        "NSTimer"
-      ).$scheduledTimerWithTimeInterval_target_selector_userInfo_repeats(
-        0.15,
-        self,
-        "fireAction",
-        null,
-        true
-      );
-      self.$setTimer(timer);
-    },
-    "disableTimer": () => {
-      if (self.$timer()) {
-        self.$timer().$invalidate();
-        self.$setTimer(null);
-      }
-    },
-    "fireAction": () => {
-      self.$setCallCnt(self.$callCnt() + 1);
-      $objc(
-        "NSObject"
-      ).$cancelPreviousPerformRequestsWithTarget_selector_object(
-        self,
-        "fireAction",
-        null
-      );
-
-      if (self.$callCnt() % 8 == 0) {
-        self.$setCharCnt(self.$charCnt() + 4);
-      }
-
-      for (let idx = 0; idx < self.$charCnt(); ++idx) {
-        $keyboard.delete();
-      }
-
-      $keyboard.playInputClick();
-    }
-  }
-});
-
-const emitter = $objc("EventEmitter").$new();
-$objc_retain(emitter);
-const button = $objc("BaseButton").$new();
-button.$addTarget_action_forControlEvents(emitter, "deleteOnce:", 1 << 0);
-button.$addTarget_action_forControlEvents(emitter, "touchDown:", 1 << 0);
-button.$addTarget_action_forControlEvents(
-  emitter,
-  "touchUp:",
-  (1 << 6) | (1 << 7) | (1 << 3) | (1 << 5) | (1 << 8)
-);
-
 async function getText() {
   if ($keyboard.selectedText) return $keyboard.selectedText;
   else if ($clipboard.text) return $clipboard.text;
@@ -103,7 +36,7 @@ function init() {
         layout: (make, view) => {
           make.right.left.inset(-0.2);
           make.top.inset(0);
-          make.height.equalTo(49);
+          make.height.equalTo(40);
         },
         views: [
           {
@@ -173,6 +106,7 @@ function init() {
             () => {
               getText().then(x => {
                 if (x.length > 0) {
+                  $keyboard.barHidden = true;
                   let translator = require("./translator");
                   translator.gtrans(x);
                 }
@@ -181,6 +115,7 @@ function init() {
             () => {
               getText().then(x => {
                 if (x.length > 0) {
+                  $keyboard.barHidden = true;
                   let dic = require("./dictionary");
                   dic.dic(x);
                 }
@@ -192,7 +127,7 @@ function init() {
             () => {
               getText().then(x => {
                 let preview = require("./preview");
-                if (x != "") preview.show(x);
+                if (x != "") ($keyboard.barHidden = true) && preview.show(x);
               });
             },
             () => {
@@ -225,76 +160,6 @@ function init() {
           }
         }
       },
-      {
-        type: "blur",
-        props: {
-          style: 1,
-          borderWidth: 0.4,
-          borderColor: $rgba(100, 100, 100, 0.25)
-        },
-        layout: (make, view) => {
-          make.right.left.inset(-0.2);
-          make.bottom.inset(0);
-          make.top.equalTo(view.super.safeAreaBottom).offset(-49.4);
-        },
-        views: [
-          {
-            type: "button",
-            props: {
-              bgcolor: $color("clear"),
-              borderWidth: 0.6,
-              borderColor: $rgba(100, 100, 100, 0.25)
-            },
-            layout: (make, view) => {
-              make.left.inset(4);
-              make.centerY.equalTo(view.super);
-              make.size.equalTo($size(41.4, 41.4));
-            },
-            views: ui.earth(),
-            events: {
-              tapped(sender) {
-                $device.taptic(1);
-                $keyboard.next();
-              }
-            }
-          },
-          {
-            type: "button",
-            props: { bgcolor: $color(COLOR) },
-            views: ui.enter(),
-            layout: (make, view) => {
-              make.right.inset(4);
-              make.centerY.equalTo(view.super);
-              make.size.equalTo($size(40.5, 40.5));
-            },
-            events: {
-              tapped(sender) {
-                $keyboard.send();
-              },
-              longPressed: sender => {
-                $keyboard.insert("\n ");
-                $keyboard.delete();
-              }
-            }
-          },
-          {
-            type: "runtime",
-            props: {
-              view: button,
-              bgcolor: $color("clear"),
-              radius: 6,
-              borderWidth: 0.6,
-              borderColor: $rgba(100, 100, 100, 0.25)
-            },
-            layout: (make, view) => {
-              make.right.inset(49.4);
-              make.centerY.equalTo(view.super);
-              make.size.equalTo($size(41.4, 41.4));
-            },
-            views: ui.del()
-          }
-        ]
-      }
     ]
   });
   dataManager.init();

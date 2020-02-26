@@ -1,6 +1,6 @@
 let _sync = $cache.get("sync");
 let _list = $cache.get("list");
-let _prefs = $cache.get("today") || [[0, 1], 12, 0, 9, 0, 0];
+let _prefs = $cache.get("today") || [[0, 1], 0, 12, 9, 0, 0];
 
 let dataManager = require("./data-manager"),
   builder = require("./builder"),
@@ -22,6 +22,10 @@ const layout = (make, view, name) => {
 };
 
 function init() {
+  let text = JSON.stringify($clipboard.items).indexOf('org.nspasteboard.ConcealedType') < 0 && $clipboard.text ? $clipboard.text : "";
+  let textColor = text.indexOf("\n") >= 0 ? ui.color.general_n : ui.color.general;
+  let placeholder = $clipboard.image ? "🌁 ‣ Long-Press to Show" : "剪贴板无内容";
+
   let views = [
     {
       type: "view",
@@ -70,6 +74,9 @@ function init() {
         $device.taptic(0);
         createSyncView();
       },
+      long: () => {
+        $app.openURL("jsbox://run?name=" + encodeURI($addin.current.name));
+      },
       layout
     }),
     ui.button({
@@ -117,7 +124,7 @@ function init() {
             "http://cn.bing.com/search?q=",
             "https://m.baidu.com/s?word="
           ];
-          $app.openURL(urls[_prefs[2]] + encodeURIComponent(t));
+          $app.openURL(urls[_prefs[1]] + encodeURIComponent(t));
         }
       },
       layout
@@ -125,13 +132,14 @@ function init() {
     {
       type: "input",
       props: {
+        darkKeyboard: $device.isDarkMode ? true : false,
         borderWidth: 1.0 / $device.info.screen.scale,
         borderColor: ui.color.border,
-        textColor: ui.color.general,
-        darkKeyboard: $device.isDarkMode ? true : false,
-        placeholder: $clipboard.image ? "🌁 ‣ Long-Press to Show" : "剪贴板无内容",
-        font: $font(_prefs[1]),
-        bgcolor: ui.rgba(200),
+        text,
+        textColor,
+        placeholder,
+        font: $font(_prefs[2]),
+        bgcolor: ui.rgba(100),
         align: $align.left,
         id: "i2clip",
         radius: 10
@@ -166,8 +174,6 @@ function init() {
   $ui.render({ props: { id: "main" }, views: views });
   dataManager.init();
   !_prefs[4] && initActionButtons();
-  let flag = $clipboard.text.indexOf("\n") >= 0;
-  $delay(0, () => ((($("i2clip").text = $clipboard.text) && ($("i2clip").textColor = flag ? ui.color.general_n:ui.color.general)) || ""));
 }
 
 function showImage(imageData) {
@@ -424,7 +430,7 @@ function menuProps(id, data) {
     template: {
       props: {
         textColor: $color("black"),
-        font: $font(_prefs[1]),
+        font: $font(_prefs[2]),
         align: $align.left
       }
     }

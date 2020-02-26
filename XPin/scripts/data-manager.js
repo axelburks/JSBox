@@ -1,10 +1,14 @@
-let _sync, _list,
-  ui = require("./ui");
+let _sync, _list, ui = require("./ui");
 
 const local = "assets/text-items.json";
 const cloud = "drive://XPin/text-items.json";
+!$file.exists(local) && $file.write({
+  data: $data({ string: JSON.stringify([]) }),
+  path: local
+});
 
-const getTextItems = (isCloud = _list) => JSON.parse($file.read(isCloud ? cloud : local).string);
+const getTextItems = (isCloud = _list) =>
+  JSON.parse($file.read(isCloud ? cloud : local).string);
 const setTextItems = (data, isCloud = _list) =>
   $file.write({
     data: $data({ string: JSON.stringify(data) }),
@@ -19,7 +23,7 @@ const mergeData = () => {
   return [...x];
 };
 
-function init() {
+function init(triggerAction) {
   _sync = $cache.get("sync");
   _list = $cache.get("list");
   //若是自动同步模式，合并本地和云端
@@ -28,23 +32,14 @@ function init() {
     saveTextItems(x);
   }
   //检查并记录剪贴板文本
-  let t = $clipboard.text || "";
+  let t = (triggerAction == "RefreshList" || JSON.stringify($clipboard.items).indexOf('org.nspasteboard.ConcealedType') < 0) && $clipboard.text ? $clipboard.text : "";
   let tmp = getTextItems();
   if (t.length > 0) {
     tmp.unshift(t);
     tmp = [...new Set(tmp)];
     saveTextItems(tmp);
   }
-  //将记录数据填入list
-  $("itemlist").data = [];
-  tmp = tmp.map(i => {
-    let flag = i.indexOf("\n") >= 0;
-    return { itemtext: {
-      text: i,
-      textColor: flag? ui.color.general_n:ui.color.general
-    } };
-  });
-  $("itemlist").data = tmp;
+  addTextToList(tmp);
 }
 
 function copyAndSaveText(text) {
@@ -52,9 +47,23 @@ function copyAndSaveText(text) {
   $clipboard.set({ type: "public.plain-text", value: text });
   let items = getTextItems();
   items.unshift(text);
-  saveTextItems([...new Set(items)]);
-  $("itemlist") && $("itemlist").insert({ index: 0, value: { itemtext: { text: text } } });
+  items = [...new Set(items)];
+  saveTextItems(items);
+  $("itemlist") && addTextToList(items);
   $app.env == 2 && $("i2clip") && ($("i2clip").text = text);
+}
+
+function addTextToList(items) {
+  //将记录数据填入list
+  $("itemlist").data = [];
+  items = items.map(i => {
+    let flag = i.indexOf("\n") >= 0;
+    return { itemtext: {
+      text: i,
+      textColor: flag? ui.color.general_n:ui.color.general
+    } };
+  });
+  $("itemlist").data = items;
 }
 
 module.exports = {
@@ -63,5 +72,5 @@ module.exports = {
   getTextItems: getTextItems,
   setTextItems: setTextItems,
   saveTextItems: saveTextItems,
-  copyAndSaveText: copyAndSaveText,
+  copyAndSaveText: copyAndSaveText
 };

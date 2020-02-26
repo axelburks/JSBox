@@ -1,8 +1,8 @@
-let today = $cache.get("today") || [[0, 1], 12, 0, 9, 0, 0];
+let today = $cache.get("today") || [[0, 1], 0, 12, 9, 0, 0];
 let builder = require("./builder");
 let ui = require("./ui");
 
-const cv = 2.8;
+const cv = 2.93;
 const bgcolor = ui.color.cell;
 const textColor = ui.color.general;
 const ver = parseInt($device.info.version.split(".")[0]) - 12;
@@ -138,25 +138,11 @@ function show() {
               props: { bgcolor },
               layout: $layout.fill,
               views: tabView(
-                "字体大小",
-                ["小号", "中号", "大号"],
-                today[1],
-                sender => {
-                  today[1] = sender.index + 12;
-                  $cache.set("today", today);
-                }
-              )
-            },
-            {
-              type: "views",
-              props: { bgcolor },
-              layout: $layout.fill,
-              views: tabView(
                 "搜索引擎",
                 ["默认", "谷歌", "必应", "百度"],
-                today[2],
+                today[1],
                 sender => {
-                  today[2] = sender.index;
+                  today[1] = sender.index;
                   $cache.set("today", today);
                 }
               )
@@ -165,51 +151,13 @@ function show() {
               type: "views",
               props: { bgcolor },
               layout: $layout.fill,
-              views: [
-                {
-                  type: "label",
-                  props: { text: "底栏图标列数", textColor },
-                  layout: (make, view) => {
-                    make.centerY.equalTo(view.super);
-                    make.left.inset(15);
-                  }
-                },
-                {
-                  type: "stepper",
-                  props: {
-                    min: 1,
-                    value: today[3],
-                    tintColor: $color(COLOR)
-                  },
-                  layout: (make, view) => {
-                    make.centerY.equalTo(view.super);
-                    make.right.inset(15);
-                  },
-                  events: {
-                    ready: sender => {
-                      if (!ver) return;
-                      sender.views[0].views[6].tintColor = $color(COLOR);
-                      sender.views[0].views[5].tintColor = $color(COLOR);
-                    },
-                    changed: sender => {
-                      sender.next.text = sender.value;
-                      today[3] = sender.value;
-                      $cache.set("today", today);
-                    }
-                  }
-                },
-                {
-                  type: "label",
-                  props: {
-                    text: String(today[3]),
-                    color: $color(COLOR)
-                  },
-                  layout: (make, view) => {
-                    make.centerY.equalTo(view.super);
-                    make.right.equalTo(view.prev.left).offset(-10);
-                  }
-                }
-              ]
+              views: stepperView("字体大小", 2, [12, 16])
+            },
+            {
+              type: "views",
+              props: { bgcolor },
+              layout: $layout.fill,
+              views: stepperView("底栏图标列数", 3, [3, 30])
             },
             {
               type: "views",
@@ -313,7 +261,7 @@ function show() {
             switch (row) {
               case 0:
                 $ui.menu(["确认"]).then(selected => {
-                  if (selected) {
+                  if ('index' in selected) {
                     $device.taptic(2);
                     $cache.clear();
                   }
@@ -370,6 +318,55 @@ function tabView(title, items, index, handler) {
           });
       },
       events: { changed: handler }
+    }
+  ];
+}
+
+function stepperView(text, index, range) {
+  return [
+    {
+      type: "label",
+      props: { text, textColor },
+      layout: (make, view) => {
+        make.centerY.equalTo(view.super);
+        make.left.inset(15);
+      }
+    },
+    {
+      type: "stepper",
+      props: {
+        min: range[0],
+        max: range[1],
+        value: today[index],
+        tintColor: $color(COLOR)
+      },
+      layout: (make, view) => {
+        make.centerY.equalTo(view.super);
+        make.right.inset(15);
+      },
+      events: {
+        ready: sender => {
+          if (!ver) return;
+          sender.views[0].views[6].tintColor = $color(COLOR);
+          sender.views[0].views[5].tintColor = $color(COLOR);
+        },
+        changed: sender => {
+          sender.next.text = sender.value;
+          today[index] = sender.value;
+          $cache.set("today", today);
+        }
+      }
+    },
+    {
+      type: "label",
+      props: {
+        text: String(today[index]),
+        color: $color(COLOR)
+      },
+      layout: (make, view) => {
+        make.centerY.equalTo(view.super);
+        make.right.equalTo(view.prev.left).offset(-10);
+      }
     }
   ];
 }

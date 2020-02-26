@@ -27,7 +27,7 @@ const languageKv = {
     "繁中(香港)",
     "繁中(台湾)"
   ],
-  env = $app.env,
+  env = $app.env.toString().slice(0, 1),  // 1/2/3 - app/today/keyboard
   origClang = ["auto", ...transClang],
   origClangCN = ["自动", ...transClangCN],
   borderWidth = 1.0 / $device.info.screen.scale,
@@ -48,8 +48,8 @@ function transUI() {
   }
   $ui.render({
     props: {
-      id: "mainbg"
-      //      bgcolor: env == 2 && !ver ? $rgba(255, 255, 255, 0.28) : $color("clear")
+      id: "mainbg",
+      bgcolor: env == 3 && $device.isDarkMode ? $color("black") : $color("clear")
     },
     events: {
       layoutSubviews: view => {
@@ -57,7 +57,7 @@ function transUI() {
           let v = $("iptvw"),
             w = v.frame.width,
             h = v.frame.height;
-          if (isBack) return;
+          if (isBack && env != 3) return;
           else if (env == 2) {
             v.views[0].frame = $rect(0, 0, w, h / 2);
             v.views[1].frame = $rect(0, h / 2, w, h / 2);
@@ -111,7 +111,7 @@ function transUI() {
             tap: () => {
               isBack = 1;
               if (env == 2) $widget.height = 180;
-              if (env == 3) timer.invalidate();
+              if (env == 3) ($keyboard.barHidden = false) && timer.invalidate();
               ui.back();
             }
           }),
