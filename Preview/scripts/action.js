@@ -27,7 +27,7 @@ function init() {
   }
 
   let editor = require("./editor");
-  editor.show(textContent, popItems);
+  editor.showEditor(textContent, popItems);
   editor.drawOthers();
 }
 

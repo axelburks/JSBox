@@ -5,7 +5,7 @@ function init() {
   }
 
   let editor = require("./editor");
-  editor.show(textContent);
+  editor.showEditor(textContent);
 }
 
 module.exports = {

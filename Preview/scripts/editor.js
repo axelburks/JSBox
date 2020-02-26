@@ -1,10 +1,497 @@
+const env = $app.env.toString().slice(0, 1) - 1;  // 0/1/2 - app/today/keyboard
 let view_blank = 4;
 let view_width = $device.info.screen.width - view_blank * 2;
 let shareItems = [], naviaddButton = {}, addCount = 0, um;
 let searchViewHeight = 65;
-let codeSearchHeight = $device.info.screen.height - (($app.env == $env.app) ? 545 : 570);
-let codeContentHeight = $context.dataItems ? 400 : $device.info.screen.height - (($app.env == $env.app) ? 120 : 170);
+let codeSearchHeight = $device.info.screen.height - ((env == 0) ? 545 : 570);
+let codeContentHeight = $context.dataItems ? 400 : $device.info.screen.height - ((env == 0) ? 120 : 170);
 let search_result = [], search_result_index = 0, replaced = false;
+
+let accessoryView = {
+  type: "view",
+  props: {
+    height: 40,
+    bgcolor: $color("#080808"),
+    borderWidth: 0.5,
+    borderColor: $color("clear")
+  },
+  views: [
+    {
+      type: "button",
+      props: {
+        id: "UndoButton",
+        title: "⃔",
+        radius: 6,
+        font: $font(14),
+        bgcolor: $color("#404040"),
+        borderWidth: 0.5,
+        borderColor: $color("#606060")
+      },
+      layout: function (make, view) {
+        make.top.inset(5);
+        make.left.inset(8);
+        make.width.equalTo(35);
+        make.centerY.equalTo(view.super);
+      },
+      events: {
+        tapped: function (sender) {
+          $device.taptic(0);
+          if (um.$canUndo()) {
+            um.$undo();
+          } else {
+            $ui.error("Nothing to Undo!", 0.6);
+          }
+        }
+      }
+    },
+    {
+      type: "button",
+      props: {
+        id: "RedoButton",
+        title: "⃕",
+        radius: 6,
+        font: $font(14),
+        bgcolor: $color("#404040"),
+        borderWidth: 0.5,
+        borderColor: $color("#606060")
+      },
+      layout: function (make, view) {
+        make.top.width.equalTo(view.prev);
+        make.left.equalTo(view.prev.right).inset(5);
+      },
+      events: {
+        tapped: function (sender) {
+          $device.taptic(0);
+          if (um.$canRedo()) {
+            um.$redo();
+          } else {
+            $ui.error("Nothing to Redo!", 0.6);
+          }
+        }
+      }
+    },
+    {
+      type: "button",
+      props: {
+        id: "QRButton",
+        icon: $icon("017", $color("#C0C0C0"), $size(20, 20)),
+        font: $font("bold", 25),
+        bgcolor: $color("clear"),
+      },
+      layout: function (make, view) {
+        make.top.bottom.equalTo(view.prev);
+        make.left.equalTo(view.prev.right).inset(12);
+      },
+      events: {
+        tapped: function (sender) {
+          processText("QRcode");
+        }
+      }
+    },
+    {
+      type: "button",
+      props: {
+        id: "linkButton",
+        icon: $icon("020", $color("#C0C0C0"), $size(20, 20)),
+        font: $font("bold", 25),
+        bgcolor: $color("clear")
+      },
+      layout: function (make, view) {
+        make.top.bottom.equalTo(view.prev);
+        make.left.equalTo(view.prev.right).inset(8);
+      },
+      events: {
+        tapped: async function (sender) {
+          let regex = /([\w-]+:\/\/|(mailto|tel):)([^\s<>"]+)?/g;
+          let links = $("codeContent").text.match(regex);
+          if (links) {
+            if (links.length == 1) {
+              $app.openURL(links[0]);
+            } else {
+              let result = await $ui.menu({ items: links });
+              $app.openURL(result.title);
+            }
+          } else {
+            $ui.error("No URL");
+          }
+        }
+      }
+    },
+    {
+      type: "button",
+      props: {
+        id: "searchButton",
+        icon: $icon("023", $color("#C0C0C0"), $size(20, 20)),
+        font: $font("bold", 25),
+        bgcolor: $color("clear"),
+      },
+      layout: function(make, view) {
+        make.top.bottom.equalTo(view.prev);
+        make.left.equalTo(view.prev.right).inset(8);
+      },
+      events: {
+        tapped: function(sender) {
+          showSearchView();
+        }
+      }
+    },
+    {
+      type: "button",
+      props: {
+        id: "doneButton",
+        title: "Done",
+        font: $font("bold", 14),
+        bgcolor: $color("#0a85ff"),
+        borderWidth: 0.5,
+        borderColor: $color("clear")
+      },
+      layout: function (make, view) {
+        make.top.equalTo($("UndoButton").top);
+        make.right.inset(5);
+        make.width.equalTo(50);
+      },
+      events: {
+        tapped: function (sender) {
+          $("codeContent").blur();
+        }
+      }
+    },
+    {
+      type: "button",
+      props: {
+        id: "copyButton",
+        title: "CA",
+        font: $font("bold", 14),
+        bgcolor: $color("#383838"),
+        borderWidth: 0.5,
+        borderColor: $color("clear")
+      },
+      layout: function (make, view) {
+        make.top.width.equalTo($("UndoButton"));
+        make.right.equalTo(view.prev.left).inset(8);
+      },
+      events: {
+        tapped: function (sender) {
+          processText("CopyAll");
+        }
+      }
+    },
+    {
+      type: "button",
+      props: {
+        id: "clineButton",
+        title: "CL",
+        font: $font("bold", 14),
+        bgcolor: $color("#383838"),
+        borderWidth: 0.5,
+        borderColor: $color("clear")
+      },
+      layout: function (make, view) {
+        make.top.width.equalTo(view.prev);
+        make.right.equalTo(view.prev.left).inset(5);
+      },
+      events: {
+        tapped: function (sender) {
+          let oriText = $("codeContent").text;
+          let curLoc = $("codeContent").info;
+          let oriLines = oriText.split("\n");
+
+          let charCount = 0;
+          for (let lineIndex in oriLines) {
+            charCount = charCount + oriLines[lineIndex].length + 1;
+            if (charCount > curLoc) {
+              $clipboard.text = oriLines[lineIndex];
+              $ui.toast("Copied Line: " + oriLines[lineIndex]);
+              break;
+            }
+          }
+        }
+      }
+    },
+    {
+      type: "button",
+      props: {
+        id: "dlineButton",
+        title: "DL",
+        font: $font("bold", 14),
+        bgcolor: $color("#993366"),
+        borderWidth: 0.5,
+        borderColor: $color("clear")
+      },
+      layout: function (make, view) {
+        make.top.width.equalTo(view.prev);
+        make.right.equalTo(view.prev.left).inset(5);
+      },
+      events: {
+        tapped: function (sender) {
+          let oriText = $("codeContent").text;
+          let curLoc = $("codeContent").info;
+          let oriLines = oriText.split("\n");
+
+          let charCount = 0;
+          for (let lineIndex in oriLines) {
+            let lastlineLoc = charCount;
+            charCount = charCount + oriLines[lineIndex].length + 1;
+            if (charCount > curLoc) {
+              oriLines.splice(lineIndex, 1);
+              $("codeContent").text = oriLines.join("\n");
+              $("codeContent").selectedRange = $range(lastlineLoc, 0);
+              break;
+            }
+          }
+        }
+      }
+    },
+    {
+      type: "button",
+      props: {
+        id: "shareButton",
+        icon: $icon("022", $color("#C0C0C0"), $size(20, 20)),
+        font: $font("bold", 25),
+        bgcolor: $color("clear"),
+      },
+      layout: function (make, view) {
+        make.top.bottom.inset(0);
+        make.right.equalTo(view.prev.left).inset(10);
+      },
+      events: {
+        tapped: function (sender) {
+          processText("Share");
+        }
+      }
+    }
+  ]
+};
+
+let searchView = {
+  type: "view",
+  props: {
+    id: "searchView",
+    hidden: true
+  },
+  layout: function(make, view) {
+    make.top.equalTo(view.prev.bottom);
+    make.left.right.inset(0);
+    make.width.equalTo(view.super.width);
+    make.height.equalTo(0);
+  },
+  views: [
+    {
+      type: "button",
+      props: {
+        id: "button_next",
+        symbol: "arrowtriangle.right.fill",
+        bgcolor: $color("#7EC0EE")
+      },
+      layout: function(make, view) {
+        make.top.equalTo(view.super.top).inset(5);
+        make.right.inset(view_blank);
+        make.width.equalTo(35);
+        make.height.equalTo(27);
+      },
+      events: {
+        tapped: function(sender) {
+          if (search_result.length > 0) {
+            $device.taptic(0);
+            $("codeContent").blur();
+            if (replaced) {
+              if (search_result_index >= search_result.length) {
+                search_result_index = 0;
+              }
+            } else {
+              search_result_index = (search_result_index == search_result.length - 1) ? 0 : search_result_index + 1;
+            }
+            replaced = false;
+            $("codeContent").focus();
+            $("codeContent").selectedRange = $range(search_result[search_result_index][1], search_result[search_result_index][0].length);
+            $("search_count").text = (search_result_index + 1) + "/" + search_result.length;
+          } else if ($("search_input").text.length == 0) {
+            $ui.toast("Please Input Query First");
+          }
+        }
+      }
+    },
+    {
+      type: "button",
+      props: {
+        id: "button_prev",
+        symbol: "arrowtriangle.left.fill",
+        bgcolor: $color("#7EC0EE")
+      },
+      layout: function(make, view) {
+        make.top.equalTo(view.prev.top);
+        make.right.equalTo(view.prev.left).inset(5);
+        make.width.equalTo(view.prev.width);
+        make.height.equalTo(view.prev.height);
+      },
+      events: {
+        tapped: function(sender) {
+          if (search_result.length > 0) {
+            $device.taptic(0);
+            $("codeContent").blur();
+            search_result_index = (search_result_index  == 0) ?  search_result.length - 1 : search_result_index - 1;
+            replaced = false;
+            $("codeContent").focus();
+            $("codeContent").selectedRange = $range(search_result[search_result_index][1], search_result[search_result_index][0].length);
+            $("search_count").text = (search_result_index + 1) + "/" + search_result.length;
+          } else if ($("search_input").text.length == 0) {
+            $ui.toast("Please Input Query First");
+          }
+        }
+      }
+    },
+    {
+      type: "label",
+      props: {
+        id: "search_count",
+        text: "0/0",
+        bgcolor: $color("#9C9C9C"),
+        radius: 5,
+        autoFontSize: true,
+        align: $align.center
+      },
+      layout: function(make, view) {
+        make.top.equalTo(view.prev.top);
+        make.right.equalTo(view.prev.left).inset(5);
+        make.width.equalTo(60);
+        make.height.equalTo(view.prev.height);
+      }
+    },
+    {
+      type: "input",
+      props: {
+        id: "search_input",
+        type: $kbType.search,
+        darkKeyboard: true
+      },
+      layout: function(make, view) {
+        make.top.equalTo(view.prev.top);
+        make.right.equalTo(view.prev.left).inset(5);
+        make.height.equalTo(view.prev.height);
+        make.left.inset(view_blank);
+      },
+      events: {
+        didBeginEditing: function(sender) {
+          search_result = [];
+          search_result_index = 0;
+          replaced = false;
+          $("search_count").text = "0/0";
+        },
+        returned: function(sender) {
+          if (sender.text.length > 0) {
+            search_result = [];
+            search_result_index = 0;
+            replaced = false;
+            $("search_count").text = "0/0";
+            let search_query = sender.text.replace(/\\(?=$|\\)/g, "\\\\");
+            let regex1 = RegExp(search_query, 'ig');
+            let array1;
+            while ((array1 = regex1.exec($("codeContent").text)) !== null) {
+              search_result.push([array1[0], regex1.lastIndex - array1[0].length]);
+            }
+            if (search_result.length > 0) {
+              $("codeContent").focus();
+              $("codeContent").selectedRange = $range(search_result[search_result_index][1], search_result[search_result_index][0].length);
+              $("search_count").text = "1/" + search_result.length;
+            } else {
+              $ui.error("No Match Content");
+            }
+          } else {
+            showSearchView();
+          }
+        }
+      }
+    },
+    {
+      type: "button",
+      props: {
+        id: "button_replace",
+        title: "Replace",
+        bgcolor: $color("#8968CD")
+      },
+      layout: function(make, view) {
+        make.top.equalTo(view.prev.bottom).inset(5);
+        make.right.inset(view_blank);
+        make.width.equalTo(85);
+        make.height.equalTo(view.prev.height);
+      },
+      events: {
+        tapped: function(sender) {
+          if (search_result.length > 0 && $("codeContent").selectedRange.length > 0) {
+            $device.taptic(0);
+            $("codeContent").text = $("codeContent").text.slice(0, search_result[search_result_index][1]) + $("replace_input").text + $("codeContent").text.slice(search_result[search_result_index][1] + search_result[search_result_index][0].length);
+            $("codeContent").blur();
+            $("codeContent").focus();
+            $("codeContent").selectedRange = $range(search_result[search_result_index][1] + $("replace_input").text.length, 0);
+            search_result.splice(search_result_index, 1);
+            for (let i = search_result_index; i < search_result.length; i++) {
+              search_result[i][1] = search_result[i][1] + ($("replace_input").text.length - search_result[i][0].length);
+            }
+            replaced = true;
+          } else if ($("search_input").text.length == 0) {
+            $ui.toast("Please Input Query First");
+          }
+        }
+      }
+    },
+    {
+      type: "button",
+      props: {
+        id: "button_replaceall",
+        title: "All",
+        bgcolor: $color("#8968CD")
+      },
+      layout: function(make, view) {
+        make.top.equalTo(view.prev.top);
+        make.right.equalTo(view.prev.left).inset(5);
+        make.width.equalTo(50);
+        make.height.equalTo(view.prev.height);
+      },
+      events: {
+        tapped: function(sender) {
+          if (search_result.length > 0) {
+            $device.taptic(0);
+            let search_query = $("search_input").text.replace(/\\(?=$|\\)/g, "\\\\");
+            let regex1 = RegExp(search_query, 'ig');
+            $("codeContent").text = $("codeContent").text.replace(regex1, $("replace_input").text);
+            $("codeContent").blur();
+            $("codeContent").focus();
+            $("codeContent").selectedRange = $range(search_result[0][1] + $("replace_input").text.length, 0);
+            search_result = [];
+            search_result_index = 0;
+            replaced = false;
+            $("search_count").text = "0/0";
+          } else if ($("search_input").text.length == 0) {
+            $ui.toast("Please Input Query First");
+          }
+        }
+      }
+    },
+    {
+      type: "input",
+      props: {
+        id: "replace_input",
+        type: $kbType.search,
+        darkKeyboard: true
+      },
+      layout: function(make, view) {
+        make.top.equalTo(view.prev.top);
+        make.right.equalTo(view.prev.left).inset(5);
+        make.height.equalTo(view.prev.height);
+        make.left.inset(view_blank);
+      },
+      events: {
+        returned: function(sender) {
+          if (search_result.length > 0) {
+            replaced = false;
+            $("codeContent").focus();
+            $("codeContent").selectedRange = $range(search_result[search_result_index][1], search_result[search_result_index][0].length);
+          }
+        }
+      }
+    }
+  ]
+};
 
 let textView = [
   {
@@ -19,293 +506,7 @@ let textView = [
       darkKeyboard: true,
       font: $font(15),
       radius: 10,
-      accessoryView: {
-        type: "view",
-        props: {
-          height: 40,
-          bgcolor: $color("#080808"),
-          borderWidth: 0.5,
-          borderColor: $color("clear")
-        },
-        views: [
-          {
-            type: "button",
-            props: {
-              id: "UndoButton",
-              title: "⃔",
-              radius: 6,
-              font: $font(14),
-              bgcolor: $color("#404040"),
-              borderWidth: 0.5,
-              borderColor: $color("#606060")
-            },
-            layout: function (make, view) {
-              make.top.inset(5);
-              make.left.inset(8);
-              make.width.equalTo(35);
-              make.centerY.equalTo(view.super);
-            },
-            events: {
-              tapped: function (sender) {
-                $device.taptic(0);
-                if (um.$canUndo()) {
-                  um.$undo();
-                } else {
-                  $ui.error("Nothing to Undo!", 0.6);
-                }
-              }
-            }
-          },
-          {
-            type: "button",
-            props: {
-              id: "RedoButton",
-              title: "⃕",
-              radius: 6,
-              font: $font(14),
-              bgcolor: $color("#404040"),
-              borderWidth: 0.5,
-              borderColor: $color("#606060")
-            },
-            layout: function (make, view) {
-              make.top.equalTo($("UndoButton").top);
-              make.left.equalTo($("UndoButton").right).inset(5);
-              make.width.equalTo($("UndoButton").width);
-              make.centerY.equalTo(view.super);
-            },
-            events: {
-              tapped: function (sender) {
-                $device.taptic(0);
-                if (um.$canRedo()) {
-                  um.$redo();
-                } else {
-                  $ui.error("Nothing to Redo!", 0.6);
-                }
-              }
-            }
-          },
-          {
-            type: "button",
-            props: {
-              id: "QRButton",
-              icon: $icon("017", $color("#C0C0C0"), $size(20, 20)),
-              font: $font("bold", 25),
-              bgcolor: $color("clear"),
-            },
-            layout: function (make, view) {
-              make.top.bottom.inset(0);
-              make.left.equalTo($("RedoButton").right).inset(12);
-              make.centerY.equalTo(view.super);
-            },
-            events: {
-              tapped: function (sender) {
-                if ($("codeContent").text.length > 0) {
-                  let QRText = $("codeContent").selectedRange.length > 0 ? $("codeContent").text.substr($("codeContent").selectedRange.location, $("codeContent").selectedRange.length) : $("codeContent").text;
-                  let QRimage = $qrcode.encode(QRText);
-                  showImage(QRimage.png);
-                } else {
-                  $ui.error("No Content!", 0.5);
-                }
-              }
-            }
-          },
-          {
-            type: "button",
-            props: {
-              id: "linkButton",
-              icon: $icon("020", $color("#C0C0C0"), $size(20, 20)),
-              font: $font("bold", 25),
-              bgcolor: $color("clear")
-            },
-            layout: function (make, view) {
-              make.top.bottom.inset(0);
-              make.left.equalTo($("QRButton").right).inset(8);
-              make.centerY.equalTo(view.super);
-            },
-            events: {
-              tapped: async function (sender) {
-                let regex = /([\w-]+:\/\/|(mailto|tel):)([^\s<>"]+)?/g;
-                let links = $("codeContent").text.match(regex);
-                if (links) {
-                  if (links.length == 1) {
-                    $app.openURL(links[0]);
-                  } else {
-                    let result = await $ui.menu({ items: links });
-                    $app.openURL(result.title);
-                  }
-                } else {
-                  $ui.error("No URL");
-                }
-              }
-            }
-          },
-          {
-            type: "button",
-            props: {
-              id: "searchButton",
-              icon: $icon("023", $color("#C0C0C0"), $size(20, 20)),
-              font: $font("bold", 25),
-              bgcolor: $color("clear"),
-            },
-            layout: function(make, view) {
-              make.top.bottom.inset(0);
-              make.left.equalTo(view.prev.right).inset(8);
-            },
-            events: {
-              tapped: function(sender) {
-                showSearchView();
-              }
-            }
-          },
-          {
-            type: "button",
-            props: {
-              id: "doneButton",
-              title: "Done",
-              font: $font("bold", 14),
-              bgcolor: $color("#0a85ff"),
-              borderWidth: 0.5,
-              borderColor: $color("clear")
-            },
-            layout: function (make, view) {
-              make.top.equalTo($("UndoButton").top);
-              make.right.inset(5);
-              make.width.equalTo(50);
-              make.centerY.equalTo(view.super);
-            },
-            events: {
-              tapped: function (sender) {
-                $("codeContent").blur();
-              }
-            }
-          },
-          {
-            type: "button",
-            props: {
-              id: "copyButton",
-              title: "CA",
-              font: $font("bold", 14),
-              bgcolor: $color("#383838"),
-              borderWidth: 0.5,
-              borderColor: $color("clear")
-            },
-            layout: function (make, view) {
-              make.top.equalTo($("UndoButton").top);
-              make.width.equalTo($("UndoButton").width);
-              make.right.equalTo(view.prev.left).inset(8);
-              make.centerY.equalTo(view.super);
-            },
-            events: {
-              tapped: function (sender) {
-                $clipboard.set({
-                  "type": "public.plain-text",
-                  "value": $("codeContent").text
-                });
-                $ui.toast("Copied All");
-              }
-            }
-          },
-          {
-            type: "button",
-            props: {
-              id: "clineButton",
-              title: "CL",
-              font: $font("bold", 14),
-              bgcolor: $color("#383838"),
-              borderWidth: 0.5,
-              borderColor: $color("clear")
-            },
-            layout: function (make, view) {
-              make.top.equalTo($("UndoButton").top);
-              make.width.equalTo($("UndoButton").width);
-              make.right.equalTo(view.prev.left).inset(5);
-              make.centerY.equalTo(view.super);
-            },
-            events: {
-              tapped: function (sender) {
-                let oriText = $("codeContent").text;
-                let curLoc = $("codeContent").info;
-                let oriLines = oriText.split("\n");
-
-                let charCount = 0;
-                for (let lineIndex in oriLines) {
-                  charCount = charCount + oriLines[lineIndex].length + 1;
-                  if (charCount > curLoc) {
-                    $clipboard.set({
-                      "type": "public.plain-text",
-                      "value": oriLines[lineIndex]
-                    })
-                    $ui.toast("Copied Line: " + oriLines[lineIndex]);
-                    break;
-                  }
-                }
-              }
-            }
-          },
-          {
-            type: "button",
-            props: {
-              id: "dlineButton",
-              title: "DL",
-              font: $font("bold", 14),
-              bgcolor: $color("#993366"),
-              borderWidth: 0.5,
-              borderColor: $color("clear")
-            },
-            layout: function (make, view) {
-              make.top.equalTo($("UndoButton").top);
-              make.width.equalTo($("UndoButton").width);
-              make.right.equalTo(view.prev.left).inset(5);
-              make.centerY.equalTo(view.super);
-            },
-            events: {
-              tapped: function (sender) {
-                let oriText = $("codeContent").text;
-                let curLoc = $("codeContent").info;
-                let oriLines = oriText.split("\n");
-
-                let charCount = 0;
-                for (let lineIndex in oriLines) {
-                  let lastlineLoc = charCount;
-                  charCount = charCount + oriLines[lineIndex].length + 1;
-                  if (charCount > curLoc) {
-                    oriLines.splice(lineIndex, 1);
-                    $("codeContent").text = oriLines.join("\n");
-                    $("codeContent").selectedRange = $range(lastlineLoc, 0);
-                    break;
-                  }
-                }
-              }
-            }
-          },
-          {
-            type: "button",
-            props: {
-              id: "shareButton",
-              icon: $icon("022", $color("#C0C0C0"), $size(20, 20)),
-              font: $font("bold", 25),
-              bgcolor: $color("clear"),
-            },
-            layout: function (make, view) {
-              make.top.bottom.inset(0);
-              make.right.equalTo(view.prev.left).inset(10);
-              make.centerY.equalTo(view.super);
-            },
-            events: {
-              tapped: function (sender) {
-                $share.sheet({
-                  item: $("codeContent").text,
-                  handler: function(success) {
-                    if (success) {
-                      $context.close();
-                    }
-                  }
-                });
-              }
-            }
-          }
-        ]
-      }
+      accessoryView
     },
     layout: function (make, view) {
       make.top.equalTo(view.super.safeAreaTop).inset(view_blank);
@@ -319,235 +520,7 @@ let textView = [
       }
     }
   },
-  {
-    type: "view",
-    props: {
-      id: "searchView",
-      hidden: true
-    },
-    layout: function(make, view) {
-      make.top.equalTo(view.prev.bottom);
-      make.left.right.inset(0);
-      make.width.equalTo(view.super.width);
-      make.height.equalTo(0);
-    },
-    views: [
-      {
-        type: "button",
-        props: {
-          id: "button_next",
-          symbol: "arrowtriangle.right.fill",
-          bgcolor: $color("#7EC0EE")
-        },
-        layout: function(make, view) {
-          make.top.equalTo(view.super.top).inset(5);
-          make.right.inset(view_blank);
-          make.width.equalTo(35);
-          make.height.equalTo(27);
-        },
-        events: {
-          tapped: function(sender) {
-            if (search_result.length > 0) {
-              $device.taptic(0);
-              $("codeContent").blur();
-              if (replaced) {
-                if (search_result_index >= search_result.length) {
-                  search_result_index = 0;
-                }
-              } else {
-                search_result_index = (search_result_index == search_result.length - 1) ? 0 : search_result_index + 1;
-              }
-              replaced = false;
-              $("codeContent").focus();
-              $("codeContent").selectedRange = $range(search_result[search_result_index][1], search_result[search_result_index][0].length);
-              $("search_count").text = (search_result_index + 1) + "/" + search_result.length;
-            } else if ($("search_input").text.length == 0) {
-              $ui.toast("Please Input Query First");
-            }
-          }
-        }
-      },
-      {
-        type: "button",
-        props: {
-          id: "button_prev",
-          symbol: "arrowtriangle.left.fill",
-          bgcolor: $color("#7EC0EE")
-        },
-        layout: function(make, view) {
-          make.top.equalTo(view.prev.top);
-          make.right.equalTo(view.prev.left).inset(5);
-          make.width.equalTo(view.prev.width);
-          make.height.equalTo(view.prev.height);
-        },
-        events: {
-          tapped: function(sender) {
-            if (search_result.length > 0) {
-              $device.taptic(0);
-              $("codeContent").blur();
-              search_result_index = (search_result_index  == 0) ?  search_result.length - 1 : search_result_index - 1;
-              replaced = false;
-              $("codeContent").focus();
-              $("codeContent").selectedRange = $range(search_result[search_result_index][1], search_result[search_result_index][0].length);
-              $("search_count").text = (search_result_index + 1) + "/" + search_result.length;
-            } else if ($("search_input").text.length == 0) {
-              $ui.toast("Please Input Query First");
-            }
-          }
-        }
-      },
-      {
-        type: "label",
-        props: {
-          id: "search_count",
-          text: "0/0",
-          bgcolor: $color("#9C9C9C"),
-          radius: 5,
-          autoFontSize: true,
-          align: $align.center
-        },
-        layout: function(make, view) {
-          make.top.equalTo(view.prev.top);
-          make.right.equalTo(view.prev.left).inset(5);
-          make.width.equalTo(60);
-          make.height.equalTo(view.prev.height);
-        }
-      },
-      {
-        type: "input",
-        props: {
-          id: "search_input",
-          type: $kbType.search,
-          darkKeyboard: true
-        },
-        layout: function(make, view) {
-          make.top.equalTo(view.prev.top);
-          make.right.equalTo(view.prev.left).inset(5);
-          make.height.equalTo(view.prev.height);
-          make.left.inset(view_blank);
-        },
-        events: {
-          didBeginEditing: function(sender) {
-            search_result = [];
-            search_result_index = 0;
-            replaced = false;
-            $("search_count").text = "0/0";
-          },
-          returned: function(sender) {
-            if (sender.text.length > 0) {
-              search_result = [];
-              search_result_index = 0;
-              replaced = false;
-              $("search_count").text = "0/0";
-              let search_query = sender.text.replace(/\\(?=$|\\)/g, "\\\\");
-              let regex1 = RegExp(search_query, 'ig');
-              let array1;
-              while ((array1 = regex1.exec($("codeContent").text)) !== null) {
-                search_result.push([array1[0], regex1.lastIndex - array1[0].length]);
-              }
-              if (search_result.length > 0) {
-                $("codeContent").focus();
-                $("codeContent").selectedRange = $range(search_result[search_result_index][1], search_result[search_result_index][0].length);
-                $("search_count").text = "1/" + search_result.length;
-              } else {
-                $ui.error("No Match Content");
-              }
-            } else {
-              showSearchView();
-            }
-          }
-        }
-      },
-      {
-        type: "button",
-        props: {
-          id: "button_replace",
-          title: "Replace",
-          bgcolor: $color("#8968CD")
-        },
-        layout: function(make, view) {
-          make.top.equalTo(view.prev.bottom).inset(5);
-          make.right.inset(view_blank);
-          make.width.equalTo(85);
-          make.height.equalTo(view.prev.height);
-        },
-        events: {
-          tapped: function(sender) {
-            if (search_result.length > 0 && $("codeContent").selectedRange.length > 0) {
-              $device.taptic(0);
-              $("codeContent").text = $("codeContent").text.slice(0, search_result[search_result_index][1]) + $("replace_input").text + $("codeContent").text.slice(search_result[search_result_index][1] + search_result[search_result_index][0].length);
-              $("codeContent").blur();
-              $("codeContent").focus();
-              $("codeContent").selectedRange = $range(search_result[search_result_index][1] + $("replace_input").text.length, 0);
-              search_result.splice(search_result_index, 1);
-              for (let i = search_result_index; i < search_result.length; i++) {
-                search_result[i][1] = search_result[i][1] + ($("replace_input").text.length - search_result[i][0].length);
-              }
-              replaced = true;
-            } else if ($("search_input").text.length == 0) {
-              $ui.toast("Please Input Query First");
-            }
-          }
-        }
-      },
-      {
-        type: "button",
-        props: {
-          id: "button_replaceall",
-          title: "All",
-          bgcolor: $color("#8968CD")
-        },
-        layout: function(make, view) {
-          make.top.equalTo(view.prev.top);
-          make.right.equalTo(view.prev.left).inset(5);
-          make.width.equalTo(50);
-          make.height.equalTo(view.prev.height);
-        },
-        events: {
-          tapped: function(sender) {
-            if (search_result.length > 0) {
-              $device.taptic(0);
-              let search_query = $("search_input").text.replace(/\\(?=$|\\)/g, "\\\\");
-              let regex1 = RegExp(search_query, 'ig');
-              $("codeContent").text = $("codeContent").text.replace(regex1, $("replace_input").text);
-              $("codeContent").blur();
-              $("codeContent").focus();
-              $("codeContent").selectedRange = $range(search_result[0][1] + $("replace_input").text.length, 0);
-              search_result = [];
-              search_result_index = 0;
-              replaced = false;
-              $("search_count").text = "0/0";
-            } else if ($("search_input").text.length == 0) {
-              $ui.toast("Please Input Query First");
-            }
-          }
-        }
-      },
-      {
-        type: "input",
-        props: {
-          id: "replace_input",
-          type: $kbType.search,
-          darkKeyboard: true
-        },
-        layout: function(make, view) {
-          make.top.equalTo(view.prev.top);
-          make.right.equalTo(view.prev.left).inset(5);
-          make.height.equalTo(view.prev.height);
-          make.left.inset(view_blank);
-        },
-        events: {
-          returned: function(sender) {
-            if (search_result.length > 0) {
-              replaced = false;
-              $("codeContent").focus();
-              $("codeContent").selectedRange = $range(search_result[search_result_index][1], search_result[search_result_index][0].length);
-            }
-          }
-        }
-      }
-    ]
-  }
+  searchView
 ];
 
 let scrollView = {
@@ -560,12 +533,12 @@ let scrollView = {
   },
   events: {
     pulled: function(sender) {
-      $app.env == $env.app ? $app.close() : $context.close();
+      env == 0 ? $app.close() : $context.close();
     }
   }
 };
 
-function show(textContent, popItems = []) {
+function showEditor(textContent, popItems = []) {
   if (!textContent) {
     naviaddButton = {
       title: "Add",
@@ -575,7 +548,7 @@ function show(textContent, popItems = []) {
           addCount = 1;
           shareItems = [];
           $("scrollView").remove();
-          $("mainView").add(scrollView);
+          $("editorView").add(scrollView);
           $("scrollView").relayout();
           textView.forEach(element => $("scrollView").add(element));
           um = $("codeContent").runtimeValue().$undoManager();
@@ -601,7 +574,7 @@ function show(textContent, popItems = []) {
 
   $ui.render({
     props: {
-      id: "mainView",
+      id: "editorView",
       bgcolor: $color("#282828"),
       navButtons: [
         {
@@ -647,7 +620,7 @@ function show(textContent, popItems = []) {
     },
   });
 
-  $("mainView").add(scrollView);
+  $("editorView").add(scrollView);
   if (textContent) {
     textView.forEach(element => $("scrollView").add(element));
     $("codeContent").text = textContent;
@@ -675,6 +648,17 @@ function showSearchView() {
     $("searchView").updateLayout(function(make) {make.height.equalTo(0)});
     $("codeContent").updateLayout(function(make) {make.height.equalTo(codeContentHeight)});
     $("codeContent").focus();
+  }
+}
+
+function processText(type) {
+  if ($("codeContent").text.length > 0) {
+    let OriText = $("codeContent").selectedRange.length > 0 ? $("codeContent").text.substr($("codeContent").selectedRange.location, $("codeContent").selectedRange.length) : $("codeContent").text;
+    type == "Share" && $share.sheet({ item: OriText, handler: function(success) { success && $context.close() }});
+    type == "QRcode" && showImage($qrcode.encode(OriText).png);
+    type == "CopyAll" && ($clipboard.text = $("codeContent").text) && $ui.toast("Copied All");
+  } else {
+    $ui.error("No Content!", 0.5);
   }
 }
 
@@ -789,6 +773,8 @@ function convertVol(bnums){
 
 function showImage(imageData) {
   let ratio = imageData.image.size.height / imageData.image.size.width;
+  let baseEdge = $device.info.screen.width - 100;
+  let imgSize = $size(baseEdge, baseEdge * ratio);
   $("codeContent").blur();
   let initLocation = new Array();
   $ui.push({
@@ -806,7 +792,7 @@ function showImage(imageData) {
         },
         layout: function (make, view) {
           make.center.equalTo(view.super);
-          make.size.equalTo($size(($device.info.screen.width - 100), ($device.info.screen.width - 100) * ratio));
+          make.size.equalTo(imgSize);
         }
       }
     ],
@@ -842,6 +828,6 @@ function showImage(imageData) {
 }
 
 module.exports = {
-  show: show,
+  showEditor: showEditor,
   drawOthers: drawOthers
 }
