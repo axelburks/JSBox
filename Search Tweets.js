@@ -299,8 +299,11 @@ $ui.render({
           $app.env == $env.app ? $app.close() : $context.close();
         },
         longPressed: sender => {
-          $safari.open({ url: "https://mobile.twitter.com/search?q=" + schemeParam() }).then(() => {
-            $app.env == $env.app ? $app.close() : $context.close();
+          $safari.open({
+            url: "https://mobile.twitter.com/search?q=" + schemeParam(),
+            handler: function() {
+              $app.env == $env.app ? $app.close() : $context.close();
+            }
           });
         }
       }
@@ -371,9 +374,9 @@ function schemeParam() {
   $("user_at").text.length > 0 && adv_arr.push(`(@${$("user_at").text})`);
   $("query_all").text.length > 0 && adv_arr.push($("query_all").text);
   $("query_exact").text.length > 0 && adv_arr.push(`"${$("query_exact").text}"`);
-  $("query_any").text.length > 0 && adv_arr.push(`(${$("query_any").text.split(' ').join('OR')})`);
+  $("query_any").text.length > 0 && adv_arr.push(`(${$("query_any").text.split(' ').join(' OR ')})`);
   $("query_none").text.length > 0 && adv_arr.push($("query_none").text.split(' ').map(x => `-${x}`).join(' '));
-  $("query_tag").text.length > 0 && adv_arr.push(`(${$("query_tag").text.split(' ').map(x => `#${x}`).join('OR')})`);
+  $("query_tag").text.length > 0 && adv_arr.push(`(${$("query_tag").text.split(' ').map(x => `#${x}`).join(' OR ')})`);
   $("query_since").text.length > 0 && adv_arr.push(`since:${$("query_since").text}`);
   $("query_until").text.length > 0 && adv_arr.push(`until:${$("query_until").text}`);
   let adv_str = adv_arr.join(' ');
