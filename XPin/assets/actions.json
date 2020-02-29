@@ -315,7 +315,7 @@
         "pattern": "http://dict.eudic.net/mdicts/en/%@"
       },
       {
-        "name": "欧陆词典App/百度翻译",
+        "name": "欧路词典/百度翻译",
         "pattern": "eudic://dict/%@"
       }
     ]

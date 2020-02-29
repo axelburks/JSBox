@@ -89,7 +89,7 @@ $cache.get("actions") === undefined &&
         "pattern": "eudic://dict/%@",
         "noenc": false,
         "icon": "icon_057.png",
-        "name": "欧陆词典/百度翻译"
+        "name": "欧路词典/百度翻译"
       },
       {
         "pattern": "weibco",

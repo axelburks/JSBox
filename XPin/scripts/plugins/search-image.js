@@ -48,12 +48,12 @@ function searchImage(data, search) {
     $ui.toast("Uploading to SMMS",10)
   }
   $http.upload({
-    url: "https://sm.ms/api/upload",
+    url: "https://sm.ms/api/v2/upload",
     files: [{"data": data, "name": "smfile"}],
     handler: function(resp) {
       $ui.loading(false)
-      if (resp.data && resp.data.data.url) {
-        var url = resp.data.data.url
+      if (resp.data.code == "image_repeated" || resp.data.code == "success") {
+        let url = resp.data.code == "image_repeated" ? resp.data.images : resp.data.data.url
         $clipboard.text = url      
         // showEngines(url)
         if (search) {
