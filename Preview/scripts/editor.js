@@ -383,8 +383,13 @@ let searchView = {
             search_result_index = 0;
             replaced = false;
             $("search_count").text = "0/0";
-            let search_query = sender.text.replace(/\\(?=$|\\)/g, "\\\\");
-            let regex1 = RegExp(search_query, 'ig');
+            let regex1;
+            try {
+              regex1 = RegExp(sender.text, 'ig');
+            } catch (error) {
+              $ui.error("Not Regex, Please Check Again", 2);
+              return;
+            }
             let array1;
             while ((array1 = regex1.exec($("codeContent").text)) !== null) {
               search_result.push([array1[0], regex1.lastIndex - array1[0].length]);
@@ -451,8 +456,13 @@ let searchView = {
         tapped: function(sender) {
           if (search_result.length > 0) {
             $device.taptic(0);
-            let search_query = $("search_input").text.replace(/\\(?=$|\\)/g, "\\\\");
-            let regex1 = RegExp(search_query, 'ig');
+            let regex1;
+            try {
+              regex1 = RegExp($("search_input").text, 'ig');
+            } catch (error) {
+              $ui.error("Not Regex, Please Check Again", 2);
+              return;
+            }
             $("codeContent").text = $("codeContent").text.replace(regex1, $("replace_input").text);
             $("codeContent").blur();
             $("codeContent").focus();
