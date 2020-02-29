@@ -312,9 +312,13 @@ function updateItem(data) {
 
 function searchItem(query) {
   function isContain(element) {
-    let rex = query.replace(/\\(?=$|\\)/g, "\\\\");
-    let rexx = RegExp(rex,"im");
-    return rexx.test(element);
+    try {
+      let rex = RegExp(query,"im");
+      return rex.test(element);
+    } catch (error) {
+      $ui.toast("Not Regex, Try As String", 1);
+      return element.indexOf(query) > -1 ? true : false;
+    }
   }
   let all_items = dataManager.getTextItems();
   let result = all_items.filter(isContain);

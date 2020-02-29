@@ -416,8 +416,13 @@ let searchView = env == 2 ? {} : {
             search_result_index = 0;
             replaced = false;
             $("search_count").text = "0/0";
-            let search_query = sender.text.replace(/\\(?=$|\\)/g, "\\\\");
-            let regex1 = RegExp(search_query, 'ig');
+            let regex1;
+            try {
+              regex1 = RegExp(sender.text, 'ig');
+            } catch (error) {
+              $ui.error("Not Regex, Please Check Again", 2);
+              return;
+            }
             let array1;
             while ((array1 = regex1.exec($("codeContent").text)) !== null) {
               search_result.push([array1[0], regex1.lastIndex - array1[0].length]);
@@ -484,8 +489,13 @@ let searchView = env == 2 ? {} : {
         tapped: function(sender) {
           if (search_result.length > 0) {
             $device.taptic(0);
-            let search_query = $("search_input").text.replace(/\\(?=$|\\)/g, "\\\\");
-            let regex1 = RegExp(search_query, 'ig');
+            let regex1;
+            try {
+              regex1 = RegExp($("search_input").text, 'ig');
+            } catch (error) {
+              $ui.error("Not Regex, Please Check Again", 2);
+              return;
+            }
             $("codeContent").text = $("codeContent").text.replace(regex1, $("replace_input").text);
             $("codeContent").blur();
             $("codeContent").focus();
@@ -545,7 +555,7 @@ let textView = [
       accessoryView
     },
     layout: function (make, view) {
-      make.top.equalTo(env == 2 ? $("closeEditor").bottom : view.super.safeAreaTop).inset(view_blank);
+      env == 2 ? make.top.equalTo($("closeEditor").bottom) : make.top.equalTo(view.super.safeAreaTop).inset(view_blank);
       make.width.equalTo(view_width);
       make.height.equalTo(codeContentHeight);
       make.centerX.equalTo(view.super);
@@ -568,10 +578,10 @@ let kbView = env != 2 ? [] : [
       bgcolor: $color("clear"),
     },
     layout: (make, view) => {
-      make.top.equalTo(view.super.safeAreaTop).inset(view_blank);
-      make.right.inset(view_blank);
+      make.top.equalTo(view.super.safeAreaTop);
+      make.right.inset(0);
       make.width.equalTo(50);
-      make.height.equalTo(30);
+      make.height.equalTo(40);
     },
     events: {
       tapped: sender => { closeView() }
@@ -585,7 +595,8 @@ let kbView = env != 2 ? [] : [
     },
     layout: (make, view) => {
       make.top.bottom.equalTo(view.prev);
-      make.right.equalTo(view.prev.left).inset(2 * view_blank);
+      make.width.equalTo(40);
+      make.right.equalTo(view.prev.left).inset(0);
     },
     events: {
       tapped: sender => { processText("Copy") }
@@ -598,8 +609,8 @@ let kbView = env != 2 ? [] : [
       bgcolor: $color("clear"),
     },
     layout: (make, view) => {
-      make.top.bottom.equalTo(view.prev);
-      make.right.equalTo(view.prev.left).inset(4 * view_blank);
+      make.top.bottom.width.equalTo(view.prev);
+      make.right.equalTo(view.prev.left).inset(0);
     },
     events: {
       tapped: sender => { processText("QRcode") }
@@ -612,8 +623,8 @@ let kbView = env != 2 ? [] : [
       bgcolor: $color("clear"),
     },
     layout: (make, view) => {
-      make.top.bottom.equalTo(view.prev);
-      make.right.equalTo(view.prev.left).inset(4 * view_blank);
+      make.top.bottom.width.equalTo(view.prev);
+      make.right.equalTo(view.prev.left).inset(0);
     },
     events: {
       tapped: sender => { processText("Paste") }
@@ -626,8 +637,8 @@ let kbView = env != 2 ? [] : [
       bgcolor: $color("clear"),
     },
     layout: (make, view) => {
-      make.top.bottom.equalTo(view.prev);
-      make.right.equalTo(view.prev.left).inset(4 * view_blank);
+      make.top.bottom.width.equalTo(view.prev);
+      make.right.equalTo(view.prev.left).inset(0);
     },
     events: {
       tapped: sender => { processText("Send") }
@@ -693,12 +704,7 @@ function processText(type) {
 
   function sendText(text) {
     $keyboard.insert(text);
-    $delay(0.1, () => {
-      $keyboard.insert("\n");
-      if ($keyboard.hasText) {
-        $keyboard.delete();
-      }
-    });
+    $keyboard.send();
   }
 }
 
