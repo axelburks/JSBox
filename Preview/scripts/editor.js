@@ -3,9 +3,9 @@ let view_blank = 4;
 let view_width = $device.info.screen.width - view_blank * 2;
 let shareItems = [], naviaddButton = {}, addCount = 0, um;
 let searchViewHeight = 65;
-let codeSearchHeight = $device.info.screen.height - ((env == 0) ? 545 : 570);
+let codeSearchHeight = $device.info.screen.height - ((env == 0) ? 510 : 535);
 let codeContentHeight = $context.dataItems ? 400 : $device.info.screen.height - ((env == 0) ? 120 : 170);
-let search_result = [], search_result_index = 0, replaced = false;
+let search_result = [], search_result_index = 0, replaced = false, scrollViewHeight = 0;
 
 let accessoryView = {
   type: "view",
@@ -533,22 +533,8 @@ let textView = [
   searchView
 ];
 
-let scrollView = {
-  type: "scroll",
-  props: {
-    id: "scrollView"
-  },
-  layout: function(make, view) {
-    make.left.right.top.bottom.inset(0);
-  },
-  events: {
-    pulled: function(sender) {
-      env == 0 ? $app.close() : $context.close();
-    }
-  }
-};
-
 function showEditor(textContent, popItems = []) {
+  scrollViewHeight = textContent ? codeContentHeight : 0;
   if (!textContent) {
     naviaddButton = {
       title: "Add",
@@ -557,12 +543,13 @@ function showEditor(textContent, popItems = []) {
         if (addCount == 0) {
           addCount = 1;
           shareItems = [];
+          scrollViewHeight = codeContentHeight
           $("scrollView").remove();
+          let otherViews = drawOthers();
           $("editorView").add(scrollView);
-          $("scrollView").relayout();
-          textView.forEach(element => $("scrollView").add(element));
+          textView.forEach(element => $("scrollContainer").add(element));
           um = $("codeContent").runtimeValue().$undoManager();
-          drawOthers();
+          otherViews.forEach(element => $("scrollContainer").add(element));
         } else {
           $ui.error("You can only add once");
         }
@@ -581,6 +568,31 @@ function showEditor(textContent, popItems = []) {
       }
     };
   }
+
+  let otherViews = drawOthers();
+  let scrollView = {
+    type: "scroll",
+    props: {
+      id: "scrollView"
+    },
+    layout: $layout.fill,
+    events: {
+      pulled: function(sender) {
+        env == 0 ? $app.close() : $context.close();
+      },
+      layoutSubviews: sender => {
+        $("scrollContainer").frame = $rect(0, 0, sender.frame.width, scrollViewHeight);
+      }
+    },
+    views: [
+      {
+        type: "view",
+        props: {
+          id: "scrollContainer",
+        },
+      }
+    ]
+  };
 
   $ui.render({
     props: {
@@ -625,17 +637,15 @@ function showEditor(textContent, popItems = []) {
         naviaddButton
       ]
     },
-    layout: function(make, view) {
-      make.left.right.top.bottom.inset(0);
-    },
   });
 
   $("editorView").add(scrollView);
   if (textContent) {
-    textView.forEach(element => $("scrollView").add(element));
+    textView.forEach(element => $("scrollContainer").add(element));
     $("codeContent").text = textContent;
     um = $("codeContent").runtimeValue().$undoManager();
   }
+  otherViews.forEach(element => $("scrollContainer").add(element));
 }
 
 function showSearchView() {
@@ -646,11 +656,13 @@ function showSearchView() {
   $("search_input").text = "";
   $("replace_input").text = "";
   if ($("searchView").hidden) {
+    scrollViewHeight += searchViewHeight + view_blank;
     $("searchView").updateLayout(function(make) {make.height.equalTo(searchViewHeight)});
     $("searchView").hidden = false;
     $("codeContent").updateLayout(function(make) {make.height.equalTo(codeSearchHeight)});
     $("search_input").focus();
   } else {
+    scrollViewHeight -= searchViewHeight + view_blank;
     $("codeContent").blur();
     $("search_input").text = "";
     $("search_count").text = "0/0";
@@ -673,6 +685,7 @@ function processText(type) {
 }
 
 function drawOthers() {
+  let otherViews = [];
   if ($context.dataItems) {
     let iconSize = 20;
     for (let dataIndex in $context.dataItems) {
@@ -721,7 +734,8 @@ function drawOthers() {
           }
         }
       };
-      $("scrollView").add(dataView);
+      scrollViewHeight += iconSize + 20 + view_blank;
+      otherViews.push(dataView);
     }
   }
   if ($context.imageItems) {
@@ -755,10 +769,11 @@ function drawOthers() {
           }
         }
       };
-      $("scrollView").add(imageView);
+      scrollViewHeight += img_height + view_blank;
+      otherViews.push(imageView);
     }
   }
-  $("scrollView").resize();
+  return otherViews;
 }
 
 function convertVol(bnums){

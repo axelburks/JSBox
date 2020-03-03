@@ -28,7 +28,6 @@ function init() {
 
   let editor = require("./editor");
   editor.showEditor(textContent, popItems);
-  editor.drawOthers();
 }
 
 module.exports = {
