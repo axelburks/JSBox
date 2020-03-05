@@ -4,21 +4,91 @@ function init(item, country) {
   let moment = require('moment')
   let constants = require("scripts/constants")
   let currency = constants.currencies[country]
-  let lang = constants.langs[country]
-  let content = ""
-  let date_count = 0
-  let chart_list = []
-  let price_list = []
-  let last_status = null
-  let showChart = false
-  let lowest_price = "NaN"
-  let title = item.trackCensoredName.match(/^.+(?=\s[-—－–])|^.+(?=[-—－–])|^.+/)[0]
-  let price = item.formattedPrice
-  let bundleId = item.bundleId
-  let description = item.description.replace(/\n/g, "<br>").replace(/(https?:\/\/[^"\(\)\[\]\{\}<>\s]+)/g, "<a name=\"universal_links\" href=\"$1\">$1</a>")
-  let whatsnew = item.releaseNotes.replace(/\n/g, "<br>").replace(/(https?:\/\/[^"\(\)\[\]\{\}<>\s]+)/g, "<a name=\"universal_links\" href=\"$1\">$1</a>")
-
-  let detail = `<div class="container" name="Detail">
+  $ui.loading(true)
+  $http.request({
+    method: "GET",
+    url: `https://buster.cheapcharts.de/v1/DetailData.php?&store=itunes&country=${country}&itemType=apps&idInStore=${item.trackId}`,
+    header: {
+      "Content-Type": "application/json",
+      "User-Agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 11_4 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Mobile/15F5079a"
+    },
+    handler: function(resp) {
+      let resp_data = resp.data;
+      let price_data = [];
+      try {
+        price_data = resp_data.results.apps.priceEvolution.replace(/:(\+|\-)/g, ":").split("~");
+      } catch (error) {
+        price_data = [];
+        $ui.error("Get Price Data with Error");
+      }
+      let content = ""
+      let date_count = 0
+      let chart_list = []
+      let price_list = []
+      let last_status = null
+      let showChart = false
+      let lowest_price = "NaN"
+      let title = item.trackCensoredName.match(/^.+(?=\s[-—－–])|^.+(?=[-—－–])|^.+/)[0]
+      let price = item.formattedPrice
+      let bundleId = item.bundleId
+      let description = item.description.replace(/\n/g, "<br>").replace(/(https?:\/\/[^"\(\)\[\]\{\}<>\s]+)/g, "<a name=\"universal_links\" href=\"$1\">$1</a>")
+      let whatsnew = item.releaseNotes.replace(/\n/g, "<br>").replace(/(https?:\/\/[^"\(\)\[\]\{\}<>\s]+)/g, "<a name=\"universal_links\" href=\"$1\">$1</a>")
+      if (price_data.length > 0) {
+        price = currency + price_data[0].split(":")[1];
+        for (let i = 0; i < price_data.length; i++) {
+          showChart = true
+          let date = price_data[i].split(":")[0]
+          let current_price = price_data[i].split(":")[1]
+          let previous_price = i == price_data.length - 1 ? current_price : price_data[i + 1].split(":")[1]
+          let date_dot = moment(date, 'YYYY-MM-DD').utc().valueOf() + 8*3600000
+          if (date_count == 0) {
+            let today = new Date().getTime() + 8*3600000
+            chart_list.push(`[${today},${current_price}]`)
+            date_count ++
+          }
+          chart_list.push(`[${date_dot},${current_price}]`)
+          
+          last_status = `[${date_dot},${previous_price}]`
+          let pricefrom = Number(previous_price)
+          let priceto = Number(current_price)
+          price_list.push(pricefrom, priceto)
+          let trend = priceto - pricefrom
+          if (trend > 0) {
+            let increase = `<div class="container" name="PriceInc">
+            <div class="box">
+            <div class="date">
+            <p>${date}</p>
+            </div>
+            <div class="content">
+            <p><span style="color: rgba(244,67,54,0.8);">Price Increase</span> : ${currency}${pricefrom} → ${currency}${priceto}</p>
+            </div>
+            </div>
+            <div class="border">
+            </div>
+            </div>`
+            content = content + increase
+          } else if (trend < 0) {
+            let drop = `<div class="container" name="PriceDrop">
+            <div class="box">
+            <div class="date">
+            <p>${date}</p>
+            </div>
+            <div class="content">
+            <p><span style="color: rgba(76,175,80,0.8);">Price Drop</span> : ${currency}${pricefrom} → ${currency}${priceto}</p>
+            </div>
+            </div>
+            <div class="border">
+            </div>
+            </div>`
+            content = content + drop
+          }
+        }
+      }
+      if (price_list.length > 0) {
+        let min = Math.min.apply(null, price_list)
+        lowest_price = `${currency}${min}`
+      }
+      let detail = `<div class="container" name="Detail">
       <div class="box">
       <div class="detail">
       <p>ASO100: </p>
@@ -59,8 +129,10 @@ function init(item, country) {
       <div class="border">
       </div>
       </div>`
-  content = content + detail
-  let html = `<html>
+      content = content + detail
+      chart_list.push(last_status)
+      let chart_data_set = chart_list.reverse().join(",")
+      let html = `<html>
       <head>
       <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
       <title>App Preview</title>
@@ -83,7 +155,9 @@ function init(item, country) {
       <script src="http://cdn.hcharts.cn/highcharts/highcharts.js"></script>
       <script language="javascript">      
       window.onload=function(){
-
+        if (${showChart} == true) {
+          displayChart()
+        }
         $PriceInc=document.getElementsByName("PriceInc");
         $PriceDrop=document.getElementsByName("PriceDrop");
         $Detail=document.getElementsByName("Detail");
@@ -97,6 +171,74 @@ function init(item, country) {
         Init();
       }
       
+      function displayChart() {
+        document.getElementById("price_chart").style.display="";
+        var options = {
+          credits: {
+            enabled: false
+          },
+          chart: {
+            type: 'line',
+            style: {
+              fontSize: '20px',
+              fontWeight: 'bold'
+            }
+          },
+          title: {
+            text: null
+          },
+          xAxis: {
+            type: 'datetime',
+            title: {
+              text: null
+            },
+            labels: {
+              format: '{value:%y-%m-%d}',
+              step:2,
+              align: 'center',
+              style: { "color": "#666666", "cursor": "default", "fontSize": "25px" }
+            }
+          },
+          yAxis: {
+            title: {
+              text: null
+            },
+            labels: {
+              step:2,
+              align: 'center',
+              style: { "color": "#666666", "cursor": "default", "fontSize": "20px" }
+            },
+            min: 0
+          },
+          tooltip: {
+            style: {
+              fontSize: "25px",
+              fontWeight: "blod"
+            },
+            headerFormat: '<b>{series.name}</b><br>',
+            pointFormat: '{point.x:%Y-%m-%d}: ${currency}{point.y:.2f}'
+          },
+          plotOptions: {
+            line: {
+              marker: {
+                enabled: null
+              },
+              dataLabels: {
+                enabled: ${showLabels},
+                style: {"color": "#A9A9A9", "fontSize": "18px", "textOutline": "1px 1px contrast" }
+              },
+              enableMouseTracking: true
+            }
+          },
+          series: [{
+            name: 'Price',
+            lineWidth: 4,
+            showInLegend: false,
+            data: [${chart_data_set}]
+          }]
+        };
+        var chart = Highcharts.chart('price_chart', options);
+      }
 
       function getElementsByClassName(n){
       var classElements = [],allElements = document.getElementsByTagName('*');
@@ -244,7 +386,7 @@ function init(item, country) {
       </head>
       
       <body>
-      <h1>${title}<div class="content">${price}<br><span style="font-size: 20pt;color: rgb(192,192,192);">${bundleId}</span></div></h1>
+      <h1>${title}<div class="content">${price} (<span style="color: rgba(76,175,80,0.8);">${lowest_price}</span>)<br><span style="font-size: 20pt;color: rgb(192,192,192);">${bundleId}</span></div></h1>
 
       <div id="price_chart" style="margin: 0px 40px 20px;min-width:400px;height:400px;display:none"></div>
       
@@ -262,54 +404,56 @@ function init(item, country) {
       
       <div class="footer">
       </div>`
-  $ui.loading(false)
-  $ui.push({
-    props: {
-      title: "Preview"
-    },
-    views: [{
-      type: "web",
-      props: {
-        html: html,
-        script: function () {
-          let aso100_links = document.getElementsByName("aso100_links")
-          for (let i = 0; i < aso100_links.length; ++i) {
-            let element = aso100_links[i]
-            element.onclick = function (event) {
-              let source = event.target || event.srcElement
-              $notify("openinSVC", { "url": source.getAttribute("href") })
-              return false
-            }
-          }
-          let universal_links = document.getElementsByName("universal_links")
-          for (let i = 0; i < universal_links.length; ++i) {
-            let element = universal_links[i]
-            element.onclick = function (event) {
-              let source = event.target || event.srcElement
-              $notify("openinSafari", { "url": source.getAttribute("href") })
-              return false
-            }
-          }
-        }
-      },
-      events: {
-        openinSVC: function (object) {
-          $safari.open({
-            url: object.url,
-            height: 360,
-            handler: function () { }
-          })
+      $ui.loading(false)
+      $ui.push({
+        props: {
+          title: "Preview"
         },
-        openinSafari: function (object) {
-          $app.openURL(object.url)
+        views: [{
+          type: "web",
+          props: {
+            html: html,
+            script: function () {
+              let aso100_links = document.getElementsByName("aso100_links")
+              for (let i = 0; i < aso100_links.length; ++i) {
+                let element = aso100_links[i]
+                element.onclick = function (event) {
+                  let source = event.target || event.srcElement
+                  $notify("openinSVC", { "url": source.getAttribute("href") })
+                  return false
+                }
+              }
+              let universal_links = document.getElementsByName("universal_links")
+              for (let i = 0; i < universal_links.length; ++i) {
+                let element = universal_links[i]
+                element.onclick = function (event) {
+                  let source = event.target || event.srcElement
+                  $notify("openinSafari", { "url": source.getAttribute("href") })
+                  return false
+                }
+              }
+            }
+          },
+          events: {
+            openinSVC: function (object) {
+              $safari.open({
+                url: object.url,
+                height: 360,
+                handler: function () { }
+              })
+            },
+            openinSafari: function (object) {
+              $app.openURL(object.url)
+            }
+          },
+          layout: $layout.fill,
+        }]
+      })
+      $app.listen({
+        exit: function () {
+          $context.close()
         }
-      },
-      layout: $layout.fill,
-    }]
-  })
-  $app.listen({
-    exit: function () {
-      $context.close()
+      })
     }
   })
 }
