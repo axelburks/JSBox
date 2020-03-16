@@ -525,6 +525,9 @@ let textView = [
       make.centerX.equalTo(view.super);
     },
     events: {
+      ready: function(sender) {
+        sender.info = sender.selectedRange.location;
+      },
       didChangeSelection: function(sender) {
         sender.info = sender.selectedRange.location;
       }
