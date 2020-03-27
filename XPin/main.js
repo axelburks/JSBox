@@ -6,6 +6,7 @@ if (bakStamp) {
   x && $file.delete(src);
 }
 
+let initClipText = JSON.stringify($clipboard.items).indexOf('org.nspasteboard.ConcealedType') < 0 && $clipboard.text ? $clipboard.text : "";
 let m = ["app", "today", "keyboard"];
 let n = $app.env.toString().slice(0, 1) - 1;
 
@@ -124,4 +125,4 @@ $cache.get("actions") === undefined &&
 
 let module = require(`scripts/${m[n]}`);
 
-module.init($context.query);
+module.init($app.env == $env.app ? $context.query : initClipText);

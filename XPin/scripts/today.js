@@ -21,8 +21,8 @@ const layout = (make, view, name) => {
   make.size.equalTo($size(22.4, 22.4));
 };
 
-function init() {
-  let text = JSON.stringify($clipboard.items).indexOf('org.nspasteboard.ConcealedType') < 0 && $clipboard.text ? $clipboard.text : "";
+function init(initClipText) {
+  let text = initClipText ? initClipText : JSON.stringify($clipboard.items).indexOf('org.nspasteboard.ConcealedType') < 0 && $clipboard.text ? $clipboard.text : "";
   let textColor = text.indexOf("\n") >= 0 ? ui.color.general_n : ui.color.general;
   let placeholder = $clipboard.image ? "🌁 ‣ Long-Press to Show" : "剪贴板无内容";
 
