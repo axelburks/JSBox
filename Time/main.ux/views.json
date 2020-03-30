@@ -1,0 +1,34 @@
+{
+  "props" : {
+    "id" : "main",
+    "navBarHidden" : true,
+    "homeIndicatorHidden" : true
+  },
+  "views" : [
+    {
+      "type" : "label",
+      "props" : {
+        "align" : 1,
+        "frame" : {
+          "y" : 307,
+          "x" : 27,
+          "width" : 360,
+          "height" : 122
+        },
+        "id" : "time_label",
+        "font" : {
+          "$type" : "$font",
+          "$props" : {
+            "name" : "Lato-Bold",
+            "size" : 80
+          }
+        },
+        "autoFontSize" : false,
+        "text" : "15:21:23"
+      },
+      "events" : {
+
+      }
+    }
+  ]
+}
