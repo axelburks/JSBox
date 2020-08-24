@@ -1,0 +1,45 @@
+{
+  "title": "Settings",
+  "groups": [
+    {
+      "title": "GENERAL",
+      "items": [
+        {
+          "title": "API PASSWORD",
+          "type": "string",
+          "key": "api.pwd",
+          "value": "password"
+        }
+      ]
+    },
+    {
+      "title": "DEVICE",
+      "items": [
+        {
+          "title": "iPhone",
+          "type": "string",
+          "key": "device.iPhone",
+          "value": "192.168.123.111:6166"
+        },
+        {
+          "title": "iPad",
+          "type": "string",
+          "key": "device.iPad",
+          "value": "192.168.123.131:6166"
+        },
+        {
+          "title": "MBP13",
+          "type": "string",
+          "key": "device.MBP13",
+          "value": "192.168.123.101:6166"
+        },
+        {
+          "title": "Mac",
+          "type": "string",
+          "key": "device.Mac",
+          "value": "192.168.123.100:6166"
+        }
+      ]
+    }
+  ]
+}
