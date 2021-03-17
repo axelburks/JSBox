@@ -3,12 +3,11 @@ IPA 文件安装器
 - 支持文件分享安装
 - 支持主程序运行选择文件安装
 - 安装完成后请返回运行界面选择后续操作
-
-作者联系：https://t.me/axel_burks
 */
 
 var port_number = 8080
 var plist_url = "itms-services://?action=download-manifest&url=https://suisr.coding.net/p/PlistServer/d/PlistServer/git/raw/master/universal_jsbox.plist"
+// var plist_url = "itms-services://?action=download-manifest&url=https://nobyda/install/jsbox"
 
 $app.strings = {
   "en": {
@@ -108,18 +107,12 @@ function install(fileName, file) {
     } else {
       $ui.alert({
         title: "Open itms-services scheme failed",
-        message: "Please contact the author @axel_burks",
-        actions: [{
-          title: "Cancel",
-          style: "Cancel",
-          handler: function() {
-            delayClose(0.2)
-          }
-        },
+        message: "Please rerun the script or restart device",
+        actions: [
         {
           title: "OK",
           handler: function() {
-            $app.openURL("tg://resolve?domain=axel_burks")
+            delayClose(0.2)
           }
         }]
       })
@@ -151,6 +144,3 @@ function delayClose(time) {
       }
     })
 }
-
-
-
