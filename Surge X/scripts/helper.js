@@ -3,12 +3,20 @@ const data = require("data");
 let appData = data.appData;
 
 let funcColor = {
-  true: $color("tint"),
-  false: $color("lightGray")
+  true: $device.isDarkMode ? $color("#157EFB") : $color("tint"),
+  false: $device.isDarkMode ? $color("darkGray") : $color("lightGray")
 };
 
 function findColorKey(obj, value, compare = (a, b) => a.hexCode == b.hexCode) {
   return Object.keys(obj).find(k => compare(obj[k], value)) == "true" ? true : false;
+}
+
+function filterUnrelated(item) {
+  return /iPhone|iPad/i.test(app.device_list[$("deviceTab").index]) && item.platform && item.platform == "Mac" || !/iPhone|iPad/i.test(app.device_list[$("deviceTab").index]) && item.platform && item.platform == "iOS" ? false : true;
+}
+
+async function showProfile() {
+  return await app.surgeController("GET", "profiles_current", "?sensitive=1");
 }
 
 async function groupStat(group, check) {
@@ -96,8 +104,9 @@ async function setFunc(name, status) {
     }
   }
   if (appData[cFuncName].switch) {
-    for (let i = 0; i < appData[cFuncName].switch.length; i++) {
-      await setSwitch(appData[cFuncName].switch[i].name, appData[cFuncName].switch[i].status, appData[cFuncName].switch[i].type);
+    let cSwitchData = appData[name].switch.filter(filterUnrelated);
+    for (let i = 0; i < cSwitchData.length; i++) {
+      await setSwitch(cSwitchData[i].name, cSwitchData[i].status, cSwitchData[i].type);
     }
   }
 }
@@ -110,7 +119,7 @@ async function isFunc(name) {
     }
   }
   if (appData[name].switch) {
-    let cSwitchData = appData[name].switch;
+    let cSwitchData = appData[name].switch.filter(filterUnrelated);
     for (let j = 0; j < cSwitchData.length; j++) {
       if ((await isSwitch(cSwitchData[j].name, cSwitchData[j].type)) != cSwitchData[j].status) return false;
     }
@@ -124,7 +133,7 @@ async function fillDataSource() {
     return { funcButton: { title: item, bgcolor: funcColor[(await isFunc(item))] } }
   }));
 
-  $("switchView").data = await Promise.all(appData["Default"].switch.map(async function (item) {
+  $("switchView").data = await Promise.all(appData["Default"].switch.filter(filterUnrelated).map(async function (item) {
     return {
       switchSwitch: { on: await isSwitch(item.name, item.type), info: { name: item.name, type: item.type } },
       switchLabel: { text: item.label },
@@ -143,6 +152,7 @@ async function fillDataSource() {
 module.exports = {
   funcColor: funcColor,
   findColorKey: findColorKey,
+  showProfile: showProfile,
   groupPolicies: groupPolicies,
   setGroup: setGroup,
   setFunc: setFunc,

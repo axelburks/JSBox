@@ -19,13 +19,19 @@
           "title": "iPhone",
           "type": "string",
           "key": "device.iPhone",
-          "value": "192.168.123.111:6166"
+          "value": "https://remotediag.baidu.com/CD/tmp/infoip.txt:6166"
         },
         {
           "title": "iPad",
           "type": "string",
           "key": "device.iPad",
-          "value": "192.168.123.131:6166"
+          "value": "192.168.123.112:6166"
+        },
+        {
+          "title": "Home",
+          "type": "string",
+          "key": "device.Home",
+          "value": "home.axel.com:6166"
         },
         {
           "title": "MBP13",
@@ -37,7 +43,7 @@
           "title": "Mac",
           "type": "string",
           "key": "device.Mac",
-          "value": "192.168.123.100:6166"
+          "value": "https://remotediag.baidu.com/CD/tmp/info15.txt:6166"
         }
       ]
     }

@@ -3,10 +3,10 @@ exports.appData = {
     group: [
       { name: "Outbound", policy: "rule" },
       { name: "Global", policy: "X-Man" },
-      { name: "X-Man", policy: "🇲🇴 澳门 CTM 01" },
+      { name: "X-Man", policy: "🇭🇰 香港 CC 01" },
       { name: "XCross", policy: "SSID" },
       { name: "", policy: "XCross" },
-      { name: "WiFi-Fall", policy: "MO-CTM" },
+      { name: "WiFi-Fall", policy: "HK-CC" },
       { name: "XGo", policy: "DIRECT" },
       { name: "XDeny", policy: "REJECT" },
     ],
@@ -15,6 +15,9 @@ exports.appData = {
       { name: "🔥 HTTPS", status: false, label: "Https Mod", type: "module" },
       { name: "💊 iTunes", status: false, label: "iTunes Mod", type: "module" },
       { name: "WiFi Access", status: false, label: "Access Mod", type: "module" },
+      { name: "🌀 VIF", status: false, label: "VIF Mod", type: "module", platform: "iOS" },
+      { name: "system_proxy", status: true, label: "OS Proxy", type: "feature", platform: "Mac" },
+      { name: "enhanced_mode", status: false, label: "Enhanced", type: "feature", platform: "Mac" },
     ],
   },
   "Cap All": {

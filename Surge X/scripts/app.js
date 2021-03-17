@@ -59,15 +59,28 @@ function genConfig() {
   prefs_conf = $prefs.all()
   password = $prefs.get("api.pwd")
   device_list = JSON.parse($file.read("prefs.json").string).groups[1].items.map( item => item.key ).map( item => item.replace("device.", "") )
-  current_url = prefs_conf["device." + current_device].replace(/[^:]+(:\d+)/i, '127.0.0.1$1')
+  current_url = prefs_conf["device." + current_device].replace(/.+(:\d+$)/i, '127.0.0.1$1')
 }
 
-function getDeviceURL() {
-  return $("deviceButton").title == current_device ? current_url : prefs_conf["device." + $("deviceButton").title]
+async function getDeviceURL() {
+  // return $("deviceButton").title == current_device ? current_url : prefs_conf["device." + $("deviceButton").title]
+  if ($("deviceTab").index == device_list.indexOf(current_device)) {
+    return current_url
+  } else {
+    var prefs_conf_other_device = prefs_conf["device." + device_list[$("deviceTab").index]]
+    var is_url_regex = /^(https?:\/\/.+)(:\d+)$/
+    if (is_url_regex.test(prefs_conf_other_device)) {
+      prefs_conf_other_device = prefs_conf_other_device.match(is_url_regex)
+      prefs_conf_other_device_ip = (await $http.get(prefs_conf_other_device[1])).data
+      prefs_conf_other_device_port = prefs_conf_other_device[2]
+      prefs_conf_other_device = prefs_conf_other_device_ip + prefs_conf_other_device_port
+    }
+    return prefs_conf_other_device
+  }
 }
 
 async function surgeController(type, feature, info) {
-  let surge_url = "http://" + getDeviceURL() + feature_list[feature]
+  let surge_url = "http://" + $("deviceLabel").text + feature_list[feature]
   let surge_body = null
   // console.log(surge_url)
 
