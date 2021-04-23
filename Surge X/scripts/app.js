@@ -92,6 +92,7 @@ async function surgeController(type, feature, info) {
 
   let surgeData = await $http.request({
     method: type,
+    timeout: 4,
     url: surge_url,
     header: {
       "X-Key": password,
@@ -99,8 +100,12 @@ async function surgeController(type, feature, info) {
     },
     body: surge_body
   });
+  // if (surge_url.match(/system_proxy/)) {
+  //   console.log(surgeData)
+  // }
   // console.log(surgeData)
   if (!surgeData.data) {
+    // console.log(surge_url)
     $ui.error("Error: " + surgeData.error.localizedDescription)
     return false
   }

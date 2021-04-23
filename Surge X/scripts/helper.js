@@ -15,6 +15,11 @@ function filterUnrelated(item) {
   return /iPhone|iPad/i.test(app.device_list[$("deviceTab").index]) && item.platform && item.platform == "Mac" || !/iPhone|iPad/i.test(app.device_list[$("deviceTab").index]) && item.platform && item.platform == "iOS" ? false : true;
 }
 
+function hiddenUnnecesFunc(item) {
+  let unnecesFuncRegex = new RegExp("^All$|^Default-(?!" + app.device_list[$("deviceTab").index] + ")");
+  return !item.match(unnecesFuncRegex);
+}
+
 async function showProfile() {
   return await app.surgeController("GET", "profiles_current", "?sensitive=1");
 }
@@ -58,7 +63,9 @@ async function setGroup(group, sel) {
 }
 
 async function setModule(name, status) {
+  $("loadingView").start();
   await app.surgeController("POST", "modules", { [name]: status });
+  await $wait(1);
 }
 
 async function isModule(name) {
@@ -72,9 +79,9 @@ async function setFeature(name, status) {
 }
 
 async function isFeature(name) {
-  let captureStat = await app.surgeController("GET", name, "");
-  let enabledCapture = captureStat.enabled;
-  return enabledCapture;
+  let featureStat = await app.surgeController("GET", name, "");
+  let enabledFeature = featureStat.enabled;
+  return enabledFeature;
 }
 
 async function setSwitch(name, status, type) {
@@ -97,7 +104,9 @@ async function isSwitch(name, type) {
 }
 
 async function setFunc(name, status) {
-  let cFuncName = status ? name : "Default";
+  let defaultFuncName = "Default-" + app.device_list[$("deviceTab").index];
+  name = name == "Default" ? defaultFuncName : name;
+  let cFuncName = status ? name : defaultFuncName;
   if (appData[cFuncName].group) {
     for (let i = 0; i < appData[cFuncName].group.length; i++) {
       await setGroup(appData[cFuncName].group[i].name, appData[cFuncName].group[i].policy);
@@ -129,18 +138,18 @@ async function isFunc(name) {
 
 async function fillDataSource() {
   $("loadingView").start();
-  $("funcView").data = await Promise.all(Object.keys(appData).map(async function (item) {
-    return { funcButton: { title: item, bgcolor: funcColor[(await isFunc(item))] } }
+  $("funcView").data = await Promise.all(Object.keys(appData).filter(hiddenUnnecesFunc).map(async function (item) {
+    return { funcButton: { title: item.match(/^Default-/) ? "Default" : item, bgcolor: funcColor[(await isFunc(item))] } }
   }));
 
-  $("switchView").data = await Promise.all(appData["Default"].switch.filter(filterUnrelated).map(async function (item) {
+  $("switchView").data = await Promise.all(appData["All"].switch.filter(filterUnrelated).map(async function (item) {
     return {
       switchSwitch: { on: await isSwitch(item.name, item.type), info: { name: item.name, type: item.type } },
       switchLabel: { text: item.label },
     }
   }));
 
-  $("selectView").data = await Promise.all(appData["Default"].group.map(async function (item) {
+  $("selectView").data = await Promise.all(appData["All"].group.map(async function (item) {
     return {
       selectLabel: { text: item.name },
       selectButton: { title: await groupStat(item.name), info: item.name },

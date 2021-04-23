@@ -19,7 +19,7 @@
           "title": "iPhone",
           "type": "string",
           "key": "device.iPhone",
-          "value": "https://remotediag.baidu.com/CD/tmp/infoip.txt:6166"
+          "value": "iphone.axel.com:6166"
         },
         {
           "title": "iPad",
@@ -43,7 +43,7 @@
           "title": "Mac",
           "type": "string",
           "key": "device.Mac",
-          "value": "https://remotediag.baidu.com/CD/tmp/info15.txt:6166"
+          "value": "mbp.axel.com:6166"
         }
       ]
     }
