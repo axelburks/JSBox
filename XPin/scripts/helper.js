@@ -50,7 +50,7 @@ function runLongAction(action) {
   }
 
   if (_hasPrefix(pattern, "eudic://dict")) {
-    $app.openURL("http://fanyi.baidu.com/#en/zh/" + replacement);
+    $app.openURL("http://fanyi.baidu.com/#auto/en/" + replacement);
     return;
   }
 
