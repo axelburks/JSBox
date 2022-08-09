@@ -2,7 +2,7 @@ exports.appData = {
   "All": {
     group: [
       { name: "Outbound", policy: "rule" },
-      { name: "Global", policy: "X-Man" },
+      // { name: "Global", policy: "X-Man" },
       { name: "X-Man", policy: "🇭🇰 香港 CC 01" },
       { name: "XCross", policy: "SSID" },
       { name: "", policy: "XCross" },
@@ -23,7 +23,7 @@ exports.appData = {
   "Default-iPhone": {
     group: [
       { name: "Outbound", policy: "rule" },
-      { name: "Global", policy: "X-Man" },
+      // { name: "Global", policy: "X-Man" },
       { name: "X-Man", policy: "🇭🇰 香港 CC 01" },
       { name: "XCross", policy: "SSID" },
       { name: "", policy: "XCross" },
@@ -42,7 +42,7 @@ exports.appData = {
   "Default-iPad": {
     group: [
       { name: "Outbound", policy: "rule" },
-      { name: "Global", policy: "X-Man" },
+      // { name: "Global", policy: "X-Man" },
       { name: "X-Man", policy: "🇭🇰 香港 CC 01" },
       { name: "XCross", policy: "SSID" },
       { name: "", policy: "XCross" },
@@ -61,7 +61,7 @@ exports.appData = {
   "Default-Home": {
     group: [
       { name: "Outbound", policy: "rule" },
-      { name: "Global", policy: "X-Man" },
+      // { name: "Global", policy: "X-Man" },
       { name: "X-Man", policy: "🇭🇰 香港 CC 01" },
       { name: "XCross", policy: "SSID" },
       { name: "", policy: "XCross" },
@@ -81,7 +81,7 @@ exports.appData = {
   "Default-MBP13": {
     group: [
       { name: "Outbound", policy: "rule" },
-      { name: "Global", policy: "X-Man" },
+      // { name: "Global", policy: "X-Man" },
       { name: "X-Man", policy: "🇭🇰 香港 CC 01" },
       { name: "XCross", policy: "SSID" },
       { name: "", policy: "XCross" },
@@ -101,7 +101,7 @@ exports.appData = {
   "Default-Mac": {
     group: [
       { name: "Outbound", policy: "rule" },
-      { name: "Global", policy: "X-Man" },
+      // { name: "Global", policy: "X-Man" },
       { name: "X-Man", policy: "🇭🇰 香港 CC 01" },
       { name: "XCross", policy: "SSID" },
       { name: "", policy: "XCross" },
