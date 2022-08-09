@@ -1,41 +1,63 @@
-# JSBox
+# JSBox Apps
+Apps by Axel Burks on JSBox.
 
-# Installation
-npm install -g jsbox-cli-plus
-npm install -g jsbox-logger
+## What's JSBox?
+JSBox is an Integrated Development Environment for JavaScript. You can learn to code JavaScript here, as we provide tons of utilities to enhance the development experience.
 
-JSBox 引入模块
-将socketLogger.js(https://github.com/Fndroid/jsbox_pc_debuger/raw/master/jsboxModule/socketLogger.js)导入JSBox的脚本模块下（方便下次使用）
+## Apps
+| Name  |  Notes | Installation  |
+|---|---|---|
+| Extract Scheme | Extract URL Scheme from ipa file  |   |
+| iTunes Utilities | Some useful utilities for apple contents, such as price history, get verison id, get icon or screenshots, search for more area stores, search iPhone/iPad/Mac/AppleTV apps  |   |
+| Magic Launcher | Launch apps from wieget or in jsbox  |   |
+| Preview | Preview share contents with extension  |   |
+| Schedule Message | Send message in schedule  |   |
+| Surge X | Surge Controller for Surge  |   |
+| Time | Show current time with style hh:mm:ss  |   |
+| XPin | Clipboard Manager with action support  |   |
+| Boom | Quickly input keyboard extension  |   |
+| Clip Editor | Clip Editor with advanced action and syntax  |   |
+| Downloader | A file downloader on iOS  |   |
+| Emoji | Search or show emoji with words  |   |
+| Installer | JSBox scripts installler  |   |
+| IPA Installer | Tool for installing ipa on iOS  |   |
+| Pushbullet | Pushbullet Client with extension and widget support  |   |
+| Search Tweets | Tweet advanced search tool  |   |
+| Shorten | Shorten URL  |   |
+| SM.MS | Upload pics to smms  |   |
+| Thunder | Download files in Thunder  |   |
+| Tool Box | JSBox scripts manager  |   |
+| Weico | Transfer webo link between webo and weico style  |   |
+| XQRcode | Generate and recognize qrcode with camera and share extension  |   |
 
-# Getting Started
+# Devlepment
+## Installation
+- [jsbox-cli-plus](https://github.com/Fndroid/jsbox-cli-plus): Another CLI version of JSBox VSCode extension
+- [jsbox_pc_debuger](https://github.com/Fndroid/jsbox_pc_debuger): JSBox logging utility on your PC
 
-## 设置手机端 Host IP
+## Settings
+```sh
+# set jsbox host
+jsbox set 192.168.1.1
 
-$ jsbox set 192.168.1.1
-查看当前的 Host IP
+# show current host
+jsbox host
 
-$ jsbox host
-监听一个目录或文件
+# watch a file or dir
+jsbox watch
+jsbox watch ./dist
+jsbox watch ./index.js
 
-## 监听当前目录
-$ jsbox watch
+# watch current dir and log to chrome
+jsbox watch --logger
+jsbox watch -l
 
-## 监听当前目录并输出日志到 Chrome
-$ jsbox watch --logger
-$ jsbox watch -l
+# build current dir, and output to .output
+jsbox build
 
-## 监听指定目录
-$ jsbox watch ./dist
+# build to specified dir
+jsbox build ./dist
 
-## 监听指定文件
-$ jsbox watch ./index.js
-构建一个 JSBox 应用
-
-## 构建当前目录, 默认生成到 .output
-$ jsbox build
-
-## 构建指定目录
-$ jsbox build ./dist
-
-## 自定义输出路径
-$ jsbox build ./dist -o ./dist/output.box
+# build to specified dir and file
+jsbox build ./dist -o ./dist/output.box
+```

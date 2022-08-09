@@ -2,6 +2,7 @@ var entities = [
   { name: $l10n("SOFTWARE"), code: "software" },
   { name: $l10n("IPAD"), code: "iPadSoftware" },
   { name: $l10n("MACOS"), code: "macSoftware" },
+  { name: $l10n("TVOS"), code: "tvSoftware" },
   { name: $l10n("MUSIC"), code: "musicTrack" },
   { name: $l10n("MOVIE"), code: "movie" },
   { name: $l10n("PODCAST"), code: "podcast" },
@@ -41,5 +42,5 @@ module.exports = {
   entities: entities,
   countries: countries,
   currencies: currencies,
-  langs, langs
+  langs: langs
 }

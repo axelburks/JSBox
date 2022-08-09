@@ -80,7 +80,7 @@ async function getDeviceURL() {
 }
 
 async function surgeController(type, feature, info) {
-  let surge_url = "http://" + $("deviceLabel").text + feature_list[feature]
+  let surge_url = "https://" + $("deviceLabel").text + feature_list[feature]
   let surge_body = null
   // console.log(surge_url)
 

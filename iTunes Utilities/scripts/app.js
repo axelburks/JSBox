@@ -43,7 +43,7 @@ function showActions(index) {
 
   var items = []
 
-  if (entity.code.match(/software|iPadSoftware|macSoftware/)) {
+  if (entity.code.match(/software|iPadSoftware|macSoftware|tvSoftware/)) {
     items = [ACTIONS.GET_ICON, ACTIONS.GET_SCREENSHOTS, ACTIONS.SHOW_DETAILS, ACTIONS.OPEN_APP_STORE, ACTIONS.TRANSLATE, ACTIONS.RSS_LINK, ACTIONS.APP_PREVIEW]
     if (entity.code.match(/^software|iPadSoftware/)) {
       items.splice(5, 0, ACTIONS.APP_VERSIONID)
