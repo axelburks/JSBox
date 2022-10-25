@@ -40,6 +40,14 @@ npm i -g jsbox-cli-plus
 ```bash
 npm i -g jsbox-logger
 ```
+- [hpagent](https://github.com/delvedor/hpagent): Http and https agent for [got](https://github.com/sindresorhus/got) used in [jsbox-cli-plus](https://github.com/Fndroid/jsbox-cli-plus)
+```bash
+npm i -g hpagent
+# remove ip style restriction
+sed -i 's#!net.isIP(hostIP)#1 == 2#' /opt/homebrew/lib/node_modules/jsbox-cli-plus/dist/index.js
+# add proxy support
+sed -i 's#const got = require("got");#const got = require("got");\nconst { HttpProxyAgent } = require("hpagent")\nconst agent = new HttpProxyAgent({ proxy: process.env.http_proxy || process.env.HTTP_PROXY })#;s#got.post(`http://${host}/upload`, {#got.post(`http://${host}/upload`, {\n        agent: agent,#' /opt/homebrew/lib/node_modules/jsbox-cli-plus/dist/actions.js
+```
 
 ## Settings
 ```sh

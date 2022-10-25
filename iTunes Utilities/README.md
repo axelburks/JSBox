@@ -1,10 +1,10 @@
 # iTunes Utilities
 
-在钟大的 itunes-search 脚本基础上修改增强
+在 [cyanzhong](https://github.com/cyanzhong) 的 [itunes-search](https://github.com/cyanzhong/xTeko/blob/master/extension-scripts/itunes-search.box) 基础上修改增强
 
 - 增加扩展运行方式
 - 增加多媒体类型的分享
-- 增加 macOS、iPad 分类
+- 增加 macOS、iPad、tvOS 分类
 - 增加 App 今日推荐壁纸下载
 - 增加 Version ID 获取(用于查询下载旧版)
 - 增加应用描述和更新翻译(Google API + 链接可点击)
