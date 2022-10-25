@@ -33,7 +33,13 @@ JSBox is an Integrated Development Environment for JavaScript. You can learn to 
 # Devlepment
 ## Installation
 - [jsbox-cli-plus](https://github.com/Fndroid/jsbox-cli-plus): Another CLI version of JSBox VSCode extension
+```bash
+npm i -g jsbox-cli-plus
+```
 - [jsbox_pc_debuger](https://github.com/Fndroid/jsbox_pc_debuger): JSBox logging utility on your PC
+```bash
+npm i -g jsbox-logger
+```
 
 ## Settings
 ```sh

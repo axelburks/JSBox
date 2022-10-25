@@ -10,6 +10,7 @@ var entities = [
 
 var countries = [
   { name: "🇺🇸 US", code: "us" },
+  { name: "🇹🇷 TR", code: "tr" },
   { name: "🇨🇳 CN", code: "cn" },
   { name: "🇭🇰 HK", code: "hk" },
   { name: "🇬🇧 UK", code: "gb" },
@@ -20,6 +21,7 @@ var countries = [
 
 var currencies = {
   "us" : "$",
+  "tr" : "₺",
   "cn" : "￥",
   "hk" : "$",
   "gb" : "$",
@@ -30,6 +32,7 @@ var currencies = {
 
 var langs = {
   "us" : "en",
+  "tr" : "en",
   "cn" : "zh-Hans-CN",
   "hk" : "en",
   "gb" : "en",

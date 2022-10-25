@@ -1,15 +1,14 @@
 function getIcon(item) {
   showDownloading()
-  if ($app.env == $env.action) {
-    savePic(item.artworkUrl100.replaceAll("100x100", "1024x1024")).then(function (data) {
-      if (data) {
-        $ui.toast("Saved Success!", 1)
+  savePic(item.artworkUrl100.replaceAll("100x100", "1024x1024")).then(function (data) {
+    if (data) {
+      $ui.toast("Saved Success!", 1)
+      if ($app.env == $env.action) {
         delayClose(0.6)
       }
-    })
-  } else {
-    $quicklook.open({ url: item.artworkUrl100.replaceAll("100x100", "1024x1024") })
-  }
+    }
+  })
+
 }
 
 function getScreenshots(item) {

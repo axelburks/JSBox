@@ -5,18 +5,18 @@ var helper = require("scripts/helper")
 var entities = constants.entities
 var countries = constants.countries
 var entity = entities[0]
-var country = countries[0].code
+var country = countries[2].code
 
 function init() {
   render()
   var link = $context.link || $context.text
-  if (link && link.match(/(itunes|apps)\.apple\.com\/[a-z]+\/app\/?.*?\/id(\d+).*?(mt=\d+)?/)) {
-    var result = link.match(/(itunes|apps)\.apple\.com\/([a-z]+)\/app\/?.*?\/id(\d+).*?(mt=\d+)?/)
-    country = result[2]
-    var appid = result[3]
+  if (link && link.match(/(itunes|apps)\.apple\.com\/(([a-z]+)\/)?app\/?.*?\/id(\d+).*?(mt=\d+)?/)) {
+    var result = link.match(/(itunes|apps)\.apple\.com\/(([a-z]+)\/)?app\/?.*?\/id(\d+).*?(mt=\d+)?/)
+    country = result[3] ? result[3] : country
+    var appid = result[4]
     var search_url = `https://itunes.apple.com/lookup?id=${appid}&country=${country}`
     fetchData(search_url).then(function(data){
-      showActions(data)
+      showActions(data, null, country)
     })
   } else if (link && link.match(/(itunes|apps)\.apple\.com\/[a-z]+\/story\/?.*?\/id(\d+)/)) {
     var html = ""
@@ -95,7 +95,7 @@ function processHtml(html) {
   }
 }
 
-function showActions(data, wallpaper) {
+function showActions(data, wallpaper, country) {
 
   const ACTIONS = {
     GET_ICON: $l10n("GET_ICON"),
@@ -113,6 +113,7 @@ function showActions(data, wallpaper) {
     OPEN_ARTIST_VIEW: $l10n("OPEN_ARTIST_VIEW"),
     OPEN_TRACK_VIEW: $l10n("OPEN_TRACK_VIEW"),
     OPEN_PREVIEW: $l10n("OPEN_PREVIEW"),
+    CURRENT_AREA: $l10n("CURRENT_AREA") + countries.filter(function(ct) { return ct.code === country })[0].name,
   }
 
   var items = []
@@ -130,6 +131,7 @@ function showActions(data, wallpaper) {
     } else if (data.ipadScreenshotUrls && data.ipadScreenshotUrls.length > 0) {
       items.splice(2, 0, ACTIONS.GET_IPAD_SCREENSHOTS)
     }
+    items.push(ACTIONS.CURRENT_AREA)
   } else if (entity.code === "podcast") {
     items = [ACTIONS.GET_ICON, ACTIONS.SHOW_DETAILS, ACTIONS.SHARE_MEDIA]
   } else if (entity.code === "album") {
@@ -176,6 +178,14 @@ function showActions(data, wallpaper) {
       helper.openTrackView(item)
     } else if (action === ACTIONS.OPEN_PREVIEW) {
       helper.openPreview(item)
+    } else if (action === ACTIONS.CURRENT_AREA) {
+      $ui.menu({
+        items: countries.map(function(item) { return item.name }),
+        handler: function(title, idx) {
+          country = countries[idx].code
+          showActions(data, wallpaper, country)
+        }
+      })
     }
   }
 
@@ -214,7 +224,7 @@ function render() {
         layout: function(make, view) {
           make.centerX.equalTo(view.super)
           make.top.equalTo($("conTitle").bottom).offset(10)
-          make.size.equalTo($size(150, 150))
+          make.size.equalTo($size(100, 100))
         }
       },
       {
