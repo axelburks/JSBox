@@ -10,6 +10,14 @@ function runLongAction(action) {
 
   pattern = pattern.replace("%@", replacement);
 
+  if (_hasPrefix(pattern, "baidumap_webview_url")) {
+    if (_hasPrefix(clipText, "baidumap://map/cost_share")) {
+      $app.openURL(clipText.replace("baidumap://", "baidumapbeta://"));
+    } else {
+      $app.openURL(`baidumapbeta://map/cost_share?url=${encodeURIComponent(clipText)}&popRoot=no&mode=NORMAL_MODE&needLocation=yes&src=webapp.cost_share.nationalActivity.autojump&transparentWeb=0&navigationStatus=2&hiddenBackBtn=0&hiddenTitle=1`);
+    }
+  }
+
   if (_hasPrefix(pattern, "pushbullet")) {
     let tgpmbot_url = "";
     $file.exists("tgpmbot.txt") && $file.read("tgpmbot.txt").string && (tgpmbot_url = $file.read("tgpmbot.txt").string.replace(/(\r|\n)/gi, ""));
@@ -96,6 +104,18 @@ function runAction(action) {
     replacement = action.noenc ? clipText : encodeURIComponent(clipText);
 
   pattern = pattern.replace("%@", replacement);
+
+  if (_hasPrefix(pattern, "refresh")) {
+    $addin.replay()
+  }
+
+  if (_hasPrefix(pattern, "baidumap_webview_url")) {
+    if (_hasPrefix(clipText, "baidumap://map/cost_share")) {
+      $app.openURL(clipText);
+    } else {
+      $app.openURL(`baidumap://map/cost_share?url=${encodeURIComponent(clipText)}&popRoot=no&mode=NORMAL_MODE&needLocation=yes&src=webapp.cost_share.nationalActivity.autojump&transparentWeb=0&navigationStatus=2&hiddenBackBtn=0&hiddenTitle=1`);
+    }
+  }
 
   if (_hasPrefix(pattern, "pushbullet")) {
     var pb = require("./plugins/pushbullet");

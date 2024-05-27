@@ -3,6 +3,14 @@
     "name": "自用模块",
     "items": [
       {
+        "name": "获取剪贴板/刷新界面",
+        "pattern": "refresh"
+      },
+      {
+        "name": "百度地图内链接",
+        "pattern": "baidumap_webview_url"
+      },
+      {
         "name": "Pushbullet/PushMoreBot",
         "pattern": "pushbullet"
       },
