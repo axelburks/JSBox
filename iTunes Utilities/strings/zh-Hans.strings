@@ -9,6 +9,7 @@
 "PODCAST" = "🎙";
 "SEARCH" = "搜索";
 "GET_ICON" = "🔮 获取图标";
+"GET_ICON_LINK" = "🔗 获取图标链接";
 "GET_SCREENSHOTS" = "🎴 获取截图";
 "GET_IPAD_SCREENSHOTS" = "🗾 获取 iPad 截图";
 "GET_TODAY_WALLPAPER" = "🌄 获取今日推荐墙纸";
@@ -29,3 +30,4 @@
 "RSS_UPDATE" = "应用更新";
 "RSS_PRICE" = "价格更新";
 "RSS_INAPP" = "内购价格更新";
+"GET_ITMS_LINK" = "🔗 获取 itms 链接";

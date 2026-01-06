@@ -1,8 +1,17 @@
-function getIcon(item) {
+function getIcon(item, link=false) {
+  if (link == true) {
+    $clipboard.text = item.artworkUrl100;
+    $ui.toast("Copied Success!", 1)
+    if ($app.env == $env.action) {
+      $context.close()
+    }
+    $app.close()
+  }
   showDownloading()
   savePic(item.artworkUrl100.replaceAll("100x100", "1024x1024")).then(function (data) {
     if (data) {
       $ui.toast("Saved Success!", 1)
+      //$app.openURL("shortcuts://run-shortcut?name=Iconfy&input=text&text=1");
       if ($app.env == $env.action) {
         delayClose(0.6)
       }
@@ -163,6 +172,13 @@ function showDetails(item) {
   }
 }
 
+function getITMSLink(item) {
+  let itmsLink = `itms://itunes.apple.com/app/id${item.trackId}`;
+  $clipboard.text = itmsLink;
+  $ui.toast(`Copied: ${itmsLink}`);
+  delayClose(1);
+}
+
 function genRSSHubURL(country, type, item) {
   $ui.menu({
     items: [$l10n("RSS_UPDATE"), $l10n("RSS_PRICE"), $l10n("RSS_INAPP")],
@@ -297,6 +313,7 @@ module.exports = {
   showDetails: showDetails,
   showPreview: showPreview,
   showVersionID: showVersionID,
+  getITMSLink: getITMSLink,
   genRSSHubURL: genRSSHubURL,
   shareMedia: shareMedia,
   openAppStore: openAppStore,

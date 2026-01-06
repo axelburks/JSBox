@@ -2,10 +2,10 @@ function init(item) {
   let helper = require("scripts/helper")
   $ui.loading(true)
   $http.get({
-    url: `https://api.unlimapps.com/v1/apple_apps/${item.trackId}/versions`,
+    url: `https://apis.bilin.eu.org/history/${item.trackId}`,
     handler: function(resp) {
       $ui.loading(false)
-      let data = resp.data
+      let data = resp.data.data
       let dic = {}
       let time_list = []
       for (let i = 0; i < data.length; i++) {

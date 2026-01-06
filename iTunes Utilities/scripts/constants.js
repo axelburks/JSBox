@@ -9,14 +9,14 @@ var entities = [
 ]
 
 var countries = [
-  { name: "🇺🇸 US", code: "us" },
-  { name: "🇹🇷 TR", code: "tr" },
   { name: "🇨🇳 CN", code: "cn" },
   { name: "🇭🇰 HK", code: "hk" },
+  { name: "🇺🇸 US", code: "us" },
   { name: "🇬🇧 UK", code: "gb" },
   { name: "🇯🇵 JP", code: "jp" },
   { name: "🇦🇺 AU", code: "au" },
-  { name: "🇳🇿 NZ", code: "nz" }
+  { name: "🇳🇿 NZ", code: "nz" },
+  { name: "🇹🇷 TR", code: "tr" },
 ]
 
 var currencies = {

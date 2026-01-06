@@ -9,6 +9,7 @@
 "PODCAST" = "🎙";
 "SEARCH" = "Search";
 "GET_ICON" = "🔮 Get Icon";
+"GET_ICON_LINK" = "🔗 Get Icon Link";
 "GET_SCREENSHOTS" = "🎴 Get Screenshots";
 "GET_IPAD_SCREENSHOTS" = "🗾 Get iPad Screenshots";
 "GET_TODAY_WALLPAPER" = "🌄 Get Today Wallpaper";
@@ -29,3 +30,4 @@
 "RSS_UPDATE" = "Update";
 "RSS_PRICE" = "App Price";
 "RSS_INAPP" = "In-App Purchase";
+"GET_ITMS_LINK" = "🔗 Get itms Link";

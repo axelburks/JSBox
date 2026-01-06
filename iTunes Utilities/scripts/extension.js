@@ -5,7 +5,7 @@ var helper = require("scripts/helper")
 var entities = constants.entities
 var countries = constants.countries
 var entity = entities[0]
-var country = countries[2].code
+var country = countries[0].code
 
 function init() {
   render()
@@ -99,6 +99,7 @@ function showActions(data, wallpaper, country) {
 
   const ACTIONS = {
     GET_ICON: $l10n("GET_ICON"),
+    GET_ICON_LINK: $l10n("GET_ICON_LINK"),
     GET_SCREENSHOTS: $l10n("GET_SCREENSHOTS"),
     GET_IPAD_SCREENSHOTS: $l10n("GET_IPAD_SCREENSHOTS"),
     GET_TODAY_WALLPAPER: $l10n("GET_TODAY_WALLPAPER"),
@@ -106,6 +107,7 @@ function showActions(data, wallpaper, country) {
     APP_PREVIEW: $l10n("APP_PREVIEW"),
     APP_VERSIONID: $l10n("APP_VERSIONID"),
     RSS_LINK: $l10n("RSS_LINK"),
+    GET_ITMS_LINK: $l10n("GET_ITMS_LINK"),
     TRANSLATE: $l10n("TRANSLATE"),
     SHARE_MEDIA: $l10n("SHARE_MEDIA"),
     OPEN_APP_STORE: $l10n("OPEN_APP_STORE"),
@@ -119,7 +121,7 @@ function showActions(data, wallpaper, country) {
   var items = []
 
   if (entity.code.match(/software|iPadSoftware|macSoftware/)) {
-    items = [ACTIONS.GET_ICON, ACTIONS.GET_SCREENSHOTS, ACTIONS.SHOW_DETAILS, ACTIONS.TRANSLATE, ACTIONS.RSS_LINK, ACTIONS.APP_PREVIEW]
+    items = [ACTIONS.GET_ICON, ACTIONS.GET_ICON_LINK, ACTIONS.GET_SCREENSHOTS, ACTIONS.SHOW_DETAILS, ACTIONS.TRANSLATE, ACTIONS.RSS_LINK, ACTIONS.APP_PREVIEW, ACTIONS.GET_ITMS_LINK]
     if (entity.code.match(/^software|iPadSoftware/)) {
       items.splice(4, 0, ACTIONS.APP_VERSIONID)
     }
@@ -129,7 +131,7 @@ function showActions(data, wallpaper, country) {
     if (data == null && wallpaper) {
       items = [ACTIONS.GET_TODAY_WALLPAPER]
     } else if (data.ipadScreenshotUrls && data.ipadScreenshotUrls.length > 0) {
-      items.splice(2, 0, ACTIONS.GET_IPAD_SCREENSHOTS)
+      items.splice(3, 0, ACTIONS.GET_IPAD_SCREENSHOTS)
     }
     items.push(ACTIONS.CURRENT_AREA)
   } else if (entity.code === "podcast") {
@@ -144,7 +146,9 @@ function showActions(data, wallpaper, country) {
     var item = data
     if (action === ACTIONS.GET_ICON) {
       helper.getIcon(item)
-    } else if (action === ACTIONS.GET_SCREENSHOTS) {
+    } else if (action === ACTIONS.GET_ICON_LINK) {
+       helper.getIcon(item, true)
+     } else if (action === ACTIONS.GET_SCREENSHOTS) {
       helper.getScreenshots(item)
     } else if (action === ACTIONS.GET_IPAD_SCREENSHOTS) {
       helper.getIpadScreenshots(item)
@@ -156,6 +160,8 @@ function showActions(data, wallpaper, country) {
       helper.showPreview(item, country)
     } else if (action === ACTIONS.APP_VERSIONID) {
       helper.showVersionID(item)
+    } else if (action === ACTIONS.GET_ITMS_LINK) {
+      helper.getITMSLink(item)
     } else if (action === ACTIONS.RSS_LINK) {
       if (entity.code.match(/software|iPadSoftware/)) {
         helper.genRSSHubURL(country, "iOS", item);
